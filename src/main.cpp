@@ -2,13 +2,8 @@
 #include <math.h>
 #include <vector>
 
-#include "edge/edge_parameter.h"
 #include "edge/output_edge.h"
-#include "node/act_loss_node.h"
-#include "node/activation_node.h"
-#include "node/node_parameter.h"
-#include "node/sigmoid_node.h"
-#include "node/sigmoid_l2_node.h"
+#include "node/node_factory.h"
 #include "utility/common.h"
 #include "utility/random.h"
 
@@ -24,9 +19,9 @@ int main() {
   node_param2.dims.push_back(1);
 
   NodeSPtr<float> node1_ptr;
-  node1_ptr = make_shared<SigmoidNode<float>>(node_param1);
-  OutputNodeSPtr<float> node2_ptr;
-  node2_ptr = make_shared<SigL2Node<float>>(node_param2);
+  node1_ptr = NodeFactory<float>::Instantiate("SigmoidNode_f", node_param1);
+  NodeSPtr<float> node2_ptr;
+  node2_ptr = NodeFactory<float>::Instantiate("SigL2Node_f", node_param2);
 
   struct EdgeParameter<float> edge_param1;
   edge_param1.id = 0;
@@ -41,11 +36,6 @@ int main() {
   node1_ptr->GetActivationPtr()->array() << 0, 1;
   edge_ptr->Forward();
   node2_ptr->PrintAct();
-  
-  
-
-
-
 
   return 0;
 }

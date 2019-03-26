@@ -31,7 +31,7 @@ namespace intellgraph {
 template <class T>
 class ActivationNode : public Node<T> {
  public:
-  explicit ActivationNode(const struct NodeParameter& node_param,
+  explicit ActivationNode(const NodeParameter& node_param,
                            std::function<T(T)> act_function_ptr,
                            std::function<T(T)> act_prime_ptr);
 
