@@ -28,7 +28,7 @@ namespace intellgraph {
 template <class T>
 class SigmoidNode : public Node<T> {
  public:
-  explicit SigmoidNode(const struct NodeParameter& node_param);
+  explicit SigmoidNode(const NodeParameter& node_param);
 
   ~SigmoidNode() {}
 

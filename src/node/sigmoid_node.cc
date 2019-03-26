@@ -18,7 +18,7 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-SigmoidNode<T>::SigmoidNode(const struct NodeParameter& node_param)
+SigmoidNode<T>::SigmoidNode(const NodeParameter& node_param)
       : node_param_(node_param) {
     activation_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);
     delta_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);

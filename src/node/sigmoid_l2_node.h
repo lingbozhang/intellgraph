@@ -30,7 +30,7 @@ namespace intellgraph {
 template<class T>
 class SigL2Node : public OutputNode<T> {
  public:
-  explicit SigL2Node(const struct NodeParameter& node_param);
+  explicit SigL2Node(const NodeParameter& node_param);
 
   ~SigL2Node() {}
 

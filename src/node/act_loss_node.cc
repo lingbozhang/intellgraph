@@ -18,7 +18,7 @@ namespace intellgraph {
 
 template <class T>
 ActLossNode<T>::ActLossNode(
-    const struct NodeParameter& node_param,
+    const NodeParameter& node_param,
     std::function<T(T)> act_function_ptr,
     std::function<T(T)> act_prime_ptr,
     std::function<T(MatXXSPtr<T>, MatXXSPtr<T>)> loss_function_ptr,

@@ -17,7 +17,7 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-ActivationNode<T>::ActivationNode(const struct NodeParameter& node_param,
+ActivationNode<T>::ActivationNode(const NodeParameter& node_param,
                                   std::function<T(T)> act_function_ptr,
                                   std::function<T(T)> act_prime_ptr)
       : node_param_(node_param), act_function_ptr_(act_function_ptr),
