@@ -46,8 +46,6 @@ void OutputEdge<T>::PrintNablaWeight() const {
 
 template <class T>
 void OutputEdge<T>::Forward() {
-  //in_node_ptr_->CallActFxn();
-  
   MatXXSPtr<T> weighted_sum_ptr = std::make_shared<MatXX<T>>(
       weight_ptr_->transpose() * in_node_ptr_->GetActivationPtr()->matrix() + \
       out_node_ptr_->GetBiasPtr()->matrix());
@@ -57,7 +55,6 @@ void OutputEdge<T>::Forward() {
 
 template <class T>
 void OutputEdge<T>::Backward() {
-  //in_node_ptr_->CallActFxn();
   // $\nabla W^{l}=a^{l-1}(\delta^{l})^T$
   nabla_weight_ptr_->matrix() = in_node_ptr_->GetActivationPtr()->matrix() * \
                                 out_node_ptr_->GetDeltaPtr()->transpose();

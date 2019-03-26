@@ -42,10 +42,6 @@ int main() {
   edge_ptr->Forward();
   node2_ptr->PrintAct();
   
-  
-
-
-
 
   return 0;
 }
