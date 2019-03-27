@@ -7,7 +7,6 @@
 #include "utility/common.h"
 #include "utility/random.h"
 
-#include "boost/graph/adjacency_list.hpp"
 
 using namespace std;
 using namespace intellgraph;
