@@ -46,8 +46,6 @@ void DenseEdge<T>::PrintNablaWeight() const {
 
 template <class T>
 void DenseEdge<T>::Forward() {
-  //in_node_ptr_->CallActFxn();
-  
   MatXXSPtr<T> weighted_sum_ptr = std::make_shared<MatXX<T>>(
       weight_ptr_->transpose() * in_node_ptr_->GetActivationPtr()->matrix() + \
       out_node_ptr_->GetBiasPtr()->matrix());
