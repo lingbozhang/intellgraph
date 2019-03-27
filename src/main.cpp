@@ -2,10 +2,12 @@
 #include <math.h>
 #include <vector>
 
-#include "edge/output_edge.h"
+#include "edge/edge_factory.h"
 #include "node/node_factory.h"
 #include "utility/common.h"
 #include "utility/random.h"
+
+#include <boost/graph/adjacency_list.hpp>
 
 using namespace std;
 using namespace intellgraph;
@@ -30,8 +32,8 @@ int main() {
   edge_param1.in_node_ptr = node1_ptr;
   edge_param1.out_node_ptr = node2_ptr;
 
-  OutputEdgeSPtr<float> edge_ptr;
-  edge_ptr = make_shared<OutputEdge<float>>(edge_param1);
+  EdgeSPtr<float> edge_ptr;
+  edge_ptr = EdgeFactory<float>::Instantiate("DenseEdge_f", edge_param1);
   edge_ptr->GetWeightPtr()->array() << -2, -2;
   node2_ptr->GetBiasPtr()->array() << 3;
 

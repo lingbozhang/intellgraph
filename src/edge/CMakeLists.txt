@@ -5,7 +5,7 @@ project(edge)
 file(GLOB edge_source *.cpp)
 file(GLOB edge_header *.h)
 
-add_library(edge SHARED STATIC dense_edge.cc output_edge.cc)
+add_library(edge SHARED STATIC dense_edge.cc)
 
 
 install(TARGETS edge DESTINATION ${INTELLGRAPH_INSTALL_LIB_DIR})

@@ -18,70 +18,59 @@ Contributor(s):
 #include <functional>
 #include <unordered_map>
 
-
-
-#include "node/activation_node.h"
-#include "node/act_loss_node.h"
-#include "node/node.h"
-#include "node_parameter.h"
-#include "node/sigmoid_node.h"
-#include "node/sigmoid_l2_node.h"
+#include "edge/dense_edge.h"
+#include "edge/edge.h"
+#include "edge/edge_parameter.h"
 #include "utility/common.h"
 
 namespace intellgraph {
-// A Factory design pattern, NodeFactory is used to instantiate corresponding
-// node object.
+// A Factory design pattern, EdgeFactory is used to instantiate corresponding
+// edge object.
 template <class T>
-using NodeFunctor = std::function<NodeSPtr<T>(const NodeParameter&)>;
+using EdgeFunctor = std::function<EdgeSPtr<T>(const EdgeParameter<T>&)>;
 
 template <class T>
-using RegistryMap = std::unordered_map<std::string, NodeFunctor<T>>;
+using EdgeRegistryMap = std::unordered_map<std::string, EdgeFunctor<T>>;
 
 template <class T>
-class NodeFactory {
+class EdgeFactory {
  public:
   // use this to instantiate the proper Derived class
-  static NodeSPtr<T> Instantiate(const std::string& name,
-                                 const NodeParameter& node_param) {
-    auto it = NodeFactory::Registry().find(name);
-    return it == NodeFactory::Registry().end() ? \
-                 nullptr : \
-                 (it->second)(node_param);
+  static EdgeSPtr<T> Instantiate(const std::string& name,
+                             const EdgeParameter<T>& edge_param) {
+    auto it = EdgeFactory::Registry().find(name);
+    return it == EdgeFactory::Registry().end() ? nullptr : \
+                                                 (it->second)(edge_param);
   }
 
-  static RegistryMap<T>& Registry() {
-    static RegistryMap<T> impl;
+  static EdgeRegistryMap<T>& Registry() {
+    static EdgeRegistryMap<T> impl;
     return impl;
   }
 
  protected:
-  NodeFactory() {}
+  EdgeFactory() {}
 
-  ~NodeFactory() {}
+  ~EdgeFactory() {}
 };
 
 template<class T, class Derived> 
-class NodeFactoryRegister {
+class EdgeFactoryRegister {
  public:
-  NodeFactoryRegister(std::string name) {
-    NodeFactory<T>::Registry()[name] = \
-        [](const struct NodeParameter& node_param) {
-          return std::make_shared<Derived>(node_param);
+  EdgeFactoryRegister(std::string name) {
+    EdgeFactory<T>::Registry()[name] = \
+        [](const struct EdgeParameter<T>& edge_param) {
+          return std::make_shared<Derived>(edge_param);
         };
-    std::cout << "Registering Node: '" << name << "'" << std::endl;
+    std::cout << "Registering Edge: '" << name << "'" << std::endl;
   }
 };
 
-// Register SigmoidNode
-static NodeFactoryRegister<float, SigmoidNode<float>>
-    sigmoid_node_register_f("SigmoidNode_f");
-static NodeFactoryRegister<double, SigmoidNode<double>>
-    sigmoid_node_register_d("SigmoidNode_d");
-// Register SigL2Node
-static NodeFactoryRegister<float, SigL2Node<float>>
-    sigmoid_l2_node_register_f("SigL2Node_f");
-static NodeFactoryRegister<double, SigL2Node<double>>
-    sigmoid_l2_node_register_d("SigL2Node_d");
+// Register DenseEdge
+static EdgeFactoryRegister<float, DenseEdge<float>>
+    dense_edge_register_f("DenseEdge_f");
+static EdgeFactoryRegister<double, DenseEdge<double>>
+    dense_edge_register_d("DenseEdge_d");
 
 }  // intellgraph
 

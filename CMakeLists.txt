@@ -14,7 +14,7 @@ set(INTELLGRAPH_HEADERS_DIR ${PROJECT_SOURCE_DIR}/src)
 include_directories(${INTELLGRAPH_INSTALL_INCLUDE_DIR})
 include_directories(${INTELLGRAPH_HEADERS_DIR})
 
-include_directories(third_party/boost1.6.7)
+include_directories(third_party/boost)
 include_directories(third_party/eigen-git-mirror)
 
 add_subdirectory(src)

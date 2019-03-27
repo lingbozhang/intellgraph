@@ -33,7 +33,7 @@ template <class T, class Base>
 using NodeFunctor = std::function<Base(const NodeParameter&)>;
 
 template <class T, class Base>
-using RegistryMap = std::unordered_map<std::string, NodeFunctor<T, Base>>;
+using NodeRegistryMap = std::unordered_map<std::string, NodeFunctor<T, Base>>;
 
 template <class T, class Base>
 class NodeFactory {
@@ -47,8 +47,8 @@ class NodeFactory {
                  (it->second)(node_param);
   }
 
-  static RegistryMap<T, Base>& Registry() {
-    static RegistryMap<T, Base> impl;
+  static NodeRegistryMap<T, Base>& Registry() {
+    static NodeRegistryMap<T, Base> impl;
     return impl;
   }
 
