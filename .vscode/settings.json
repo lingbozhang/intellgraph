@@ -62,5 +62,6 @@
         "string": "cpp",
         "string_view": "cpp",
         "system_error": "cpp"
-    }
+	},
+	"C_Cpp.configurationWarnings": "Disabled"
 }
