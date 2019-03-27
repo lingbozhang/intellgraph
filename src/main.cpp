@@ -19,9 +19,11 @@ int main() {
   node_param2.dims.push_back(1);
 
   NodeSPtr<float> node1_ptr;
-  node1_ptr = NodeFactory<float>::Instantiate("SigmoidNode_f", node_param1);
-  NodeSPtr<float> node2_ptr;
-  node2_ptr = NodeFactory<float>::Instantiate("SigL2Node_f", node_param2);
+  node1_ptr = NodeFactory<float, NodeSPtr<float>>::Instantiate("SigmoidNode_f", 
+                                                               node_param1);
+  OutputNodeSPtr<float> node2_ptr;
+  node2_ptr = NodeFactory<float, OutputNodeSPtr<float>>::Instantiate(
+      "SigL2Node_f", node_param2);
 
   struct EdgeParameter<float> edge_param1;
   edge_param1.id = 0;
@@ -36,6 +38,9 @@ int main() {
   node1_ptr->GetActivationPtr()->array() << 0, 1;
   edge_ptr->Forward();
   node2_ptr->PrintAct();
+  MatXXSPtr<float> data_result_ptr = make_shared<MatXX<float>>(1,1);
+
+  node2_ptr->CalcLoss(data_result_ptr);
 
   return 0;
 }
