@@ -37,7 +37,5 @@ int main() {
   edge_ptr->Forward();
   node2_ptr->PrintAct();
 
->>>>>>> d76c2bb621cca5a81180e952f3c648001287819d
-
   return 0;
 }
