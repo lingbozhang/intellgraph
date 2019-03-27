@@ -7,7 +7,6 @@
 #include "utility/common.h"
 #include "utility/random.h"
 
-
 using namespace std;
 using namespace intellgraph;
 
