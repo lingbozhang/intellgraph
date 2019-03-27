@@ -62,5 +62,13 @@
         "string": "cpp",
         "string_view": "cpp",
         "system_error": "cpp"
-    }
+    },
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
+    },
+    "cmake.configureOnOpen": false,
+    "C_Cpp.configurationWarnings": "Disabled"
 }

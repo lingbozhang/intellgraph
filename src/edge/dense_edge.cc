@@ -57,7 +57,6 @@ void DenseEdge<T>::Forward() {
 
 template <class T>
 void DenseEdge<T>::Backward() {
-  //in_node_ptr_->CallActFxn();
   // $\nabla W^{l}=a^{l-1}(\delta^{l})^T$
   nabla_weight_ptr_->matrix() = in_node_ptr_->GetActivationPtr()->matrix() * \
                                 out_node_ptr_->GetDeltaPtr()->transpose();

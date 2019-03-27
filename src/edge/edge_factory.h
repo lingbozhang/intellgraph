@@ -12,11 +12,13 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_NODE_NODE_FACTORY_H_
-#define INTELLGRAPH_NODE_NODE_FACTORY_H_
+#ifndef INTELLGRAPH_EDGE_EDGE_FACTORY_H_
+#define INTELLGRAPH_EDGE_EDGE_FACTORY_H_
 
 #include <functional>
 #include <unordered_map>
+
+
 
 #include "node/activation_node.h"
 #include "node/act_loss_node.h"
@@ -29,17 +31,17 @@ Contributor(s):
 namespace intellgraph {
 // A Factory design pattern, NodeFactory is used to instantiate corresponding
 // node object.
-template <class T, class Base>
-using NodeFunctor = std::function<Base(const NodeParameter&)>;
+template <class T>
+using NodeFunctor = std::function<NodeSPtr<T>(const NodeParameter&)>;
 
-template <class T, class Base>
-using RegistryMap = std::unordered_map<std::string, NodeFunctor<T, Base>>;
+template <class T>
+using RegistryMap = std::unordered_map<std::string, NodeFunctor<T>>;
 
-template <class T, class Base>
+template <class T>
 class NodeFactory {
  public:
   // use this to instantiate the proper Derived class
-  static Base Instantiate(const std::string& name,
+  static NodeSPtr<T> Instantiate(const std::string& name,
                                  const NodeParameter& node_param) {
     auto it = NodeFactory::Registry().find(name);
     return it == NodeFactory::Registry().end() ? \
@@ -47,8 +49,8 @@ class NodeFactory {
                  (it->second)(node_param);
   }
 
-  static RegistryMap<T, Base>& Registry() {
-    static RegistryMap<T, Base> impl;
+  static RegistryMap<T>& Registry() {
+    static RegistryMap<T> impl;
     return impl;
   }
 
@@ -58,11 +60,11 @@ class NodeFactory {
   ~NodeFactory() {}
 };
 
-template<class T, class Base, class Derived> 
+template<class T, class Derived> 
 class NodeFactoryRegister {
  public:
   NodeFactoryRegister(std::string name) {
-    NodeFactory<T, Base>::Registry()[name] = \
+    NodeFactory<T>::Registry()[name] = \
         [](const struct NodeParameter& node_param) {
           return std::make_shared<Derived>(node_param);
         };
@@ -71,16 +73,16 @@ class NodeFactoryRegister {
 };
 
 // Register SigmoidNode
-static NodeFactoryRegister<float, NodeSPtr<float>, SigmoidNode<float>>
+static NodeFactoryRegister<float, SigmoidNode<float>>
     sigmoid_node_register_f("SigmoidNode_f");
-static NodeFactoryRegister<double, NodeSPtr<double>, SigmoidNode<double>>
+static NodeFactoryRegister<double, SigmoidNode<double>>
     sigmoid_node_register_d("SigmoidNode_d");
 // Register SigL2Node
-static NodeFactoryRegister<float, OutputNodeSPtr<float>, SigL2Node<float>>
+static NodeFactoryRegister<float, SigL2Node<float>>
     sigmoid_l2_node_register_f("SigL2Node_f");
-static NodeFactoryRegister<double, OutputNodeSPtr<double>, SigL2Node<double>>
+static NodeFactoryRegister<double, SigL2Node<double>>
     sigmoid_l2_node_register_d("SigL2Node_d");
 
 }  // intellgraph
 
-#endif  // INTELLGRAPH_NODE_NODE_FACTORY_H_
+#endif  // INTELLGRAPH_EDGE_EDGE_FACTORY_H_
