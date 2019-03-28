@@ -15,6 +15,7 @@ Contributor(s):
 #ifndef INTELLGRAPH_EDGE_EDGE_PARAMETER_H_
 #define INTELLGRAPH_EDGE_EDGE_PARAMETER_H_
 
+#include <string>
 #include <vector>
 
 #include "node/node.h"
@@ -25,8 +26,9 @@ namespace intellgraph {
 template <class T>
 struct EdgeParameter {
   size_t id;
-  NodeSPtr<T> in_node_ptr;
-  NodeSPtr<T> out_node_ptr;
+  std::string edge_name;
+  std::vector<size_t> dims_in;
+  std::vector<size_t> dims_out;
 };
 
 }  // namespace intellgraph

@@ -27,7 +27,7 @@ namespace intellgraph {
 // A Factory design pattern, EdgeFactory is used to instantiate corresponding
 // edge object.
 template <class T>
-using EdgeFunctor = std::function<EdgeSPtr<T>(const EdgeParameter<T>&)>;
+using EdgeFunctor = std::function<EdgeSPtr<T>(EdgeParameter<T>)>;
 
 template <class T>
 using EdgeRegistryMap = std::unordered_map<std::string, EdgeFunctor<T>>;
@@ -36,11 +36,15 @@ template <class T>
 class EdgeFactory {
  public:
   // use this to instantiate the proper Derived class
-  static EdgeSPtr<T> Instantiate(const std::string& name,
-                             const EdgeParameter<T>& edge_param) {
+  static EdgeSPtr<T> Instantiate(const EdgeParameter<T>& edge_param) {
+    std::string name = edge_param.edge_name;
     auto it = EdgeFactory::Registry().find(name);
-    return it == EdgeFactory::Registry().end() ? nullptr : \
-                                                 (it->second)(edge_param);
+    if (it == EdgeFactory::Registry().end() ) {
+      std::cout << "WARNING: instantiate Edge " << name << " failed"
+                << std::endl;
+    } else {
+      EdgeFactory::Registry().end();
+    }
   }
 
   static EdgeRegistryMap<T>& Registry() {

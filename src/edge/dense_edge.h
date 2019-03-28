@@ -27,7 +27,7 @@ namespace intellgraph {
 template <class T>
 class DenseEdge : public Edge<T> {
  public:
-  explicit DenseEdge(const struct EdgeParameter<T>& edge_param);
+  explicit DenseEdge(const EdgeParameter<T>& edge_param);
 
   ~DenseEdge() {}
 
@@ -35,9 +35,9 @@ class DenseEdge : public Edge<T> {
 
   void PrintNablaWeight() const final;
 
-  void Forward() final;
+  virtual void Forward(NodeSPtr<T> node_in_ptr, NodeSPtr<T> node_out_ptr) final;
 
-  void Backward() final;
+  virtual void Backward(NodeSPtr<T> node_in_ptr, NodeSPtr<T> node_out_ptr) final;
 
   void ApplyUnaryFunctor(std::function<T(T)> functor) final;
 
@@ -45,8 +45,6 @@ class DenseEdge : public Edge<T> {
 
  private:
   const struct EdgeParameter<T> edge_param_;
-  NodeSPtr<T> in_node_ptr_;
-  NodeSPtr<T> out_node_ptr_;
 
   MatXXSPtr<T> weight_ptr_;
   MatXXSPtr<T> nabla_weight_ptr_;

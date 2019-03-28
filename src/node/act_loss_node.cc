@@ -69,12 +69,12 @@ void ActLossNode<T>::ApplyUnaryFunctor(std::function<T(T)> functor) {
 
 template <class T>
 T ActLossNode<T>::CalcLoss(MatXXSPtr<T>& data_result) {
+  T loss = 0;
   if (!Transition(kAct)) {
     std::cout << "ERROR: CalcLoss() for ActLossNode fails. " 
               << "Transition to kAct fails" << std::endl;
     exit(1);
   }
-  T loss = 0.0;
   if (loss_function_ptr_ == nullptr) {
     std::cout << "WARNING: loss function is not defined." << std::endl;
   } else {

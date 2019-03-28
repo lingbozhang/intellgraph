@@ -32,8 +32,8 @@ template <class T>
 class ActivationNode : public Node<T> {
  public:
   explicit ActivationNode(const NodeParameter& node_param,
-                           std::function<T(T)> act_function_ptr,
-                           std::function<T(T)> act_prime_ptr);
+                          std::function<T(T)> act_function_ptr,
+                          std::function<T(T)> act_prime_ptr);
 
   ~ActivationNode() {
     std::cout << "ActivationNode " << node_param_.id 
@@ -102,7 +102,7 @@ class ActivationNode : public Node<T> {
 
   bool Transition(ActStates state);
 
-  const struct NodeParameter node_param_;
+  const NodeParameter node_param_;
   std::function<T(T)> act_function_ptr_;
   std::function<T(T)> act_prime_ptr_;
 

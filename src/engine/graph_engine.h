@@ -24,8 +24,12 @@ Contributor(s):
 
 namespace intellgraph {
 
+struct EdgeProperty {
+  size_t id;
+};
+
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, \
-    boost::no_property, boost::no_property> IntellGraph;
+    boost::no_property, EdgeProperty> IntellGraph;
 typedef IntellGraph::vertex_descriptor VertexD;
 typedef IntellGraph::edge_descriptor EdgeD;
 
@@ -36,23 +40,43 @@ class GraphEngine {
 
   ~GraphEngine() {}
   
-  void AddEdge(const NodeParameter& node_param_in, \
-               const NodeParameter& node_param_out, \
-               std::string& edge_fxn_name) {
-    NodeSPtr<T> node_in = NodeFactory<T, Node<T>>::Instantiate(node_param_in);
-    NodeSPtr<T> node_out = NodeFactory<T, Node<T>>::Instantiate(node_param_out);
+  void AddEdge(NodeParameter node_param_in, \
+               NodeParameter node_param_out, \
+               std::string edge_name) {
+    // Construct node objects and put them in the node_map_
+    size_t vertex_in_id = node_param_in.id;
+    size_t vertex_out_id = node_param_out.id;
 
-    VertexD vertex_d_in = node_param_in.id;
-    VertexD vertex_d_out = node_param_out.id;
+    EdgeParameter<T> edge_param;
+    EdgeProperty edge_property;
 
-    boost::add_edge(vertex_d_in, vertex_d_out);
+    if (node_param_map_.count(vertex_in_id) == 0) {
+      node_param_map_[vertex_in_id] = node_param_in;
+    }
 
-    //node_map_[]
+    if (node_param_map_.count(vertex_out_id) == 0) {
+      node_param_map_[vertex_out_id] = node_param_out;
+    }
+    edge_property.id = edge_param_map_.size();
+
+    if (edge_param_map_.count(edge_property.id) > 0) {
+      std::cout << "WARNING: Edge " << edge_property.id 
+                << "has been added, and is skipped" << std::endl;
+    } else {
+      edge_param.id = edge_property.id;
+      edge_param.edge_name = edge_name;
+      edge_param.dims_in = node_param_in.dims;
+      edge_param.dims_out = node_param_out.dims;
+
+      boost::add_edge(vertex_in_id, vertex_out_id, edge_property, graph_);
+      edge_param_map_[edge_param.id] = edge_param;
+    }
   }
- private:
+//private:
   IntellGraph graph_;
-  std::unordered_map<VertexD, NodeSPtr<T>> node_map_;
-  std::unordered_map<EdgeD, EdgeSPtr<T>> edge_map_;
+
+  std::unordered_map<size_t, NodeParameter> node_param_map_;
+  std::unordered_map<size_t, EdgeParameter<T>> edge_param_map_;
 };
 
 }  // intellgraph

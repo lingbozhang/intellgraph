@@ -97,7 +97,7 @@ class SigL2Node : public OutputNode<T> {
   // Transitions from current_act_state_ to state
   bool Transition(ActStates state);
 
-  const struct NodeParameter node_param_;
+  const NodeParameter node_param_;
   MatXXSPtr<T> activation_ptr_;
   // Delta vector stores the derivative of loss function of
   // weighted_sum variables

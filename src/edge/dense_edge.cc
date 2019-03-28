@@ -17,16 +17,13 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-DenseEdge<T>::DenseEdge(const struct EdgeParameter<T>& edge_param)
+DenseEdge<T>::DenseEdge(const EdgeParameter<T>& edge_param)
     : edge_param_(edge_param) {
-  in_node_ptr_ = edge_param.in_node_ptr;
-  out_node_ptr_ = edge_param.out_node_ptr;
+  size_t dims_in = edge_param.dims_in[0];
+  size_t dims_out = edge_param.dims_out[0];
 
-  std::vector<size_t> in_dims = in_node_ptr_->GetDims();
-  std::vector<size_t> out_dims = out_node_ptr_->GetDims();
-
-  weight_ptr_ = std::make_unique<MatXX<T>>(in_dims[0], out_dims[0]);
-  nabla_weight_ptr_ = std::make_unique<MatXX<T>>(in_dims[0], out_dims[0]);
+  weight_ptr_ = std::make_shared<MatXX<T>>(dims_in, dims_out);
+  nabla_weight_ptr_ = std::make_shared<MatXX<T>>(dims_in, dims_out);
   
   weight_ptr_->array() = 0.0;
   nabla_weight_ptr_->array() = 0.0;
@@ -45,29 +42,29 @@ void DenseEdge<T>::PrintNablaWeight() const {
 }
 
 template <class T>
-void DenseEdge<T>::Forward() {
+void DenseEdge<T>::Forward(NodeSPtr<T> node_in_ptr, NodeSPtr<T> node_out_ptr) {
   MatXXSPtr<T> weighted_sum_ptr = std::make_shared<MatXX<T>>(
-      weight_ptr_->transpose() * in_node_ptr_->GetActivationPtr()->matrix() + \
-      out_node_ptr_->GetBiasPtr()->matrix());
+      weight_ptr_->transpose() * node_in_ptr->GetActivationPtr()->matrix() + \
+      node_out_ptr->GetBiasPtr()->matrix());
   
-  out_node_ptr_->SetActivationPtr(weighted_sum_ptr);
+  node_out_ptr->SetActivationPtr(weighted_sum_ptr);
 }
 
 template <class T>
-void DenseEdge<T>::Backward() {
+void DenseEdge<T>::Backward(NodeSPtr<T> node_in_ptr, NodeSPtr<T> node_out_ptr) {
   // $\nabla W^{l}=a^{l-1}(\delta^{l})^T$
-  nabla_weight_ptr_->matrix() = in_node_ptr_->GetActivationPtr()->matrix() * \
-                                out_node_ptr_->GetDeltaPtr()->transpose();
+  nabla_weight_ptr_->matrix() = node_in_ptr->GetActivationPtr()->matrix() * \
+                                node_out_ptr->GetDeltaPtr()->transpose();
   // Calculates delta_ptr_ of input node
   // $\delta^l= \mathcal{D}[f^\prime(z^l)]W^{l+1}\delta^{l+1}$
   
-  MatXXSPtr<T> in_delta_ptr = std::make_shared<MatXX<T>>(
-      weight_ptr_->matrix() * out_node_ptr_->GetDeltaPtr()->matrix());
+  MatXXSPtr<T> delta_in_ptr = std::make_shared<MatXX<T>>(
+      weight_ptr_->matrix() * node_out_ptr->GetDeltaPtr()->matrix());
 
-  in_node_ptr_->CalcActPrime();
-  in_delta_ptr->array() *= in_node_ptr_->GetActivationPtr()->array();
+  node_in_ptr->CalcActPrime();
+  delta_in_ptr->array() *= node_in_ptr->GetActivationPtr()->array();
 
-  in_node_ptr_->SetDeltaPtr(in_delta_ptr);
+  node_in_ptr->SetDeltaPtr(delta_in_ptr);
 }
 
 template <class T>

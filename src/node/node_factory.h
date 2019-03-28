@@ -30,7 +30,7 @@ namespace intellgraph {
 // A Factory design pattern, NodeFactory is used to instantiate corresponding
 // node object.
 template <class T, class Base>
-using NodeFunctor = std::function<Base(const NodeParameter&)>;
+using NodeFunctor = std::function<Base(NodeParameter)>;
 
 template <class T, class Base>
 using NodeRegistryMap = std::unordered_map<std::string, NodeFunctor<T, Base>>;
@@ -40,11 +40,15 @@ class NodeFactory {
  public:
   // use this to instantiate the proper Derived class
   static Base Instantiate(const NodeParameter& node_param) {
-    std::string name = node_param.fxn_name;
+    std::string name = node_param.node_name;
     auto it = NodeFactory::Registry().find(name);
-    return it == NodeFactory::Registry().end() ? \
-                 nullptr : \
-                 (it->second)(node_param);
+    if (it == NodeFactory::Registry().end()) {
+      std::cout << "WARNING: instantiate node " << name << " failed" 
+                << std::endl;
+      return nullptr;
+    } else {
+      return (it->second)(node_param);
+    }
   }
 
   static NodeRegistryMap<T, Base>& Registry() {

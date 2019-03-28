@@ -61,11 +61,12 @@ void SigL2Node<T>::ApplyUnaryFunctor(std::function<T(T)> functor) {
 
 template <class T>
 T SigL2Node<T>::CalcLoss(MatXXSPtr<T>& data_result) {
+  T loss = 0;
   if (!Transition(kAct)) {
     std::cout << "ERROR: CalcDelta() for SigL2Node fails. " << std::endl;
     exit(1);
   }
-  T loss = (activation_ptr_->array() - data_result->array()). \
+  loss = (activation_ptr_->array() - data_result->array()). \
             matrix().squaredNorm();
   return loss;
 }

@@ -116,7 +116,7 @@ class ActLossNode : public OutputNode<T> {
 
   bool Transition(ActStates state);
 
-  const struct NodeParameter node_param_;
+  const NodeParameter node_param_;
   std::function<T(T)> act_function_ptr_;
   std::function<T(T)> act_prime_ptr_;
   std::function<T(MatXXSPtr<T>, MatXXSPtr<T>)> loss_function_ptr_;

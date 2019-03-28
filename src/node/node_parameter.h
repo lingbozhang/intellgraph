@@ -22,7 +22,7 @@ namespace intellgraph {
 // LayerParamter contains node information and is used to build node object
 struct NodeParameter {
   size_t id;
-  std::string fxn_name;
+  std::string node_name;
   std::vector<size_t> dims;
 };
 
