@@ -39,8 +39,8 @@ template <class T, class Base>
 class NodeFactory {
  public:
   // use this to instantiate the proper Derived class
-  static Base Instantiate(const std::string& name,
-                                 const NodeParameter& node_param) {
+  static Base Instantiate(const NodeParameter& node_param) {
+    std::string name = node_param.fxn_name;
     auto it = NodeFactory::Registry().find(name);
     return it == NodeFactory::Registry().end() ? \
                  nullptr : \

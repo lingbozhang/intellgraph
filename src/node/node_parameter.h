@@ -15,12 +15,14 @@ Contributor(s):
 #ifndef INTELLGRAPH_LAYER_NODE_PARAMETER_H_
 #define INTELLGRAPH_LAYER_NODE_PARAMETER_H_
 
+#include <string>
 #include <vector>
 
 namespace intellgraph {
 // LayerParamter contains node information and is used to build node object
 struct NodeParameter {
   size_t id;
+  std::string fxn_name;
   std::vector<size_t> dims;
 };
 

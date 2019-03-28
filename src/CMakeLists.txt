@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(IntellGraph)
 
-add_subdirectory(node)
 add_subdirectory(edge)
+add_subdirectory(engine)
+add_subdirectory(node)
 add_subdirectory(utility)
 
 set(SOURCE_FILES main.cpp)
