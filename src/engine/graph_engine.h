@@ -15,9 +15,11 @@ Contributor(s):
 #ifndef INTELLGRAPH_ENGINE_GRAPH_ENGINE_H_
 #define INTELLGRAPH_ENGINE_GRAPH_ENGINE_H_
 
+#include <string>
 #include <unordered_map>
 
 #include "boost/graph/adjacency_list.hpp"
+#include "boost/graph/topological_sort.hpp"
 #include "edge/edge_factory.h"
 #include "node/node_factory.h"
 #include "utility/common.h"
@@ -39,44 +41,55 @@ class GraphEngine {
   GraphEngine() {}
 
   ~GraphEngine() {}
+  // Add an edge in the neural graph. NodeParameters and EdgeParameters are 
+  // stored in the GraphEngine and they will be later used to instantiate a 
+  // graph object.
+  void AddEdge(const NodeParameter& node_param_in, \
+               const NodeParameter& node_param_out, \
+               const std::string& edge_name);
   
-  void AddEdge(NodeParameter node_param_in, \
-               NodeParameter node_param_out, \
-               std::string edge_name) {
-    // Construct node objects and put them in the node_map_
-    size_t vertex_in_id = node_param_in.id;
-    size_t vertex_out_id = node_param_out.id;
-
-    EdgeParameter<T> edge_param;
-    EdgeProperty edge_property;
-
-    if (node_param_map_.count(vertex_in_id) == 0) {
-      node_param_map_[vertex_in_id] = node_param_in;
-    }
-
-    if (node_param_map_.count(vertex_out_id) == 0) {
-      node_param_map_[vertex_out_id] = node_param_out;
-    }
-    edge_property.id = edge_param_map_.size();
-
-    if (edge_param_map_.count(edge_property.id) > 0) {
-      std::cout << "WARNING: Edge " << edge_property.id 
-                << "has been added, and is skipped" << std::endl;
-    } else {
-      edge_param.id = edge_property.id;
-      edge_param.edge_name = edge_name;
-      edge_param.dims_in = node_param_in.dims;
-      edge_param.dims_out = node_param_out.dims;
-
-      boost::add_edge(vertex_in_id, vertex_out_id, edge_property, graph_);
-      edge_param_map_[edge_param.id] = edge_param;
-    }
+  // Build node and edge objects based on the graph and parameters
+  void Instantiate();
+  //
+  void Forward() {
+    topological_sort(graph_, std::back_inserter(typological_order_));
   }
+
+  inline bool SetOutputNodeId(size_t id) {
+    if (node_param_map_.count(id) == 0) {
+      std::cout << "WARNING: node " << id << " does not exist in the graph" 
+                << std::endl;
+      return false;
+    }
+    output_node_id_ = id;
+    return true;
+  }
+
+  inline bool SetInputNodeId(size_t id) {
+    if (node_param_map_.count(id) == 0) {
+      std::cout << "WARNING: node " << id << " does not exist in the graph" 
+                << std::endl;
+      return false;
+    }
+    input_node_id_ = id;
+    return true;
+  }
+
 //private:
   IntellGraph graph_;
 
+  size_t output_node_id_;
+  size_t input_node_id_;
+
   std::unordered_map<size_t, NodeParameter> node_param_map_;
   std::unordered_map<size_t, EdgeParameter<T>> edge_param_map_;
+
+  OutputNodeSPtr<T> output_node_ptr_;
+  std::unordered_map<size_t, NodeSPtr<T>> node_map_;
+  std::unordered_map<size_t, EdgeSPtr<T>> edge_map_;
+
+  // topological sorting result
+  std::vector<size_t> typological_order_;
 };
 
 }  // intellgraph

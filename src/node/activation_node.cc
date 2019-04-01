@@ -18,36 +18,41 @@ namespace intellgraph {
 
 template <class T>
 ActivationNode<T>::ActivationNode(const NodeParameter& node_param,
-                                  std::function<T(T)> act_function_ptr,
-                                  std::function<T(T)> act_prime_ptr)
-      : node_param_(node_param), act_function_ptr_(act_function_ptr),
-        act_prime_ptr_(act_prime_ptr) {
-    activation_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);
-    delta_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);
-    bias_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);
+                                  const std::function<T(T)>& act_function_ptr,
+                                  const std::function<T(T)>& act_prime_ptr)
+      : act_function_ptr_(act_function_ptr), act_prime_ptr_(act_prime_ptr) {
+    node_param_.Clone(node_param);
+
+    size_t row = node_param.get_k_dims()[0];
+    size_t col = node_param.get_k_dims()[1];
+    
+    activation_ptr_ = std::make_unique<MatXX<T>>(row, col);
+    delta_ptr_ = std::make_unique<MatXX<T>>(row, col);
+    bias_ptr_ = std::make_unique<MatXX<T>>(row, col);
 
     activation_ptr_->array() = 0.0;
     delta_ptr_->array() = 0.0;
     bias_ptr_->array() = 0.0;
 
-    Transition(kInit);
+    current_act_state_ = kInit;
 }
 
 template <class T>
 void ActivationNode<T>::PrintAct() const {
-  std::cout << "ActivationNode " << node_param_.id << " Activation Vector:" 
-            << std::endl << activation_ptr_->array() << std::endl;
+  std::cout << "ActivationNode: " << node_param_.get_k_id() 
+            << " Activation Vector:" << std::endl << activation_ptr_->array() 
+            << std::endl;
 }
 
 template <class T>
 void ActivationNode<T>::PrintDelta() const {
-  std::cout << "ActivationNode " << node_param_.id << " Delta Vector:" 
+  std::cout << "ActivationNode: " << node_param_.get_k_id() << " Delta Vector:" 
             << std::endl << delta_ptr_->array() << std::endl;
 }
 
 template <class T>
 void ActivationNode<T>::PrintBias() const {
-  std::cout << "ActivationNode " << node_param_.id << " Bias Vector:" 
+  std::cout << "ActivationNode: " << node_param_.get_k_id() << " Bias Vector:" 
             << std::endl << bias_ptr_->array() << std::endl;
 }
 
@@ -68,7 +73,7 @@ void ActivationNode<T>::CalcActPrime() {
 }
 
 template <class T>
-void ActivationNode<T>::ApplyUnaryFunctor(std::function<T(T)> functor) {
+void ActivationNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
     std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined." 
               << std::endl;

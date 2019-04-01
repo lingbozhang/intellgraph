@@ -17,39 +17,42 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-SigL2Node<T>::SigL2Node(const NodeParameter& node_param)
-      : node_param_(node_param) {
-    activation_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);
-    delta_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);
-    bias_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);
+SigL2Node<T>::SigL2Node(const NodeParameter& node_param) {
+  node_param_.Clone(node_param);
+  size_t row = node_param.get_k_dims()[0];
+  size_t col = node_param.get_k_dims()[1];
 
-    activation_ptr_->array() = 0.0;
-    delta_ptr_->array() = 0.0;
-    bias_ptr_->array() = 0.0;
+  activation_ptr_ = std::make_unique<MatXX<T>>(row, col);
+  delta_ptr_ = std::make_unique<MatXX<T>>(row, col);
+  bias_ptr_ = std::make_unique<MatXX<T>>(row, col);
 
-    Transition(kInit);
+  activation_ptr_->array() = 0.0;
+  delta_ptr_->array() = 0.0;
+  bias_ptr_->array() = 0.0;
+
+  current_act_state_ = kInit;
 }
 
 template <class T>
 void SigL2Node<T>::PrintAct() const {
-  std::cout << "SigL2Node " << node_param_.id << " Activation Vector:" 
+  std::cout << "SigL2Node: " << node_param_.get_k_id() << " Activation Vector:" 
             << std::endl << activation_ptr_->array() << std::endl;
 }
 
 template <class T>
 void SigL2Node<T>::PrintDelta() const {
-  std::cout << "SigL2Node " << node_param_.id << " Delta Vector:" 
+  std::cout << "SigL2Node: " << node_param_.get_k_id() << " Delta Vector:" 
             << std::endl << delta_ptr_->array() << std::endl;
 }
 
 template <class T>
 void SigL2Node<T>::PrintBias() const {
-  std::cout << "SigL2Node " << node_param_.id << " Bias Vector:" 
+  std::cout << "SigL2Node: " << node_param_.get_k_id() << " Bias Vector:" 
             << std::endl << bias_ptr_->array() << std::endl;
 }
 
 template <class T>
-void SigL2Node<T>::ApplyUnaryFunctor(std::function<T(T)> functor) {
+void SigL2Node<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
     std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined." 
               << std::endl;
@@ -60,25 +63,25 @@ void SigL2Node<T>::ApplyUnaryFunctor(std::function<T(T)> functor) {
 }
 
 template <class T>
-T SigL2Node<T>::CalcLoss(MatXXSPtr<T>& data_result) {
+T SigL2Node<T>::CalcLoss_k(const MatXX<T>& data_result) {
   T loss = 0;
   if (!Transition(kAct)) {
     std::cout << "ERROR: CalcDelta() for SigL2Node fails. " << std::endl;
     exit(1);
   }
-  loss = (activation_ptr_->array() - data_result->array()). \
-            matrix().squaredNorm();
+  loss = (activation_ptr_->array() - data_result.array()). \
+          matrix().squaredNorm();
   return loss;
 }
 
 template <class T>
-void SigL2Node<T>::CalcDelta(MatXXSPtr<T>& data_result) {
+void SigL2Node<T>::CalcDelta_k(const MatXX<T>& data_result) {
   if (!Transition(kAct)) {
     std::cout << "ERROR: CalcDelta() for SigL2Node fails. " 
               << "Transition to kAct fails" << std::endl;
     exit(1);
   }
-  delta_ptr_->array() = 2.0 * (activation_ptr_->array() - data_result->array());
+  delta_ptr_->array() = 2.0 * (activation_ptr_->array() - data_result.array());
   // Note CalcActPrime overwrites data in activation_ptr_ in-place
   if (!Transition(kPrime)) {
     std::cout << "ERROR: CalcDelta() for SigL2Node fails. "

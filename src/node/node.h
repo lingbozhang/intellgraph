@@ -16,6 +16,8 @@ Contributor(s):
 #define INTELLGRAPH_NODE_NODE_H_
  
 #include <functional>
+#include <memory>
+#include <vector>
 
 #include "utility/common.h"
 
@@ -33,11 +35,11 @@ enum ActStates {
   kPrime = 3,
 };
 // In IntellGraph, node is a basic building block that represents a neural
-// network layer, all class in the /node directory should use node class as 
-// a base class. In Node, in order to save memory, only one vector (activation 
-// vector) is used to store weighted_sum, activation, and activation prime 
-// results, hence, a state pattern is implemented to control state transitions 
-// of the activation vector.
+// network layer, all node class in /node directory should use node class as 
+// a base class. In Node classes, in order to save memory, only one vector 
+// (activation vector) is used to store all weighted_sum, activation, and 
+// activation prime results, hence, a state pattern is implemented to control 
+// state transitions of the activation vector.
 template <class T>
 class Node {
  public:
@@ -47,38 +49,33 @@ class Node {
 
   virtual void PrintBias() const = 0;
 
-  // This function calls activation function
   virtual void CallActFxn() = 0;
 
-  // This function calls activation prime function 
   virtual void CalcActPrime() = 0;
 
   // Passes a functor and applies it on the activation vector
-  virtual void ApplyUnaryFunctor(std::function<T(T)> functor) = 0;
+  virtual void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) = 0;
 
   // Get layer dimensions
-  // Note it is not a constant getter, and exposes data
-  virtual inline std::vector<size_t> GetDims() = 0;
+  virtual inline std::vector<size_t> get_c_dims() = 0;
 
-  // Note it is not a constant getter, and exposes data
-  virtual inline MatXXSPtr<T> GetActivationPtr() = 0;
+  virtual inline const std::vector<size_t>& get_k_dims() = 0;
 
-  virtual inline void SetActivationPtr(MatXXSPtr<T>& activation_ptr) = 0;
+  virtual inline MatXX<T>* get_c_activation_ptr() = 0;
 
-  virtual inline void SetActivation(T value) = 0;
+  // Setters named with letter 'm' indicates a move setter (which means 
+  // argument ownerships are moved into the function)
+  virtual inline void set_m_activation_ptr(MatXXUPtr<T> activation_ptr) = 0;
 
-  // Note it is not a constant getter, and exposes data
-  virtual inline MatXXSPtr<T> GetBiasPtr() = 0;
+  virtual inline void set_c_activation(T value) = 0;
 
-  virtual inline void SetBiasPtr(MatXXSPtr<T>& bias_ptr) = 0;
+  virtual inline MatXX<T>* get_c_bias_ptr() = 0;
 
-  // Note it is not a constant getter, and exposes data
-  virtual inline MatXXSPtr<T> GetDeltaPtr() = 0;
+  virtual inline void set_m_bias_ptr(MatXXUPtr<T> bias_ptr) = 0;
 
-  virtual inline void SetDeltaPtr(MatXXSPtr<T>& delta_ptr) = 0;
+  virtual inline MatXX<T>* get_c_delta_ptr() = 0;
 
-  // Note it is not a constant getter, and exposes data
-  virtual inline bool IsActivated() = 0;
+  virtual inline void set_m_delta_ptr(MatXXUPtr<T> delta_ptr) = 0;
 
  protected:
   Node() {}
@@ -88,7 +85,7 @@ class Node {
 
 // Alias for shared node pointer
 template <class T>
-using NodeSPtr = std::shared_ptr<Node<T>>;
+using NodeUPtr = std::unique_ptr<Node<T>>;
 
 }  // namespace intellgraph
 

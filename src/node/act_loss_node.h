@@ -33,18 +33,26 @@ namespace intellgraph {
 template <class T>
 class ActLossNode : public OutputNode<T> {
  public:
+  ActLossNode() = default;
+
   explicit ActLossNode(    
       const NodeParameter& node_param,
-      std::function<T(T)> act_function_ptr,
-      std::function<T(T)> act_prime_ptr,
-      std::function<T(MatXXSPtr<T>, MatXXSPtr<T>)> loss_function_ptr,
-      std::function<MatXXSPtr<T>(MatXXSPtr<T>, MatXXSPtr<T>)> loss_prime_ptr);
+      const std::function<T(T)>& act_function_ptr,
+      const std::function<T(T)>& act_prime_ptr,
+      const std::function<T(const MatXX<T>&, const MatXX<T>&)>& loss_function_ptr,
+      const std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)>& \
+          loss_prime_ptr);
 
-  ~ActLossNode() {
-    std::cout << "ActLossNode " << node_param_.id << " is successfully deleted."
-              << std::endl;
-  }
+  ActLossNode(ActLossNode<T>&& rhs) noexcept = default;
 
+  ActLossNode& operator=(ActLossNode<T>&& rhs) noexcept = default;
+
+  ActLossNode(const ActLossNode<T>& rhs) = delete;
+
+  ActLossNode& operator=(const ActLossNode<T>& rhs) = delete;
+
+  ~ActLossNode() = default;
+  
   void PrintAct() const;
 
   void PrintDelta() const;
@@ -53,60 +61,60 @@ class ActLossNode : public OutputNode<T> {
 
   // Calls activation function and updates activation. Note this function calls 
   // activation function at runtime and thus has performance penalty
-  void CallActFxn();
+  void CallActFxn() final;
 
   // Calculates derivative of the activation function and overwrites the 
   // activation in-place. Note this function calls activation prime function at 
   // runtime and thus has performance penalty
-  void CalcActPrime();
+  void CalcActPrime() final;
 
-  void ApplyUnaryFunctor(std::function<T(T)> functor) final;
+  void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
 
   // Note this function calls loss function at runtime and thus has performance
   // penalty
-  T CalcLoss(MatXXSPtr<T>& data_result) final;
+  T CalcLoss_k(const MatXX<T>& data_result) final;
 
   // Calculates derivative of loss function of weighted_sum variables. Note this
   // function calls loss prime function at runtime and thus has performance
   // penalty
-  void CalcDelta(MatXXSPtr<T>& data_result) final;
+  void CalcDelta_k(const MatXX<T>& data_result) final;
 
-  inline std::vector<size_t> GetDims() final {
-    return node_param_.dims;
+  inline std::vector<size_t> get_c_dims() final {
+    return node_param_.get_k_dims();
   }
 
-  inline MatXXSPtr<T> GetActivationPtr() final {
-    return activation_ptr_;
+  inline const std::vector<size_t>& get_k_dims() final {
+    return node_param_.get_k_dims();
   }
 
-  inline void SetActivationPtr(MatXXSPtr<T>& activation_ptr) final {
-    activation_ptr_ = activation_ptr;
+  inline MatXX<T>* get_c_activation_ptr() final {
+    return activation_ptr_.get();
+  }
+
+  inline void set_m_activation_ptr(MatXXUPtr<T> activation_ptr) final {
+    activation_ptr_ = std::move(activation_ptr);
     Transition(kInit);
   };
 
-  inline void SetActivation(T value) final {
+  inline void set_c_activation(T value) final {
     activation_ptr_->array() = value;
     Transition(kInit);
   }
 
-  inline MatXXSPtr<T> GetBiasPtr() final {
-    return bias_ptr_;
+  inline MatXX<T>* get_c_bias_ptr() final {
+    return bias_ptr_.get();
   }
 
-  inline void SetBiasPtr(MatXXSPtr<T>& bias_ptr) final {
-    bias_ptr_ = bias_ptr;
+  inline void set_m_bias_ptr(MatXXUPtr<T> bias_ptr) final {
+    bias_ptr_ = std::move(bias_ptr);
   }
 
-  inline MatXXSPtr<T> GetDeltaPtr() final {
-    return delta_ptr_;
+  inline MatXX<T>* get_c_delta_ptr() final {
+    return delta_ptr_.get();
   }
 
-  inline void SetDeltaPtr(MatXXSPtr<T>& delta_ptr) final {
-    delta_ptr_ = delta_ptr;
-  }
-
-  inline bool IsActivated() final {
-    return current_act_state_ == kAct;
+  inline void set_m_delta_ptr(MatXXUPtr<T> delta_ptr) final {
+    delta_ptr_ = std::move(delta_ptr);
   }
 
  private:
@@ -116,24 +124,25 @@ class ActLossNode : public OutputNode<T> {
 
   bool Transition(ActStates state);
 
-  const NodeParameter node_param_;
-  std::function<T(T)> act_function_ptr_;
-  std::function<T(T)> act_prime_ptr_;
-  std::function<T(MatXXSPtr<T>, MatXXSPtr<T>)> loss_function_ptr_;
+  NodeParameter node_param_{};
+  std::function<T(T)> act_function_ptr_{nullptr};
+  std::function<T(T)> act_prime_ptr_{nullptr};
+  std::function<T(const MatXX<T>&, const MatXX<T>&)> loss_function_ptr_{nullptr};
   // Stores derivative of loss function of activation
-  std::function<MatXXSPtr<T>(MatXXSPtr<T>, MatXXSPtr<T>)> loss_prime_ptr_;
+  std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)> \
+      loss_prime_ptr_{nullptr};
 
-  MatXXSPtr<T> activation_ptr_;
+  MatXXUPtr<T> activation_ptr_{nullptr};
   // Delta vector stores the derivative of loss function of
   // weighted_sum variables
-  MatXXSPtr<T> delta_ptr_;
-  MatXXSPtr<T> bias_ptr_;
+  MatXXUPtr<T> delta_ptr_{nullptr};
+  MatXXUPtr<T> bias_ptr_{nullptr};
   // Stores current state of activation vector
-  ActStates current_act_state_;
+  ActStates current_act_state_{kInit};
 };
 
 template <class T>
-using ActLossNodeSPtr = std::shared_ptr<ActLossNode<T>>;
+using ActLossNodeUPtr = std::unique_ptr<ActLossNode<T>>;
 
 }  // namespace intellgraph
 

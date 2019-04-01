@@ -2,27 +2,20 @@
 #include <math.h>
 #include <vector>
 
-#include "engine/graph_engine.h"
-#include "utility/common.h"
+#include "node/node_parameter.h"
+#include "node/sigmoid_node.h"
+#include "node/node.h"
 #include "utility/random.h"
+//#include "engine/graph_engine.h"
 
 using namespace std;
 using namespace intellgraph;
 
 int main() {
-  struct NodeParameter node_param1, node_param2;
-  node_param1.id = 0;
-  node_param1.node_name = "SigmoidNode_f";
-  node_param1.dims.push_back(2);
+  auto node_param1 = NodeParameter(0, "SigmoidNode_f", {2,1});
+  auto node_param2 = NodeParameter(1, "SigmoidNode_f", {2,1});
+  auto node_param3 = NodeParameter(2, "SigmoidNode_f", {2,1});
+  auto node_param4 = NodeParameter(3, "SigL2Node_f", {1,1});
 
-  node_param2.id = 1;
-  node_param2.node_name = "SigmoidNode_f";
-  node_param2.dims.push_back(1);
-
-  GraphEngine<float> graph;
-  //NodeSPtr<float> node_in_ptr = NodeFactory<float, NodeSPtr<float>>::Instantiate(node_param1);
-  graph.AddEdge(node_param1, node_param2, "DenseEdge_f");
-  graph.node_param_map_[0];
-
-  return 0;
+  SigmoidNode<float> sig_node(node_param1);
 }

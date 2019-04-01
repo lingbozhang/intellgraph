@@ -42,8 +42,9 @@ class EdgeFactory {
     if (it == EdgeFactory::Registry().end() ) {
       std::cout << "WARNING: instantiate Edge " << name << " failed"
                 << std::endl;
+      return nullptr;
     } else {
-      EdgeFactory::Registry().end();
+      return (it->second)(edge_param);
     }
   }
 

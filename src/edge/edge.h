@@ -33,14 +33,14 @@ class Edge {
 
   // Calculates weighted sum and updates activation_ptr_ of output layer
   // in-place
-  virtual void Forward(NodeSPtr<T> node_in_ptr, NodeSPtr<T> node_out_ptr) = 0;
+  virtual void Forward(NodeUPtr<T> node_in_ptr, NodeUPtr<T> node_out_ptr) = 0;
 
   // Calculates nabla_weight_ and updates delta_ptr_ of input layer in-place 
   // with backpropagation
-  virtual void Backward(NodeSPtr<T> node_in_ptr, NodeSPtr<T> node_out_ptr) = 0;
+  virtual void Backward(NodeUPtr<T> node_in_ptr, NodeUPtr<T> node_out_ptr) = 0;
 
   // Passes a unary functor and applies it on the weight matrix
-  virtual void ApplyUnaryFunctor(std::function<T(T)> functor) = 0;
+  virtual void ApplyUnaryFunctor(const std::function<T(T)>& functor) = 0;
 
   virtual MatXXSPtr<T> GetWeightPtr() = 0;
 

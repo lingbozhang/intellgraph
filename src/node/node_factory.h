@@ -33,14 +33,14 @@ template <class T, class Base>
 using NodeFunctor = std::function<Base(NodeParameter)>;
 
 template <class T, class Base>
-using NodeRegistryMap = std::unordered_map<std::string, NodeFunctor<T, Base>>;
+using NodeRegistryMap = std::unordered_map<const std::string&, NodeFunctor<T, Base>>;
 
 template <class T, class Base>
 class NodeFactory {
  public:
   // use this to instantiate the proper Derived class
   static Base Instantiate(const NodeParameter& node_param) {
-    std::string name = node_param.node_name;
+    const std::string& name = node_param.get_k_node_name();
     auto it = NodeFactory::Registry().find(name);
     if (it == NodeFactory::Registry().end()) {
       std::cout << "WARNING: instantiate node " << name << " failed" 
@@ -67,22 +67,22 @@ class NodeFactoryRegister {
  public:
   NodeFactoryRegister(std::string name) {
     NodeFactory<T, Base>::Registry()[name] = \
-        [](const struct NodeParameter& node_param) {
-          return std::make_shared<Derived>(node_param);
+        [](const NodeParameter& node_param) {
+          return std::make_unique<Derived>(node_param);
         };
     std::cout << "Registering Node: '" << name << "'" << std::endl;
   }
 };
 
 // Register SigmoidNode
-static NodeFactoryRegister<float, NodeSPtr<float>, SigmoidNode<float>>
+static NodeFactoryRegister<float, NodeUPtr<float>, SigmoidNode<float>>
     sigmoid_node_register_f("SigmoidNode_f");
-static NodeFactoryRegister<double, NodeSPtr<double>, SigmoidNode<double>>
+static NodeFactoryRegister<double, NodeUPtr<double>, SigmoidNode<double>>
     sigmoid_node_register_d("SigmoidNode_d");
 // Register SigL2Node
-static NodeFactoryRegister<float, OutputNodeSPtr<float>, SigL2Node<float>>
+static NodeFactoryRegister<float, OutputNodeUPtr<float>, SigL2Node<float>>
     sigmoid_l2_node_register_f("SigL2Node_f");
-static NodeFactoryRegister<double, OutputNodeSPtr<double>, SigL2Node<double>>
+static NodeFactoryRegister<double, OutputNodeUPtr<double>, SigL2Node<double>>
     sigmoid_l2_node_register_d("SigL2Node_d");
 
 }  // intellgraph

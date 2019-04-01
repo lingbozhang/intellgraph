@@ -33,20 +33,21 @@ using namespace intellgraph;
 class NodeTest : public ::testing::Test {
  protected:
   NodeTest() {
-    struct NodeParameter node_param;
-    node_param.id = 0;
-    node_param.dims.push_back({100});
+    NodeParameter node_param;
+    node_param.set_c_id(0);
+    node_param.set_m_node_name("Sigmoid_f");
+    node_param.set_m_dims({100,1});
 
-    sigmoid_node_ptr_ = make_shared<SigmoidNode<float>>(node_param);
-    sigmoid_l2_node_ptr_ = make_shared<SigL2Node<float>>(node_param);
+    sigmoid_node_ptr_ = make_unique<SigmoidNode<float>>(node_param);
+    sigmoid_l2_node_ptr_ = make_unique<SigL2Node<float>>(node_param);
     
-    node_ptr_v_.push_back(sigmoid_node_ptr_);
-    node_ptr_v_.push_back(sigmoid_l2_node_ptr_);
+    node_ptr_v_.push_back(sigmoid_node_ptr_.get());
+    node_ptr_v_.push_back(sigmoid_l2_node_ptr_.get());
   }
   ~NodeTest() {}
-  SigNodeSPtr<float> sigmoid_node_ptr_;
-  SigL2NodeSPtr<float> sigmoid_l2_node_ptr_;
-  std::vector<NodeSPtr<float>> node_ptr_v_;
+  SigNodeUPtr<float> sigmoid_node_ptr_;
+  SigL2NodeUPtr<float> sigmoid_l2_node_ptr_;
+  std::vector<Node<float>*> node_ptr_v_;
 
   const double kAbsoluteError_ = 1.0E-7;
   const double kRelativeError_ = 1.0E-6;
@@ -58,7 +59,7 @@ TEST_F(NodeTest, TestCallActFxn) {
   for (auto& node_ptr : node_ptr_v_) {
     for (auto value : evaluated_values) {
       //node_ptr->PrintAct();
-      node_ptr->SetActivation(value);
+      node_ptr->set_c_activation(value);
       node_ptr->CallActFxn();
       float correct_value;
       if (value >= 0) {
@@ -66,8 +67,8 @@ TEST_F(NodeTest, TestCallActFxn) {
       } else {
         correct_value = std::exp(value) / (1.0 + std::exp(value));
       }
-      for (size_t i = 0; i < node_ptr->GetDims()[0]; ++i) {
-        float test_value = node_ptr->GetActivationPtr()->array()(i);
+      for (size_t i = 0; i < node_ptr->get_k_dims()[0]; ++i) {
+        float test_value = node_ptr->get_c_activation_ptr()->array()(i);
         EXPECT_NEAR(test_value, correct_value, kAbsoluteError_)
             << "Evaluated value: " << value;
       }
@@ -75,15 +76,15 @@ TEST_F(NodeTest, TestCallActFxn) {
   }
   // Tests with random initialized data
   for (auto& node_ptr : node_ptr_v_) {
-    node_ptr->ApplyUnaryFunctor(NormalFunctor<float>(0.0, 1.0));
+    node_ptr->ApplyUnaryFunctor_k(NormalFunctor<float>(0.0, 1.0));
     MatXXSPtr<float> correct_data_ptr = make_shared<MatXX<float>>(100, 1);
-    correct_data_ptr->array() = node_ptr->GetActivationPtr()->array();
+    correct_data_ptr->array() = node_ptr->get_c_activation_ptr()->array();
     
     node_ptr->CallActFxn();
 
-    for (size_t i = 0; i < node_ptr->GetDims()[0]; ++i) {
+    for (size_t i = 0; i < node_ptr->get_k_dims()[0]; ++i) {
       float correct_value;
-      float test_value = node_ptr->GetActivationPtr()->array()(i);
+      float test_value = node_ptr->get_c_activation_ptr()->array()(i);
       float value = correct_data_ptr->array()(i);
       if (value >= 0) {
         correct_value = 1.0 / (1.0 + std::exp(-value));
@@ -96,13 +97,14 @@ TEST_F(NodeTest, TestCallActFxn) {
   }
 }
 
+
 TEST_F(NodeTest, TestCalcPrime) {
   std::vector<float> evaluated_values = {-1.0E6, -100, -100.0, -1.0E-7, 0.0, \
                                          1.0E-6, 100, 100.0, 1.0E-7};
   for (auto& node_ptr : node_ptr_v_) {
     for (auto value : evaluated_values) {
       //node_ptr->PrintAct();
-      node_ptr->SetActivation(value);
+      node_ptr->set_c_activation(value);
       node_ptr->CalcActPrime();
       float correct_value;
       if (value >= 0) {
@@ -111,8 +113,8 @@ TEST_F(NodeTest, TestCalcPrime) {
         correct_value = std::exp(value) / (1.0 + std::exp(value));
       }
       correct_value = correct_value * (1.0 - correct_value);
-      for (size_t i = 0; i < node_ptr->GetDims()[0]; ++i) {
-        float test_value = node_ptr->GetActivationPtr()->array()(i);
+      for (size_t i = 0; i < node_ptr->get_k_dims()[0]; ++i) {
+        float test_value = node_ptr->get_c_activation_ptr()->array()(i);
         EXPECT_NEAR(test_value, correct_value, kAbsoluteError_)
             << "Evaluated value: " << value;
       }
@@ -120,15 +122,15 @@ TEST_F(NodeTest, TestCalcPrime) {
   }
   // Tests with random initialized data
   for (auto& node_ptr : node_ptr_v_) {
-    node_ptr->ApplyUnaryFunctor(NormalFunctor<float>(0.0, 1.0));
+    node_ptr->ApplyUnaryFunctor_k(NormalFunctor<float>(0.0, 1.0));
     MatXXSPtr<float> correct_data_ptr = make_shared<MatXX<float>>(100, 1);
-    correct_data_ptr->array() = node_ptr->GetActivationPtr()->array();
+    correct_data_ptr->array() = node_ptr->get_c_activation_ptr()->array();
     
     node_ptr->CalcActPrime();
 
-    for (size_t i = 0; i < node_ptr->GetDims()[0]; ++i) {
+    for (size_t i = 0; i < node_ptr->get_k_dims()[0]; ++i) {
       float correct_value;
-      float test_value = node_ptr->GetActivationPtr()->array()(i);
+      float test_value = node_ptr->get_c_activation_ptr()->array()(i);
       float value = correct_data_ptr->array()(i);
       if (value >= 0) {
         correct_value = 1.0 / (1.0 + std::exp(-value));
@@ -146,14 +148,14 @@ TEST_F(NodeTest, TestCalcLoss) {
   std::vector<float> evaluated_values = {-1.0E6, -100, -100.0, -1.0E-7, 0.0, \
                                          1.0E-6, 100, 100.0, 1.0E-7};
   for (auto value : evaluated_values) {
-    sigmoid_l2_node_ptr_->SetActivation(value);
+    sigmoid_l2_node_ptr_->set_c_activation(value);
     float activation;
     if (value >= 0) {
       activation = 1.0 / (1.0 + std::exp(-value));
     } else {
       activation = std::exp(value) / (1.0 + std::exp(value));
     }
-    MatXXSPtr<float> data_result_ptr = make_shared<MatXX<float>>(100, 1);
+    MatXXUPtr<float> data_result_ptr = make_unique<MatXX<float>>(100, 1);
     data_result_ptr->array() = data_result_ptr->array().unaryExpr( \
         std::function<float(float)>(NormalFunctor<float>(0.0, 1.0)));
 
@@ -162,7 +164,7 @@ TEST_F(NodeTest, TestCalcLoss) {
       correct_loss += (activation - data_result_ptr->array()(i)) * \
                       (activation - data_result_ptr->array()(i));
     }
-    float test_loss = sigmoid_l2_node_ptr_->CalcLoss(data_result_ptr);
+    float test_loss = sigmoid_l2_node_ptr_->CalcLoss_k(*data_result_ptr);
     EXPECT_NEAR(test_loss, correct_loss, kRelativeError_ * abs(correct_loss))
         << "Activation value: " << activation << std::endl;
   }
@@ -172,10 +174,10 @@ TEST_F(NodeTest, TestCalcDelta) {
   std::vector<float> evaluated_values = {-1.0E6, -100, -100.0, -1.0E-7, 0.0, \
                                          1.0E-6, 100, 100.0, 1.0E-7};
   for (auto value : evaluated_values) {
-    sigmoid_l2_node_ptr_->SetActivation(value);
-    MatXXSPtr<float> correct_act_ptr = make_shared<MatXX<float>>(100,1);
-    MatXXSPtr<float> correct_prime_ptr = make_shared<MatXX<float>>(100,1);
-    MatXXSPtr<float> correct_delta_ptr = make_shared<MatXX<float>>(100,1);
+    sigmoid_l2_node_ptr_->set_c_activation(value);
+    MatXXUPtr<float> correct_act_ptr = make_unique<MatXX<float>>(100,1);
+    MatXXUPtr<float> correct_prime_ptr = make_unique<MatXX<float>>(100,1);
+    MatXXUPtr<float> correct_delta_ptr = make_unique<MatXX<float>>(100,1);
     float activation;
     if (value >= 0) {
       activation = 1.0 / (1.0 + std::exp(-value));
@@ -186,7 +188,7 @@ TEST_F(NodeTest, TestCalcDelta) {
       correct_act_ptr->array() = activation;
       correct_prime_ptr->array() = activation * (1.0 - activation);
     }
-    MatXXSPtr<float> data_result_ptr = make_shared<MatXX<float>>(100, 1);
+    MatXXUPtr<float> data_result_ptr = make_unique<MatXX<float>>(100, 1);
     data_result_ptr->array() = data_result_ptr->array().unaryExpr( \
         std::function<float(float)>(NormalFunctor<float>(0.0, 1.0)));
 
@@ -194,9 +196,9 @@ TEST_F(NodeTest, TestCalcDelta) {
                                  data_result_ptr->array()) * \
                                  correct_prime_ptr->array();
 
-    sigmoid_l2_node_ptr_->CalcDelta(data_result_ptr);
+    sigmoid_l2_node_ptr_->CalcDelta_k(*data_result_ptr);
     for (int i = 0; i < 100; ++i) {
-      float test_value = sigmoid_l2_node_ptr_->GetDeltaPtr()->array()(i);
+      float test_value = sigmoid_l2_node_ptr_->get_c_delta_ptr()->array()(i);
       float correct_value = correct_delta_ptr->array()(i);
       EXPECT_NEAR(test_value, correct_value, kRelativeError_ * abs(correct_value));
     }

@@ -15,6 +15,8 @@ Contributor(s):
 #ifndef INTELLGRAPH_NODE_OUTPUT_NODE_H_
 #define INTELLGRAPH_NODE_OUTPUT_NODE_H_
 
+#include <memory>
+
 #include "node/node.h"
 #include "utility/common.h"
 
@@ -25,9 +27,11 @@ namespace intellgraph {
 template <class T>
 class OutputNode : public Node<T> {
  public:
-  virtual T CalcLoss(MatXXSPtr<T>& data_result) = 0;
+  // Function name with letter 'k' indicates a reference function (which means
+  // arguments are referred in the function)
+  virtual T CalcLoss_k(const MatXX<T>& data_result) = 0;
 
-  virtual void CalcDelta(MatXXSPtr<T>& data_result) = 0;
+  virtual void CalcDelta_k(const MatXX<T>& data_result) = 0;
 
  protected:
   OutputNode() {}
@@ -37,7 +41,7 @@ class OutputNode : public Node<T> {
 
 // Alias for shared node pointer
 template <class T>
-using OutputNodeSPtr = std::shared_ptr<OutputNode<T>>;
+using OutputNodeUPtr = std::unique_ptr<OutputNode<T>>;
 
 }  // namespace intellgraph
 

@@ -5,7 +5,7 @@ add_subdirectory(lib/googletest)
 
 include_directories(lib/googletest/googletest/include)
 
-set(SOURCE_FILES main.cpp src/node/node_tests.cc)
+set(SOURCE_FILES main.cpp src/node/node_tests.cc src/node/node_parameter_tests.cc)
 
 add_executable(intellgraph_tests ${SOURCE_FILES})
 target_link_libraries(intellgraph_tests node gtest)

@@ -19,44 +19,49 @@ namespace intellgraph {
 template <class T>
 ActLossNode<T>::ActLossNode(
     const NodeParameter& node_param,
-    std::function<T(T)> act_function_ptr,
-    std::function<T(T)> act_prime_ptr,
-    std::function<T(MatXXSPtr<T>, MatXXSPtr<T>)> loss_function_ptr,
-    std::function<MatXXSPtr<T>(MatXXSPtr<T>, MatXXSPtr<T>)> loss_prime_ptr)
-    : node_param_(node_param), act_function_ptr_(act_function_ptr),
-      act_prime_ptr_(act_prime_ptr), loss_function_ptr_(loss_function_ptr),
-      loss_prime_ptr_(loss_prime_ptr) {
-    activation_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);
-    delta_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);
-    bias_ptr_ = std::make_shared<MatXX<T>>(node_param.dims[0], 1);
+    const std::function<T(T)>& act_function_ptr,
+    const std::function<T(T)>& act_prime_ptr,
+    const std::function<T(const MatXX<T>&, const MatXX<T>&)>& loss_function_ptr,
+    const std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)>& \
+        loss_prime_ptr)
+    : act_function_ptr_(act_function_ptr), act_prime_ptr_(act_prime_ptr), \
+      loss_function_ptr_(loss_function_ptr), loss_prime_ptr_(loss_prime_ptr) {
+  node_param_.Clone(node_param);
 
-    activation_ptr_->array() = 0.0;
-    delta_ptr_->array() = 0.0;
-    bias_ptr_->array() = 0.0;
+  size_t row = node_param.get_k_dims()[0];
+  size_t col = node_param.get_k_dims()[1];
+
+  activation_ptr_ = std::make_unique<MatXX<T>>(row, col);
+  delta_ptr_ = std::make_unique<MatXX<T>>(row, col);
+  bias_ptr_ = std::make_unique<MatXX<T>>(row, col);
+
+  activation_ptr_->array() = 0.0;
+  delta_ptr_->array() = 0.0;
+  bias_ptr_->array() = 0.0;
   
-    Transition(kInit);
+  Transition(kInit);
 }
 
 template <class T>
 void ActLossNode<T>::PrintAct() const {
-  std::cout << "ActLossNode " << node_param_.id << " Activation Vector:" 
+  std::cout << "ActLossNode " << node_param_.get_k_id() << " Activation Vector:" 
             << std::endl << activation_ptr_->array() << std::endl;
 }
 
 template <class T>
 void ActLossNode<T>::PrintDelta() const {
-  std::cout << "ActLossNode " << node_param_.id << " Delta Vector:" 
+  std::cout << "ActLossNode " << node_param_.get_k_id() << " Delta Vector:" 
             << std::endl << delta_ptr_->array() << std::endl;
 }
 
 template <class T>
 void ActLossNode<T>::PrintBias() const {
-  std::cout << "ActLossNode " << node_param_.id << " Bias Vector:" 
+  std::cout << "ActLossNode " << node_param_.get_k_id() << " Bias Vector:" 
             << std::endl << bias_ptr_->array() << std::endl;
 }
 
 template <class T>
-void ActLossNode<T>::ApplyUnaryFunctor(std::function<T(T)> functor) {
+void ActLossNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
     std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined." 
               << std::endl;
@@ -68,7 +73,7 @@ void ActLossNode<T>::ApplyUnaryFunctor(std::function<T(T)> functor) {
 }
 
 template <class T>
-T ActLossNode<T>::CalcLoss(MatXXSPtr<T>& data_result) {
+T ActLossNode<T>::CalcLoss_k(const MatXX<T>& data_result) {
   T loss = 0;
   if (!Transition(kAct)) {
     std::cout << "ERROR: CalcLoss() for ActLossNode fails. " 
@@ -78,13 +83,13 @@ T ActLossNode<T>::CalcLoss(MatXXSPtr<T>& data_result) {
   if (loss_function_ptr_ == nullptr) {
     std::cout << "WARNING: loss function is not defined." << std::endl;
   } else {
-    loss = loss_function_ptr_(activation_ptr_, data_result);
+    loss = loss_function_ptr_(*activation_ptr_, data_result);
   }
   return loss;
 }
 
 template <class T>
-void ActLossNode<T>::CalcDelta(MatXXSPtr<T>& data_result) {
+void ActLossNode<T>::CalcDelta_k(const MatXX<T>& data_result) {
   if (!Transition(kAct)) {
     std::cout << "ERROR: CalcDelta() for ActLossNode fails. " 
               << "Transition to kAct fails" << std::endl;
@@ -93,7 +98,7 @@ void ActLossNode<T>::CalcDelta(MatXXSPtr<T>& data_result) {
   if (loss_prime_ptr_ == nullptr) {
     std::cout << "WARNING: loss prime function is not defined." << std::endl;
   } else {
-    delta_ptr_ = loss_prime_ptr_(activation_ptr_, data_result);
+    loss_prime_ptr_(*activation_ptr_, data_result, *delta_ptr_);
   }
   // Note CalcActPrime overwrites data in activation_ptr in-place
   if (!Transition(kPrime)) {
