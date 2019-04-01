@@ -29,7 +29,7 @@ namespace intellgraph {
 template <class T>
 class SigmoidNode : public Node<T> {
  public:
-  SigmoidNode() = default;
+  SigmoidNode() noexcept = default;
 
   explicit SigmoidNode(const NodeParameter& node_param);
 
@@ -43,7 +43,7 @@ class SigmoidNode : public Node<T> {
   SigmoidNode(const SigmoidNode<T>& rhs) = delete;
   SigmoidNode& operator=(const SigmoidNode<T>& rhs) = delete;
 
-  ~SigmoidNode() = default;
+  ~SigmoidNode() noexcept = default;
 
   void PrintAct() const final;
 
@@ -111,6 +111,7 @@ class SigmoidNode : public Node<T> {
   MatXXUPtr<T> bias_ptr_{nullptr};
   // Stores current state of activation vector
   ActStates current_act_state_{kInit};
+
 };
 
 // Alias for shared SigmoidNode pointer

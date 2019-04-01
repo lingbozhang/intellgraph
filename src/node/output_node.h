@@ -27,16 +27,16 @@ namespace intellgraph {
 template <class T>
 class OutputNode : public Node<T> {
  public:
+  OutputNode() noexcept = default;
+  
+  virtual ~OutputNode() noexcept = default;
+  
   // Function name with letter 'k' indicates a reference function (which means
   // arguments are referred in the function)
   virtual T CalcLoss_k(const MatXX<T>& data_result) = 0;
 
   virtual void CalcDelta_k(const MatXX<T>& data_result) = 0;
 
- protected:
-  OutputNode() {}
-  
-  ~OutputNode() {}
 };
 
 // Alias for shared node pointer

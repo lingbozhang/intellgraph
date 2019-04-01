@@ -33,7 +33,7 @@ namespace intellgraph {
 template <class T>
 class ActLossNode : public OutputNode<T> {
  public:
-  ActLossNode() = default;
+  ActLossNode() noexcept = default;
 
   explicit ActLossNode(    
       const NodeParameter& node_param,
@@ -51,7 +51,7 @@ class ActLossNode : public OutputNode<T> {
 
   ActLossNode& operator=(const ActLossNode<T>& rhs) = delete;
 
-  ~ActLossNode() = default;
+  ~ActLossNode() noexcept = default;
   
   void PrintAct() const;
 
@@ -139,6 +139,7 @@ class ActLossNode : public OutputNode<T> {
   MatXXUPtr<T> bias_ptr_{nullptr};
   // Stores current state of activation vector
   ActStates current_act_state_{kInit};
+
 };
 
 template <class T>

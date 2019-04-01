@@ -12,7 +12,6 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-
 #include "node/sigmoid_node.h"
 
 namespace intellgraph {

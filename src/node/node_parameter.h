@@ -32,7 +32,7 @@ namespace intellgraph {
 // reference of corresponding object.
 class NodeParameter {
  public:
-  NodeParameter() {}
+  NodeParameter() noexcept {};
 
   explicit NodeParameter(size_t id, const std::string& name, \
                          const std::vector<size_t>& dims)
@@ -53,7 +53,7 @@ class NodeParameter {
   NodeParameter(const NodeParameter& rhs) = delete;
   NodeParameter& operator=(const NodeParameter& rhs) = delete;
   
-  ~NodeParameter() = default;
+  ~NodeParameter() noexcept = default;
 
   // Accessor function name with letter 'c' indicates return copy variables
   inline size_t get_c_id() const {
@@ -111,10 +111,11 @@ class NodeParameter {
 
  private:
   // List initialization (since C++11)
-  // Note Member will be initialized before the class constructor
+  // Note Member will be initialized before the class constructor (C++11)
   size_t id_{0};
   std::string node_name_{""};
   std::vector<size_t> dims_{};
+
 };
 
 }  // namespace intellgraph

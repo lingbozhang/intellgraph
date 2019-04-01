@@ -36,7 +36,7 @@ class NodeTest : public ::testing::Test {
     NodeParameter node_param;
     node_param.set_c_id(0);
     node_param.set_m_node_name("Sigmoid_f");
-    node_param.set_m_dims({100,1});
+    node_param.set_m_dims({100, 1});
 
     sigmoid_node_ptr_ = make_unique<SigmoidNode<float>>(node_param);
     sigmoid_l2_node_ptr_ = make_unique<SigL2Node<float>>(node_param);

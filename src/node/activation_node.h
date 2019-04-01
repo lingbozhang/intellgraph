@@ -32,13 +32,13 @@ namespace intellgraph {
 template <class T>
 class ActivationNode : public Node<T> {
  public:
-  ActivationNode() = default;
+  ActivationNode() noexcept = default;
 
   explicit ActivationNode(const NodeParameter& node_param,
                           const std::function<T(T)>& act_function_ptr,
                           const std::function<T(T)>& act_prime_ptr);
 
-  ~ActivationNode() = default;
+  ~ActivationNode() noexcept = default;
 
   // Move constructor
   ActivationNode(ActivationNode<T>&& rhs) noexcept = default;
@@ -123,6 +123,7 @@ class ActivationNode : public Node<T> {
   MatXXUPtr<T> bias_ptr_{nullptr};
   // Stores current state of activation vector
   ActStates current_act_state_{kInit};
+
 };
 
 template <class T>

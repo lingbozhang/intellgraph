@@ -30,17 +30,21 @@ namespace intellgraph {
 // A Factory design pattern, NodeFactory is used to instantiate corresponding
 // node object.
 template <class T, class Base>
-using NodeFunctor = std::function<Base(NodeParameter)>;
+using NodeFunctor = std::function<std::unique_ptr<Base>(const NodeParameter&)>;
 
 template <class T, class Base>
-using NodeRegistryMap = std::unordered_map<const std::string&, NodeFunctor<T, Base>>;
+using NodeRegistryMap = std::unordered_map<std::string, NodeFunctor<T, Base>>;
 
 template <class T, class Base>
 class NodeFactory {
  public:
+  NodeFactory() = delete;
+
+  ~NodeFactory() = delete;
+
   // use this to instantiate the proper Derived class
-  static Base Instantiate(const NodeParameter& node_param) {
-    const std::string& name = node_param.get_k_node_name();
+  static std::unique_ptr<Base> Instantiate(const NodeParameter& node_param) {
+    std::string name = node_param.get_c_node_name();
     auto it = NodeFactory::Registry().find(name);
     if (it == NodeFactory::Registry().end()) {
       std::cout << "WARNING: instantiate node " << name << " failed" 
@@ -55,34 +59,30 @@ class NodeFactory {
     static NodeRegistryMap<T, Base> impl;
     return impl;
   }
-
- protected:
-  NodeFactory() {}
-
-  ~NodeFactory() {}
 };
 
 template<class T, class Base, class Derived> 
 class NodeFactoryRegister {
  public:
-  NodeFactoryRegister(std::string name) {
+  explicit NodeFactoryRegister(std::string name) {
     NodeFactory<T, Base>::Registry()[name] = \
-        [](const NodeParameter& node_param) {
-          return std::make_unique<Derived>(node_param);
+        [](const NodeParameter& node_param) -> std::unique_ptr<Base> {
+          std::unique_ptr<Base> rv = std::make_unique<Derived>(node_param); // (C++14 feature)
+          return rv;
         };
     std::cout << "Registering Node: '" << name << "'" << std::endl;
   }
 };
 
 // Register SigmoidNode
-static NodeFactoryRegister<float, NodeUPtr<float>, SigmoidNode<float>>
+static NodeFactoryRegister<float, Node<float>, SigmoidNode<float>>
     sigmoid_node_register_f("SigmoidNode_f");
-static NodeFactoryRegister<double, NodeUPtr<double>, SigmoidNode<double>>
+static NodeFactoryRegister<double, Node<double>, SigmoidNode<double>>
     sigmoid_node_register_d("SigmoidNode_d");
 // Register SigL2Node
-static NodeFactoryRegister<float, OutputNodeUPtr<float>, SigL2Node<float>>
+static NodeFactoryRegister<float, OutputNode<float>, SigL2Node<float>>
     sigmoid_l2_node_register_f("SigL2Node_f");
-static NodeFactoryRegister<double, OutputNodeUPtr<double>, SigL2Node<double>>
+static NodeFactoryRegister<double, OutputNode<double>, SigL2Node<double>>
     sigmoid_l2_node_register_d("SigL2Node_d");
 
 }  // intellgraph

@@ -31,7 +31,7 @@ namespace intellgraph {
 template<class T>
 class SigL2Node : public OutputNode<T> {
  public:
-  SigL2Node() = default;
+  SigL2Node() noexcept = default;
 
   explicit SigL2Node(const NodeParameter& node_param);
 
@@ -45,7 +45,7 @@ class SigL2Node : public OutputNode<T> {
   SigL2Node(const SigL2Node<T>& rhs) = delete;
   SigL2Node& operator=(const SigL2Node<T>& rhs) = delete;
 
-  ~SigL2Node() = default;
+  ~SigL2Node() noexcept = default;
 
   void PrintAct() const final;
 
@@ -117,6 +117,7 @@ class SigL2Node : public OutputNode<T> {
   MatXXUPtr<T> bias_ptr_{nullptr};
   // Stores current state of activation vector
   ActStates current_act_state_{kInit};
+
 };
 
 // Alias for shared SigL2Node pointer

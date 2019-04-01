@@ -43,6 +43,10 @@ enum ActStates {
 template <class T>
 class Node {
  public:
+  Node() noexcept = default;
+
+  virtual ~Node() noexcept = default;
+
   virtual void PrintAct() const = 0;
 
   virtual void PrintDelta() const = 0;
@@ -77,10 +81,6 @@ class Node {
 
   virtual inline void set_m_delta_ptr(MatXXUPtr<T> delta_ptr) = 0;
 
- protected:
-  Node() {}
-  
-  ~Node() {}
 };
 
 // Alias for shared node pointer
