@@ -77,13 +77,13 @@ namespace devimpl {
 // own node classes. Note in order to activate register macros, user defined
 // classes should be added as a dynamic library (see force static variable
 // initialization)
-#define DEVIMPL_REGISTER(classname, base) \
+#define DEVIMPL_REGISTER_NODE(classname, base) \
   static const NodeFactoryRegister<float, base<float>, classname<float>> \
       register_f_##classname; \
   static const NodeFactoryRegister<double, base<double>, classname<double>> \
       register_d_##classname;
 
-#define DEVIMPL_REGISTERIMPL(classname, base) \
+#define DEVIMPL_REGISTERIMPL_NODE(classname, base) \
   static const NodeFactoryRegister<float, base<float>, classname<float>> \
       register_f_##classname(#classname); \
   static const NodeFactoryRegister<double, base<double>, classname<double>> \

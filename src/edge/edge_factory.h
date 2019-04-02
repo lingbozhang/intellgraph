@@ -70,6 +70,25 @@ class EdgeFactoryRegister {
   }
 };
 
+namespace devimpl {
+// Registers macros are defined here, developers can use them to register their
+// own edge classes. Note in order to activate register macros, user defined
+// classes should be added as a dynamic library (see force static variable
+// initialization)
+#define DEVIMPL_REGISTER_EDGE(classname, base) \
+  static const EdgeFactoryRegister<float, base<float>, classname<float>> \
+      register_f_##classname; \
+  static const EdgeFactoryRegister<double, base<double>, classname<double>> \
+      register_d_##classname;
+
+#define DEVIMPL_REGISTERIMPL_EDGE(classname, base) \
+  static const EdgeFactoryRegister<float, base<float>, classname<float>> \
+      register_f_##classname(#classname); \
+  static const EdgeFactoryRegister<double, base<double>, classname<double>> \
+      register_d_##classname(#classname);
+
+}  // devimp
+
 }  // intellgraph
 
 #endif  // INTELLGRAPH_EDGE_EDGE_FACTORY_H_

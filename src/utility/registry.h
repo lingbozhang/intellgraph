@@ -15,6 +15,8 @@ Contributor(s):
 #ifndef NICOLE_UTILITY_REGISTRY_H_
 #define NICOLE_UTILITY_REGISTRY_H_
 
+#include "edge/dense_edge.h"
+#include "edge/edge.h"
 #include "node/activation_node.h"
 #include "node/act_loss_node.h"
 #include "node/node.h"
@@ -32,13 +34,16 @@ class Registry {
 
   static void LoadRegistry() {
     // Registers SigmoidNode
-    DEVIMPL_REGISTERIMPL(SigmoidNode, Node);
+    DEVIMPL_REGISTERIMPL_NODE(SigmoidNode, Node);
     // Registers ActivationNode
-    DEVIMPL_REGISTERIMPL(ActivationNode, Node);
+    DEVIMPL_REGISTERIMPL_NODE(ActivationNode, Node);
     // Registers SigL2Node
-    DEVIMPL_REGISTERIMPL(SigL2Node, OutputNode);
+    DEVIMPL_REGISTERIMPL_NODE(SigL2Node, OutputNode);
     // Registers ActLossNode
-    DEVIMPL_REGISTERIMPL(ActLossNode, OutputNode);
+    DEVIMPL_REGISTERIMPL_NODE(ActLossNode, OutputNode);
+
+    // Registers DenseEdge
+    DEVIMPL_REGISTERIMPL_EDGE(DenseEdge, Edge);
 
   }
 };
