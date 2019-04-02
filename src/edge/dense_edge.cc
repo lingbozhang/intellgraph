@@ -17,13 +17,14 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-DenseEdge<T>::DenseEdge(const EdgeParameter<T>& edge_param)
-    : edge_param_(edge_param) {
-  size_t dims_in = edge_param.dims_in[0];
-  size_t dims_out = edge_param.dims_out[0];
+DenseEdge<T>::DenseEdge(const EdgeParameter& edge_param) {
+  edge_param_.Clone(edge_param);
 
-  weight_ptr_ = std::make_shared<MatXX<T>>(dims_in, dims_out);
-  nabla_weight_ptr_ = std::make_shared<MatXX<T>>(dims_in, dims_out);
+  size_t row = edge_param.get_k_dims_in()[0];
+  size_t col = edge_param.get_k_dims_out()[0];
+
+  weight_ptr_ = std::make_unique<MatXX<T>>(row, col);
+  nabla_weight_ptr_ = std::make_unique<MatXX<T>>(row, col);
   
   weight_ptr_->array() = 0.0;
   nabla_weight_ptr_->array() = 0.0;
@@ -31,44 +32,43 @@ DenseEdge<T>::DenseEdge(const EdgeParameter<T>& edge_param)
 
 template <class T>
 void DenseEdge<T>::PrintWeight() const {
-  std::cout << "DenseEdge " << edge_param_.id << " Weight matrix:"
+  std::cout << "DenseEdge: " << edge_param_.get_k_id() << " Weight matrix:"
             << std::endl << weight_ptr_->array() << std::endl;
 }
 
 template <class T>
 void DenseEdge<T>::PrintNablaWeight() const {
-  std::cout << "DenseEdge " << edge_param_.id << " Nabla weight matrix:"
+  std::cout << "DenseEdge: " << edge_param_.get_k_id() << " Nabla weight matrix:"
             << std::endl << nabla_weight_ptr_->array() << std::endl;    
 }
 
 template <class T>
-void DenseEdge<T>::Forward(NodeSPtr<T> node_in_ptr, NodeSPtr<T> node_out_ptr) {
-  MatXXSPtr<T> weighted_sum_ptr = std::make_shared<MatXX<T>>(
-      weight_ptr_->transpose() * node_in_ptr->GetActivationPtr()->matrix() + \
-      node_out_ptr->GetBiasPtr()->matrix());
+void DenseEdge<T>::Forward_mute(Node<T>& node_in, Node<T>& node_out) {
+  MatXXUPtr<T> weighted_sum_ptr = std::make_unique<MatXX<T>>(
+      weight_ptr_->transpose() * node_in.get_c_activation_ptr()->matrix() + \
+      node_out.get_c_bias_ptr()->matrix());
   
-  node_out_ptr->SetActivationPtr(weighted_sum_ptr);
+  node_out.set_m_activation_ptr(std::move(weighted_sum_ptr));
 }
 
 template <class T>
-void DenseEdge<T>::Backward(NodeSPtr<T> node_in_ptr, NodeSPtr<T> node_out_ptr) {
+void DenseEdge<T>::Backward_mute(Node<T>& node_in, Node<T>& node_out) {
   // $\nabla W^{l}=a^{l-1}(\delta^{l})^T$
-  nabla_weight_ptr_->matrix() = node_in_ptr->GetActivationPtr()->matrix() * \
-                                node_out_ptr->GetDeltaPtr()->transpose();
+  nabla_weight_ptr_->matrix() = node_in.get_c_activation_ptr()->matrix() * \
+                                node_out.get_c_delta_ptr()->transpose();
   // Calculates delta_ptr_ of input node
   // $\delta^l= \mathcal{D}[f^\prime(z^l)]W^{l+1}\delta^{l+1}$
-  
-  MatXXSPtr<T> delta_in_ptr = std::make_shared<MatXX<T>>(
-      weight_ptr_->matrix() * node_out_ptr->GetDeltaPtr()->matrix());
+  MatXXUPtr<T> delta_in_ptr = std::make_unique<MatXX<T>>(
+      weight_ptr_->matrix() * node_out.get_c_delta_ptr()->matrix());
 
-  node_in_ptr->CalcActPrime();
-  delta_in_ptr->array() *= node_in_ptr->GetActivationPtr()->array();
+  node_in.CalcActPrime();
+  delta_in_ptr->array() *= node_in.get_c_activation_ptr()->array();
 
-  node_in_ptr->SetDeltaPtr(delta_in_ptr);
+  node_in.set_m_delta_ptr(std::move(delta_in_ptr));
 }
 
 template <class T>
-void DenseEdge<T>::ApplyUnaryFunctor(std::function<T(T)> functor) {
+void DenseEdge<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
     std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined." 
               << std::endl;
@@ -77,14 +77,15 @@ void DenseEdge<T>::ApplyUnaryFunctor(std::function<T(T)> functor) {
   }
 }
 
-template <class T>
-MatXXSPtr<T> DenseEdge<T>::GetWeightPtr() {
-  return weight_ptr_;
-}
-
 // Instantiate class, otherwise compilation will fail
 template class DenseEdge<float>;
 template class DenseEdge<double>;
+
+// Register DenseEdge
+static EdgeFactoryRegister<float, Edge<float>, DenseEdge<float>>
+  dense_edge_register_f("DenseEdge_f");
+static EdgeFactoryRegister<double, Edge<double>, DenseEdge<double>>
+  dense_edge_register_d("DenseEdge_d");
 
 } // namespace intellgraph
 

@@ -17,12 +17,19 @@ Contributor(s):
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/topological_sort.hpp"
-#include "edge/edge_factory.h"
-#include "node/node_factory.h"
+#include "edge/edge.h"
+#include "edge/dense_edge.h"
+#include "node/node.h"
+#include "node/node_parameter.h"
+#include "node/output_node.h"
+#include "node/sigmoid_node.h"
+#include "node/sigmoid_l2_node.h"
 #include "utility/common.h"
+#include "utility/random.h"
 
 namespace intellgraph {
 
@@ -38,9 +45,10 @@ typedef IntellGraph::edge_descriptor EdgeD;
 template <class T>
 class GraphEngine {
  public: 
-  GraphEngine() {}
+  GraphEngine() noexcept {};
 
-  ~GraphEngine() {}
+  ~GraphEngine() noexcept = default;
+
   // Add an edge in the neural graph. NodeParameters and EdgeParameters are 
   // stored in the GraphEngine and they will be later used to instantiate a 
   // graph object.
@@ -52,44 +60,52 @@ class GraphEngine {
   void Instantiate();
   //
   void Forward() {
-    topological_sort(graph_, std::back_inserter(typological_order_));
+    order_.clear();
+    topological_sort(graph_, std::back_inserter(order_));
+    for (auto it_r = order_.rbegin() + 1; it_r != order_.rend(); ++it_r) {
+
+    }
   }
 
-  inline bool SetOutputNodeId(size_t id) {
+  inline const std::vector<size_t>& get_k_order() const {
+    return order_;
+  }
+
+  inline void set_c_output_node_id(const size_t id) {
     if (node_param_map_.count(id) == 0) {
-      std::cout << "WARNING: node " << id << " does not exist in the graph" 
+      std::cout << "WARNING: node: " << id << " does not exist in the graph" 
                 << std::endl;
-      return false;
+      return;
     }
     output_node_id_ = id;
-    return true;
   }
 
-  inline bool SetInputNodeId(size_t id) {
+  inline void set_c_input_node_id(const size_t id) {
     if (node_param_map_.count(id) == 0) {
-      std::cout << "WARNING: node " << id << " does not exist in the graph" 
+      std::cout << "WARNING: node: " << id << " does not exist in the graph" 
                 << std::endl;
-      return false;
+      return;
     }
     input_node_id_ = id;
-    return true;
   }
 
-//private:
-  IntellGraph graph_;
+ //private:
+  IntellGraph graph_{};
 
-  size_t output_node_id_;
-  size_t input_node_id_;
+  size_t output_node_id_{0};
+  size_t input_node_id_{0};
 
-  std::unordered_map<size_t, NodeParameter> node_param_map_;
-  std::unordered_map<size_t, EdgeParameter<T>> edge_param_map_;
+  std::unordered_map<size_t, NodeParameter> node_param_map_{};
+  std::unordered_map<size_t, EdgeParameter> edge_param_map_{};
 
-  OutputNodeSPtr<T> output_node_ptr_;
-  std::unordered_map<size_t, NodeSPtr<T>> node_map_;
-  std::unordered_map<size_t, EdgeSPtr<T>> edge_map_;
+  OutputNode<T>* output_node_ptr_{nullptr};
 
-  // topological sorting result
-  std::vector<size_t> typological_order_;
+  std::unordered_map<size_t, NodeUPtr<T>> node_map_{};
+  std::unordered_map<size_t, EdgeUPtr<T>> edge_map_{};
+
+  // Topological sorting result
+  std::vector<size_t> order_{};
+
 };
 
 }  // intellgraph

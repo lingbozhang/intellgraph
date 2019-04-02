@@ -17,7 +17,7 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-SigL2Node<T>::SigL2Node(const NodeParameter& node_param) {
+SigL2Node<T>::SigL2Node(const NodeParameter<T>& node_param) {
   node_param_.Clone(node_param);
   size_t row = node_param.get_k_dims()[0];
   size_t col = node_param.get_k_dims()[1];

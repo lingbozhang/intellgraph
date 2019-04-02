@@ -20,10 +20,12 @@ Contributor(s):
 #include "node/act_loss_node.h"
 #include "node/activation_node.h"
 #include "node/node.h"
+#include "node/node_factory.h"
 #include "node/node_parameter.h"
 #include "node/output_node.h"
 #include "node/sigmoid_node.h"
 #include "node/sigmoid_l2_node.h"
+#include "utility/registry.h"
 #include "utility/random.h"
 
 using namespace std;
@@ -33,20 +35,21 @@ using namespace intellgraph;
 class NodeTest : public ::testing::Test {
  protected:
   NodeTest() {
-    NodeParameter node_param;
-    node_param.set_c_id(0);
-    node_param.set_m_node_name("Sigmoid_f");
-    node_param.set_m_dims({100, 1});
+    Registry::LoadRegistry();
+    auto node_param1 = NodeParameter<float>(0, "SigmoidNode", {100,1});
+    auto node_param2 = NodeParameter<float>(1, "SigL2Node", {100,1});
 
-    sigmoid_node_ptr_ = make_unique<SigmoidNode<float>>(node_param);
-    sigmoid_l2_node_ptr_ = make_unique<SigL2Node<float>>(node_param);
+    sigmoid_node_ptr_ = std::move( \
+        NodeFactory<float, Node<float>>::Instantiate(node_param1));
+    sigmoid_l2_node_ptr_ = std::move( \
+        NodeFactory<float, OutputNode<float>>::Instantiate(node_param2));
     
     node_ptr_v_.push_back(sigmoid_node_ptr_.get());
     node_ptr_v_.push_back(sigmoid_l2_node_ptr_.get());
   }
   ~NodeTest() {}
-  SigNodeUPtr<float> sigmoid_node_ptr_;
-  SigL2NodeUPtr<float> sigmoid_l2_node_ptr_;
+  NodeUPtr<float> sigmoid_node_ptr_;
+  OutputNodeUPtr<float> sigmoid_l2_node_ptr_;
   std::vector<Node<float>*> node_ptr_v_;
 
   const double kAbsoluteError_ = 1.0E-7;

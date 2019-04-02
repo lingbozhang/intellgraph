@@ -25,11 +25,11 @@ class NodeParamTest : public ::testing::Test {
  protected:
   NodeParamTest() 
       : node_param2_(0, "data2", {3}), dims_({2}) {
-    node_param1_ = NodeParameter(0, "data1", {2});
+    node_param1_ = NodeParameter<float>(0, "data1", {2});
   }
   ~NodeParamTest() {}
-  NodeParameter node_param1_;
-  NodeParameter node_param2_;
+  NodeParameter<float> node_param1_;
+  NodeParameter<float> node_param2_;
   vector<size_t> dims_;
 };
 

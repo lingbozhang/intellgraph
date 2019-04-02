@@ -16,21 +16,16 @@ Contributor(s):
 #define INTELLGRAPH_NODE_NODE_FACTORY_H_
 
 #include <functional>
+#include <iostream>
 #include <unordered_map>
 
-#include "node/activation_node.h"
-#include "node/act_loss_node.h"
-#include "node/node.h"
-#include "node_parameter.h"
-#include "node/sigmoid_node.h"
-#include "node/sigmoid_l2_node.h"
-#include "utility/common.h"
+#include "node/node_parameter.h"
 
 namespace intellgraph {
 // A Factory design pattern, NodeFactory is used to instantiate corresponding
 // node object.
 template <class T, class Base>
-using NodeFunctor = std::function<std::unique_ptr<Base>(const NodeParameter&)>;
+using NodeFunctor = std::function<std::unique_ptr<Base>(const NodeParameter<T>&)>;
 
 template <class T, class Base>
 using NodeRegistryMap = std::unordered_map<std::string, NodeFunctor<T, Base>>;
@@ -43,11 +38,12 @@ class NodeFactory {
   ~NodeFactory() = delete;
 
   // use this to instantiate the proper Derived class
-  static std::unique_ptr<Base> Instantiate(const NodeParameter& node_param) {
+  // static functions have no this parameter. They need no cv-qualifiers.
+  static std::unique_ptr<Base> Instantiate(const NodeParameter<T>& node_param) {
     std::string name = node_param.get_c_node_name();
     auto it = NodeFactory::Registry().find(name);
     if (it == NodeFactory::Registry().end()) {
-      std::cout << "WARNING: instantiate node " << name << " failed" 
+      std::cout << "WARNING: instantiate node " << name << " failed"
                 << std::endl;
       return nullptr;
     } else {
@@ -59,31 +55,41 @@ class NodeFactory {
     static NodeRegistryMap<T, Base> impl;
     return impl;
   }
+
 };
 
-template<class T, class Base, class Derived> 
+template <class T, class Base, class Derived>
 class NodeFactoryRegister {
  public:
-  explicit NodeFactoryRegister(std::string name) {
+  explicit NodeFactoryRegister(const std::string& name) {
     NodeFactory<T, Base>::Registry()[name] = \
-        [](const NodeParameter& node_param) -> std::unique_ptr<Base> {
-          std::unique_ptr<Base> rv = std::make_unique<Derived>(node_param); // (C++14 feature)
+        [](const NodeParameter<T>& node_param) -> std::unique_ptr<Base> {
+            // (C++14 feature)
+          std::unique_ptr<Base> rv = std::make_unique<Derived>(node_param);
           return rv;
         };
     std::cout << "Registering Node: '" << name << "'" << std::endl;
   }
 };
 
-// Register SigmoidNode
-static NodeFactoryRegister<float, Node<float>, SigmoidNode<float>>
-    sigmoid_node_register_f("SigmoidNode_f");
-static NodeFactoryRegister<double, Node<double>, SigmoidNode<double>>
-    sigmoid_node_register_d("SigmoidNode_d");
-// Register SigL2Node
-static NodeFactoryRegister<float, OutputNode<float>, SigL2Node<float>>
-    sigmoid_l2_node_register_f("SigL2Node_f");
-static NodeFactoryRegister<double, OutputNode<double>, SigL2Node<double>>
-    sigmoid_l2_node_register_d("SigL2Node_d");
+namespace devimpl {
+// Registers macros are defined here, developers can use them to register their
+// own node classes. Note in order to activate register macros, user defined
+// classes should be added as a dynamic library (see force static variable
+// initialization)
+#define DEVIMPL_REGISTER(classname, base) \
+  static const NodeFactoryRegister<float, base<float>, classname<float>> \
+      register_f_##classname; \
+  static const NodeFactoryRegister<double, base<double>, classname<double>> \
+      register_d_##classname;
+
+#define DEVIMPL_REGISTERIMPL(classname, base) \
+  static const NodeFactoryRegister<float, base<float>, classname<float>> \
+      register_f_##classname(#classname); \
+  static const NodeFactoryRegister<double, base<double>, classname<double>> \
+      register_d_##classname(#classname);
+
+}  // devimpl
 
 }  // intellgraph
 

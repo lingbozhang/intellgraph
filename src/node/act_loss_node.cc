@@ -17,15 +17,7 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-ActLossNode<T>::ActLossNode(
-    const NodeParameter& node_param,
-    const std::function<T(T)>& act_function_ptr,
-    const std::function<T(T)>& act_prime_ptr,
-    const std::function<T(const MatXX<T>&, const MatXX<T>&)>& loss_function_ptr,
-    const std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)>& \
-        loss_prime_ptr)
-    : act_function_ptr_(act_function_ptr), act_prime_ptr_(act_prime_ptr), \
-      loss_function_ptr_(loss_function_ptr), loss_prime_ptr_(loss_prime_ptr) {
+ActLossNode<T>::ActLossNode(const NodeParameter<T>& node_param) {
   node_param_.Clone(node_param);
 
   size_t row = node_param.get_k_dims()[0];
@@ -44,19 +36,19 @@ ActLossNode<T>::ActLossNode(
 
 template <class T>
 void ActLossNode<T>::PrintAct() const {
-  std::cout << "ActLossNode " << node_param_.get_k_id() << " Activation Vector:" 
+  std::cout << "ActLossNode: " << node_param_.get_k_id() << " Activation Vector:" 
             << std::endl << activation_ptr_->array() << std::endl;
 }
 
 template <class T>
 void ActLossNode<T>::PrintDelta() const {
-  std::cout << "ActLossNode " << node_param_.get_k_id() << " Delta Vector:" 
+  std::cout << "ActLossNode: " << node_param_.get_k_id() << " Delta Vector:" 
             << std::endl << delta_ptr_->array() << std::endl;
 }
 
 template <class T>
 void ActLossNode<T>::PrintBias() const {
-  std::cout << "ActLossNode " << node_param_.get_k_id() << " Bias Vector:" 
+  std::cout << "ActLossNode: " << node_param_.get_k_id() << " Bias Vector:" 
             << std::endl << bias_ptr_->array() << std::endl;
 }
 
@@ -80,10 +72,11 @@ T ActLossNode<T>::CalcLoss_k(const MatXX<T>& data_result) {
               << "Transition to kAct fails" << std::endl;
     exit(1);
   }
-  if (loss_function_ptr_ == nullptr) {
+  auto loss_functor = node_param_.get_k_loss_functor();
+  if (loss_functor == nullptr) {
     std::cout << "WARNING: loss function is not defined." << std::endl;
   } else {
-    loss = loss_function_ptr_(*activation_ptr_, data_result);
+    loss = loss_functor(*activation_ptr_, data_result);
   }
   return loss;
 }
@@ -95,10 +88,11 @@ void ActLossNode<T>::CalcDelta_k(const MatXX<T>& data_result) {
               << "Transition to kAct fails" << std::endl;
     exit(1);
   }
-  if (loss_prime_ptr_ == nullptr) {
+  auto loss_prime_functor = node_param_.get_k_loss_prime_functor();
+  if (loss_prime_functor == nullptr) {
     std::cout << "WARNING: loss prime function is not defined." << std::endl;
   } else {
-    loss_prime_ptr_(*activation_ptr_, data_result, *delta_ptr_);
+    loss_prime_functor(*activation_ptr_, data_result, *delta_ptr_);
   }
   // Note CalcActPrime overwrites data in activation_ptr in-place
   if (!Transition(kPrime)) {
@@ -112,11 +106,13 @@ void ActLossNode<T>::CalcDelta_k(const MatXX<T>& data_result) {
 // Transitions from kInit state to kAct state. 
 template <class T>
 void ActLossNode<T>::InitToAct() {
-  if (act_function_ptr_ == nullptr) {
+  auto act_functor = node_param_.get_k_act_functor();
+  if (act_functor == nullptr) {
+    std::cout << "WARNING: InitToAct() for ActLossNode failed." << std::endl;
     std::cout << "WARNING: activation function is not defined." << std::endl;
   } else {
     activation_ptr_->array() = activation_ptr_->array(). \
-                               unaryExpr(act_function_ptr_);
+                               unaryExpr(act_functor);
   }
   current_act_state_ = kAct;
 }
@@ -125,12 +121,14 @@ template <class T>
 void ActLossNode<T>::ActToPrime() {
   // Derivative equation:
   // $df/dz=f(z)(1-f(z))$
-  if (act_prime_ptr_ == nullptr) {
+  auto act_prime_functor = node_param_.get_k_act_prime_functor();
+  if (act_prime_functor == nullptr) {
+    std::cout << "WARNING: ActToPrime() for ActLossNode failed." << std::endl;
     std::cout << "WARNING: activation prime function is not defined."
               << std::endl;
   } else {
     activation_ptr_->array() = activation_ptr_->array(). \
-                               unaryExpr(act_prime_ptr_);
+                               unaryExpr(act_prime_functor);
   }
   current_act_state_ = kPrime;
 }
@@ -142,7 +140,7 @@ bool ActLossNode<T>::Transition(ActStates state) {
     return true;
   }
   if (current_act_state_ > state) {
-    std::cout << "ERROR: Transition() for ActivationNode fails" << std::endl;
+    std::cout << "ERROR: Transition() for ActLossNode fails" << std::endl;
     return false;
   }
   while (current_act_state_ < state) {
@@ -156,7 +154,7 @@ bool ActLossNode<T>::Transition(ActStates state) {
         break;
       }
       default: {
-        std::cout << "ERROR: Transition() for ActivationNode fails to handle"
+        std::cout << "ERROR: Transition() for ActLossNode fails to handle"
                   << "input state" << std::endl;
         return false;
       }

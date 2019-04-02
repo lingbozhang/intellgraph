@@ -16,28 +16,30 @@ Contributor(s):
 #define INTELLGRAPH_EDGE_EDGE_FACTORY_H_
 
 #include <functional>
+#include <iostream>
 #include <unordered_map>
 
-#include "edge/dense_edge.h"
-#include "edge/edge.h"
 #include "edge/edge_parameter.h"
-#include "utility/common.h"
 
 namespace intellgraph {
 // A Factory design pattern, EdgeFactory is used to instantiate corresponding
 // edge object.
-template <class T>
-using EdgeFunctor = std::function<EdgeSPtr<T>(EdgeParameter<T>)>;
+template <class T, class Base>
+using EdgeFunctor = std::function<std::unique_ptr<Base>(const EdgeParameter&)>;
 
-template <class T>
-using EdgeRegistryMap = std::unordered_map<std::string, EdgeFunctor<T>>;
+template <class T, class Base>
+using EdgeRegistryMap = std::unordered_map<std::string, EdgeFunctor<T, Base>>;
 
-template <class T>
+template <class T, class Base>
 class EdgeFactory {
  public:
+  EdgeFactory() = delete;
+
+  ~EdgeFactory()= delete;
+
   // use this to instantiate the proper Derived class
-  static EdgeSPtr<T> Instantiate(const EdgeParameter<T>& edge_param) {
-    std::string name = edge_param.edge_name;
+  static std::unique_ptr<Base> Instantiate(const EdgeParameter& edge_param) {
+    std::string name = edge_param.get_k_edge_name();
     auto it = EdgeFactory::Registry().find(name);
     if (it == EdgeFactory::Registry().end() ) {
       std::cout << "WARNING: instantiate Edge " << name << " failed"
@@ -48,34 +50,25 @@ class EdgeFactory {
     }
   }
 
-  static EdgeRegistryMap<T>& Registry() {
-    static EdgeRegistryMap<T> impl;
+  static EdgeRegistryMap<T, Base>& Registry() {
+    static EdgeRegistryMap<T, Base> impl;
     return impl;
   }
 
- protected:
-  EdgeFactory() {}
-
-  ~EdgeFactory() {}
 };
 
-template<class T, class Derived> 
+template<class T, class Base, class Derived>
 class EdgeFactoryRegister {
  public:
-  EdgeFactoryRegister(std::string name) {
-    EdgeFactory<T>::Registry()[name] = \
-        [](const struct EdgeParameter<T>& edge_param) {
-          return std::make_shared<Derived>(edge_param);
+  explicit EdgeFactoryRegister(const std::string& name) {
+    EdgeFactory<T, Base>::Registry()[name] = \
+        [](const EdgeParameter& edge_param) -> std::unique_ptr<Base> {
+          std::unique_ptr<Base> rv = std::make_unique<Derived>(edge_param);
+          return rv;
         };
     std::cout << "Registering Edge: '" << name << "'" << std::endl;
   }
 };
-
-// Register DenseEdge
-static EdgeFactoryRegister<float, DenseEdge<float>>
-    dense_edge_register_f("DenseEdge_f");
-static EdgeFactoryRegister<double, DenseEdge<double>>
-    dense_edge_register_d("DenseEdge_d");
 
 }  // intellgraph
 

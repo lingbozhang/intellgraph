@@ -27,13 +27,13 @@ static std::mt19937 gen;
 template <class T>
 class NormalFunctor {
  public:
-  explicit NormalFunctor(T mean, T standard_deviation)
+  explicit NormalFunctor(T mean, T standard_deviation) noexcept
       : mean_(mean), standard_deviation_(standard_deviation) {
     gen = std::mt19937(rd());
     nd_ = std::normal_distribution<T>(mean, standard_deviation);
   }
   // Operator takes dummy argument and returns normal distribution result.
-  T operator () (const T dummy) {
+  inline T operator () (const T dummy) {
     return nd_(gen);
   }
 
@@ -46,17 +46,19 @@ class NormalFunctor {
 template <class T>
 class UniformFunctor {
  public:
-  UniformFunctor(T a, T b) : a_(a), b_(b) {
+  explicit UniformFunctor(T a, T b) noexcept : a_(a), b_(b) {
     gen = std::mt19937(rd());
     dis_ = std::uniform_real_distribution<>(a,b);
   }
-  T operator () (const T dummy) {
+  inline T operator () (const T dummy) {
     return dis_(gen);
   }
+
  private:
   T a_;
   T b_;
   std::uniform_real_distribution<> dis_;
+
 };
 
 }  // intellgraph

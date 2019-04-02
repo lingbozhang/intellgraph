@@ -33,7 +33,7 @@ class SigL2Node : public OutputNode<T> {
  public:
   SigL2Node() noexcept = default;
 
-  explicit SigL2Node(const NodeParameter& node_param);
+  explicit SigL2Node(const NodeParameter<T>& node_param);
 
   // Move constructor
   SigL2Node(SigL2Node<T>&& rhs) noexcept = default;
@@ -63,15 +63,15 @@ class SigL2Node : public OutputNode<T> {
 
   void CalcDelta_k(const MatXX<T>& data_result) final;
 
-  inline std::vector<size_t> get_c_dims() final {
+  inline std::vector<size_t> get_c_dims() const final {
     return node_param_.get_k_dims();
   }
 
-  inline const std::vector<size_t>& get_k_dims() final {
+  inline const std::vector<size_t>& get_k_dims() const final {
     return node_param_.get_k_dims();
   }
 
-  inline MatXX<T>* get_c_activation_ptr() final {
+  inline MatXX<T>* get_c_activation_ptr() const final {
     return activation_ptr_.get();
   }
 
@@ -85,7 +85,7 @@ class SigL2Node : public OutputNode<T> {
     Transition(kInit);
   }
 
-  inline MatXX<T>* get_c_bias_ptr() final {
+  inline MatXX<T>* get_c_bias_ptr() const final {
     return bias_ptr_.get();
   }
 
@@ -93,7 +93,7 @@ class SigL2Node : public OutputNode<T> {
     bias_ptr_ = std::move(bias_ptr);
   }
 
-  inline MatXX<T>* get_c_delta_ptr() final {
+  inline MatXX<T>* get_c_delta_ptr() const final {
     return delta_ptr_.get();
   }
 
@@ -109,7 +109,7 @@ class SigL2Node : public OutputNode<T> {
   // Transitions from current_act_state_ to state
   bool Transition(ActStates state);
 
-  NodeParameter node_param_{};
+  NodeParameter<T> node_param_{};
   MatXXUPtr<T> activation_ptr_{nullptr};
   // Delta vector stores the derivative of loss function of
   // weighted_sum variables
@@ -119,7 +119,6 @@ class SigL2Node : public OutputNode<T> {
   ActStates current_act_state_{kInit};
 
 };
-
 // Alias for shared SigL2Node pointer
 template <class T>
 using SigL2NodeUPtr = std::unique_ptr<SigL2Node<T>>;

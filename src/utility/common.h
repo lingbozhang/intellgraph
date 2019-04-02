@@ -20,7 +20,6 @@ Contributor(s):
 #include <vector>
 
 #include "Eigen/Dense"
-#include "utility/nl_random.h"
 
 namespace intellgraph {
 // Alias for 2-D dynamic matrix from Eigen
@@ -32,10 +31,6 @@ using MatXXUPtr = std::unique_ptr<MatXX<T>>;
 // Alias 2-D dynamic matrix shared pointer from Eigen
 template<class T>
 using MatXXSPtr = std::shared_ptr<MatXX<T>>;
-
-MatXX<double> ArrayInitSDd(size_t row, size_t col);
-
-MatXX<float> ArrayInitSDf(size_t row, size_t col);
 
 }  // namespace intelgraph
 

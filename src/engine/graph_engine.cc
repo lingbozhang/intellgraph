@@ -21,34 +21,33 @@ void GraphEngine<T>::AddEdge(const NodeParameter& node_param_in, \
                              const NodeParameter& node_param_out, \
                              const std::string& edge_name) {
   // Construct node objects and put them in the node_map_
-  size_t vertex_in_id = node_param_in.id;
-  size_t vertex_out_id = node_param_out.id;
+  size_t vertex_in_id = node_param_in.get_k_id();
+  size_t vertex_out_id = node_param_out.get_k_id();
 
-  EdgeParameter<T> edge_param;
-  EdgeProperty edge_property;
+  EdgeParameter edge_param{};
+  EdgeProperty edge_property{};
 
   if (node_param_map_.count(vertex_in_id) == 0) {
-    node_param_map_[vertex_in_id] = node_param_in;
+    node_param_map_[vertex_in_id].Clone(node_param_in);
   }
 
   if (node_param_map_.count(vertex_out_id) == 0) {
-    node_param_map_[vertex_out_id] = node_param_out;
+    node_param_map_[vertex_out_id].Clone(node_param_out);
   }
   edge_property.id = edge_param_map_.size();
 
-  if (edge_param_map_.count(edge_property.id) > 0) {
-    std::cout << "ERROR: Edge " << edge_property.id << "has been added"
-              << std::endl;
-    exit(1);
-  } else {
-    edge_param.id = edge_property.id;
-    edge_param.edge_name = edge_name;
-    edge_param.dims_in = node_param_in.dims;
-    edge_param.dims_out = node_param_out.dims;
+  // Constructs EdgeParameter
+  edge_param.set_c_id(edge_property.id);
+  edge_param.set_c_edge_name(edge_name);
+  edge_param.set_c_dims_in(node_param_in.get_k_dims());
+  edge_param.set_c_dims_out(node_param_out.get_k_dims());
 
-    boost::add_edge(vertex_in_id, vertex_out_id, edge_property, graph_);
-    edge_param_map_[edge_param.id] = edge_param;
+  if (!boost::add_edge(vertex_in_id, vertex_out_id, edge_property, graph_). \
+      second) {
+    std::cout << "WARNING: Edge has already been added" << std::endl;
+    return;
   }
+  edge_param_map_[edge_property.id].Clone(edge_param);
 }
 
 template <class T>
@@ -56,22 +55,26 @@ void GraphEngine<T>::Instantiate() {
   node_map_.clear();
   edge_map_.clear();
   output_node_ptr_ = nullptr;
-  // Instantiate the outputnode object;
-  output_node_ptr_ = NodeFactory<T, OutputNodeSPtr<T>>::Instantiate(
-      node_param_map_[output_node_id_]);
-  node_map_[output_node_id_] = output_node_ptr_;
-  // Instantiate node objects;
-  for (auto node_pair : node_param_map_) {
+  // Instantiates the outputnode object;
+  OutputNodeUPtr<T> output_node_ptr = std::move( \
+      NodeFactory<T, OutputNode<T>>::Instantiate( \
+          node_param_map_[output_node_id_]));
+  node_map_[output_node_id_] = std::move(output_node_ptr);
+  output_node_ptr_ = output_node_ptr.get();
+  // Instantiates node objects;
+  for (auto& node_pair : node_param_map_) {
     if (node_pair.first != output_node_id_) {
-      NodeSPtr<T> node_ptr = NodeFactory<T, NodeSPtr<T>>::Instantiate(
-          node_pair.second);
-      node_map_[node_pair.first] = node_ptr;
+      NodeUPtr<T> node_ptr = 
+          std::move(NodeFactory<T, Node<T>>::Instantiate(node_pair.second));
+      node_map_[node_pair.first] = std::move(node_ptr);
     }
   }
-  // Instantiate edge objects;
-  for (auto edge_pair : edge_param_map_) {
-    EdgeSPtr<T> edge_ptr = EdgeFactory<T>::Instantiate(edge_pair.second);
-    edge_map_[edge_pair.first] = edge_ptr;
+  // Instantiates edge objects;
+  for (auto& edge_pair : edge_param_map_) {
+    EdgeUPtr<T> edge_ptr = std::move(EdgeFactory<T, Edge<T>>::Instantiate( \
+        edge_pair.second));
+    edge_ptr->ApplyUnaryFunctor_k(UniformFunctor<T>(0.0, 1.0));
+    edge_map_[edge_pair.first] = std::move(edge_ptr);
   }
 }
 

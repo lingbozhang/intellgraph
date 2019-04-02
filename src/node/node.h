@@ -19,6 +19,7 @@ Contributor(s):
 #include <memory>
 #include <vector>
 
+#include "node/node_factory.h"
 #include "utility/common.h"
 
 namespace intellgraph {
@@ -61,11 +62,11 @@ class Node {
   virtual void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) = 0;
 
   // Get layer dimensions
-  virtual inline std::vector<size_t> get_c_dims() = 0;
+  virtual inline std::vector<size_t> get_c_dims() const = 0;
 
-  virtual inline const std::vector<size_t>& get_k_dims() = 0;
+  virtual inline const std::vector<size_t>& get_k_dims() const = 0;
 
-  virtual inline MatXX<T>* get_c_activation_ptr() = 0;
+  virtual inline MatXX<T>* get_c_activation_ptr() const = 0;
 
   // Setters named with letter 'm' indicates a move setter (which means 
   // argument ownerships are moved into the function)
@@ -73,11 +74,11 @@ class Node {
 
   virtual inline void set_c_activation(T value) = 0;
 
-  virtual inline MatXX<T>* get_c_bias_ptr() = 0;
+  virtual inline MatXX<T>* get_c_bias_ptr() const = 0;
 
   virtual inline void set_m_bias_ptr(MatXXUPtr<T> bias_ptr) = 0;
 
-  virtual inline MatXX<T>* get_c_delta_ptr() = 0;
+  virtual inline MatXX<T>* get_c_delta_ptr() const = 0;
 
   virtual inline void set_m_delta_ptr(MatXXUPtr<T> delta_ptr) = 0;
 

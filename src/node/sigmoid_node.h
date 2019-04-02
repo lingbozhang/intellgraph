@@ -31,7 +31,7 @@ class SigmoidNode : public Node<T> {
  public:
   SigmoidNode() noexcept = default;
 
-  explicit SigmoidNode(const NodeParameter& node_param);
+  explicit SigmoidNode(const NodeParameter<T>& node_param);
 
   // Move constructor
   SigmoidNode(SigmoidNode<T>&& rhs) noexcept = default;
@@ -57,15 +57,15 @@ class SigmoidNode : public Node<T> {
 
   void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
 
-  inline std::vector<size_t> get_c_dims() final {
+  inline std::vector<size_t> get_c_dims() const final {
     return node_param_.get_k_dims();
   }
 
-  inline const std::vector<size_t>& get_k_dims() final {
+  inline const std::vector<size_t>& get_k_dims() const final {
     return node_param_.get_k_dims();
   }
 
-  inline MatXX<T>* get_c_activation_ptr() final {
+  inline MatXX<T>* get_c_activation_ptr() const final {
     return activation_ptr_.get();
   }
 
@@ -79,7 +79,7 @@ class SigmoidNode : public Node<T> {
     Transition(kInit); 
   }
 
-  inline MatXX<T>* get_c_bias_ptr() final {
+  inline MatXX<T>* get_c_bias_ptr() const final {
     return bias_ptr_.get();
   }
 
@@ -87,7 +87,7 @@ class SigmoidNode : public Node<T> {
     bias_ptr_ = std::move(bias_ptr);
   }
 
-  inline MatXX<T>* get_c_delta_ptr() final {
+  inline MatXX<T>* get_c_delta_ptr() const final {
     return delta_ptr_.get();
   }
 
@@ -103,7 +103,7 @@ class SigmoidNode : public Node<T> {
   // Transitions from current_act_state_ to state
   bool Transition(ActStates state);
   
-  NodeParameter node_param_{};
+  NodeParameter<T> node_param_{};
   MatXXUPtr<T> activation_ptr_{nullptr};
   // Delta vector stores the derivative of loss function of
   // weighted_sum variables

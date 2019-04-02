@@ -17,6 +17,7 @@ Contributor(s):
 
 #include <functional>
 
+#include "edge/edge_factory.h"
 #include "node/node.h"
 #include "utility/common.h"
 
@@ -27,32 +28,35 @@ namespace intellgraph {
 template <class T>
 class Edge {
  public:
+  Edge() noexcept = default;
+
+  virtual ~Edge() noexcept = default;
+
   virtual void PrintWeight() const = 0;
 
   virtual void PrintNablaWeight() const = 0;
 
   // Calculates weighted sum and updates activation_ptr_ of output layer
-  // in-place
-  virtual void Forward(NodeUPtr<T> node_in_ptr, NodeUPtr<T> node_out_ptr) = 0;
+  // in-place. Function name with a word 'mute' indicates it requires mutable
+  // inputs;
+  virtual void Forward_mute(Node<T>& node_in, Node<T>& node_out) = 0;
 
   // Calculates nabla_weight_ and updates delta_ptr_ of input layer in-place 
   // with backpropagation
-  virtual void Backward(NodeUPtr<T> node_in_ptr, NodeUPtr<T> node_out_ptr) = 0;
+  virtual void Backward_mute(Node<T>& node_in, Node<T>& node_out) = 0;
 
   // Passes a unary functor and applies it on the weight matrix
-  virtual void ApplyUnaryFunctor(const std::function<T(T)>& functor) = 0;
+  virtual void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) = 0;
 
-  virtual MatXXSPtr<T> GetWeightPtr() = 0;
+  virtual inline MatXX<T>* get_c_weight_ptr() const = 0;
 
- protected:
-  Edge() {}
+  virtual inline MatXX<T>* get_c_nabla_weight_ptr() const = 0;
 
-  ~Edge() {}
 };
 
 // Alias for unique Edge pointer
 template <class T>
-using EdgeSPtr = std::shared_ptr<Edge<T>>;
+using EdgeUPtr = std::unique_ptr<Edge<T>>;
 
 }  // namespace intellgraph
 

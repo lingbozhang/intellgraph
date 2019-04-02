@@ -34,9 +34,7 @@ class ActivationNode : public Node<T> {
  public:
   ActivationNode() noexcept = default;
 
-  explicit ActivationNode(const NodeParameter& node_param,
-                          const std::function<T(T)>& act_function_ptr,
-                          const std::function<T(T)>& act_prime_ptr);
+  explicit ActivationNode(const NodeParameter<T>& node_param);
 
   ~ActivationNode() noexcept = default;
 
@@ -67,15 +65,15 @@ class ActivationNode : public Node<T> {
 
   void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
 
-  inline std::vector<size_t> get_c_dims() final {
+  inline std::vector<size_t> get_c_dims() const final {
     return node_param_.get_k_dims();
   }
 
-  inline const std::vector<size_t>& get_k_dims() final {
+  inline const std::vector<size_t>& get_k_dims() const final {
     return node_param_.get_k_dims();
   }
 
-  inline MatXX<T>* get_c_activation_ptr() final {
+  inline MatXX<T>* get_c_activation_ptr() const final {
     return activation_ptr_.get();
   }
 
@@ -89,7 +87,7 @@ class ActivationNode : public Node<T> {
     Transition(kInit);
   }
 
-  inline MatXX<T>* get_c_delta_ptr() final {
+  inline MatXX<T>* get_c_delta_ptr() const final {
     return delta_ptr_.get();
   }
 
@@ -97,7 +95,7 @@ class ActivationNode : public Node<T> {
     delta_ptr_ = std::move(delta_ptr);
   }
 
-  inline MatXX<T>* get_c_bias_ptr() final {
+  inline MatXX<T>* get_c_bias_ptr() const final {
     return bias_ptr_.get();
   }
 
@@ -112,9 +110,7 @@ class ActivationNode : public Node<T> {
 
   bool Transition(ActStates state);
 
-  NodeParameter node_param_{};
-  std::function<T(T)> act_function_ptr_{nullptr};
-  std::function<T(T)> act_prime_ptr_{nullptr};
+  NodeParameter<T> node_param_{};
 
   MatXXUPtr<T> activation_ptr_{nullptr};
   // Delta vector stores the derivative of loss function of

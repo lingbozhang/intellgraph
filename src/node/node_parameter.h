@@ -19,17 +19,20 @@ Contributor(s):
 #include <utility>
 #include <vector>
 
+#include "utility/common.h"
+
 namespace intellgraph {
 // NodeParameter contains node information and is used to build node object.
 // Note NodeParameter is a movable class and it must follow rules for movable 
 // type. 
 // Specifically, in NodeParameter class, constructor and operator= only 
 // accept rvalues. There are two versions of accessors:
-//   * get_variable_name returns a copy of the variable
+//   * get_c_variable_name returns a copy of the variable
 //   * get_k_variable_name returns a constant ref of the variable
 // NodeParameter provides a Clone method which is used to copy from other object
 // In NodeParameter, in order to implement method chaining, mutators return
 // reference of corresponding object.
+template <class T>
 class NodeParameter {
  public:
   NodeParameter() noexcept {};
@@ -43,16 +46,21 @@ class NodeParameter {
 
   NodeParameter& operator=(NodeParameter&& rhs) noexcept = default;
   
-  void Clone(const NodeParameter& rhs) {
-    id_ = rhs.get_k_id();
-    dims_ = rhs.get_k_dims();
-    node_name_ = rhs.get_k_node_name();
-  }
-
   // Copy operations are explicitly deleted
   NodeParameter(const NodeParameter& rhs) = delete;
   NodeParameter& operator=(const NodeParameter& rhs) = delete;
-  
+
+  inline void Clone(const NodeParameter& rhs) {
+    id_ = rhs.get_k_id();
+    dims_ = rhs.get_k_dims();
+    node_name_ = rhs.get_k_node_name();
+
+    act_functor_ = rhs.get_k_act_functor();
+    act_prime_functor_ = rhs.get_k_act_prime_functor();
+    loss_functor_ = rhs.get_k_loss_functor();
+    loss_prime_functor_ = rhs.get_k_loss_prime_functor();
+  }
+
   ~NodeParameter() noexcept = default;
 
   // Accessor function name with letter 'c' indicates return copy variables
@@ -109,12 +117,61 @@ class NodeParameter {
     return *this;
   }
 
+  inline const std::function<T(T)>& get_k_act_functor() const {
+    return act_functor_;
+  }
+
+  inline NodeParameter& set_c_act_functor(const std::function<T(T)>& functor) {
+    act_functor_ = functor;
+    return *this;
+  }
+
+  inline const std::function<T(T)>& get_k_act_prime_functor() const {
+    return act_prime_functor_;
+  }
+
+  inline NodeParameter& set_c_act_prime_functor( \
+      const std::function<T(T)>& functor) {
+    act_prime_functor_ = functor;
+    return *this;
+  }
+
+  inline const std::function<T(const MatXX<T>&, const MatXX<T>&)>& \
+      get_k_loss_functor() const {
+    return loss_functor_;
+  }
+
+  inline NodeParameter& set_c_loss_functor( \
+      const std::function<T(const MatXX<T>&, const MatXX<T>&)>& functor) {
+    loss_functor_ = functor;
+    return *this;
+  }
+
+  inline const std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)>& \
+      get_k_loss_prime_functor() const {
+    return loss_prime_functor_;
+  }
+
+  inline NodeParameter& set_c_loss_prime_functor( \
+      const std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)>& \
+          functor) {
+    loss_prime_functor_ = functor;
+    return *this;
+  } 
+  
  private:
   // List initialization (since C++11)
   // Note Member will be initialized before the class constructor (C++11)
   size_t id_{0};
   std::string node_name_{""};
   std::vector<size_t> dims_{};
+
+  std::function<T(T)> act_functor_{nullptr};
+  std::function<T(T)> act_prime_functor_{nullptr};
+  std::function<T(const MatXX<T>&, const MatXX<T>&)> loss_functor_{nullptr};
+  // Stores derivative of loss function of activation
+  std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)> \
+      loss_prime_functor_{nullptr};
 
 };
 

@@ -27,31 +27,50 @@ namespace intellgraph {
 template <class T>
 class DenseEdge : public Edge<T> {
  public:
-  explicit DenseEdge(const EdgeParameter<T>& edge_param);
+  DenseEdge() noexcept = default;
 
-  ~DenseEdge() {}
+  explicit DenseEdge(const EdgeParameter& edge_param);
+  
+  // Move constructor
+  DenseEdge(DenseEdge<T>&& rhs) noexcept = default;
+
+  // Move operator
+  DenseEdge& operator=(DenseEdge<T>&& rhs) noexcept = default;
+
+  // Copy constructor and operator are deleted
+  DenseEdge(const DenseEdge<T>& rhs) = delete;
+  DenseEdge& operator=(const DenseEdge<T>& rhs) = delete;
+
+  ~DenseEdge() noexcept = default;
 
   void PrintWeight() const final;
 
   void PrintNablaWeight() const final;
 
-  virtual void Forward(NodeSPtr<T> node_in_ptr, NodeSPtr<T> node_out_ptr) final;
+  virtual void Forward_mute(Node<T>& node_in, Node<T>& node_out) final;
 
-  virtual void Backward(NodeSPtr<T> node_in_ptr, NodeSPtr<T> node_out_ptr) final;
+  virtual void Backward_mute(Node<T>& node_in, Node<T>& node_out) final;
 
-  void ApplyUnaryFunctor(std::function<T(T)> functor) final;
+  void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
 
-  MatXXSPtr<T> GetWeightPtr() final;
+  inline MatXX<T>* get_c_weight_ptr() const final {
+    return weight_ptr_.get();
+  }
+
+  inline MatXX<T>* get_c_nabla_weight_ptr() const final {
+    return nabla_weight_ptr_.get();
+  }
 
  private:
-  const struct EdgeParameter<T> edge_param_;
+  EdgeParameter edge_param_{};
 
-  MatXXSPtr<T> weight_ptr_;
-  MatXXSPtr<T> nabla_weight_ptr_;
+  MatXXUPtr<T> weight_ptr_{nullptr};
+  MatXXUPtr<T> nabla_weight_ptr_{nullptr};
+
 };
 // Alias for unique dense edge pointer
 template <class T>
-using DenseEdgeSPtr = std::shared_ptr<DenseEdge<T>>;
+using DenseEdgeUPtr = std::unique_ptr<DenseEdge<T>>;
 
 }  // namespace intellgraph
 

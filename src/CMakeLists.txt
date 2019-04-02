@@ -9,6 +9,6 @@ add_subdirectory(utility)
 set(SOURCE_FILES main.cpp)
 
 add_executable(IntellGraph ${SOURCE_FILES})
-target_link_libraries(IntellGraph node utility)
+target_link_libraries(IntellGraph node)
 
 install(TARGETS IntellGraph DESTINATION ${INTELLGRAPH_INSTALL_BIN_DIR})

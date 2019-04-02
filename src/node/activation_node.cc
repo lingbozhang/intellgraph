@@ -17,10 +17,7 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-ActivationNode<T>::ActivationNode(const NodeParameter& node_param,
-                                  const std::function<T(T)>& act_function_ptr,
-                                  const std::function<T(T)>& act_prime_ptr)
-      : act_function_ptr_(act_function_ptr), act_prime_ptr_(act_prime_ptr) {
+ActivationNode<T>::ActivationNode(const NodeParameter<T>& node_param) {
     node_param_.Clone(node_param);
 
     size_t row = node_param.get_k_dims()[0];
@@ -75,7 +72,7 @@ void ActivationNode<T>::CalcActPrime() {
 template <class T>
 void ActivationNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
-    std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined." 
+    std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined."
               << std::endl;
   } else {
     activation_ptr_->array() = activation_ptr_->array().unaryExpr(functor);
@@ -86,11 +83,13 @@ void ActivationNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) 
 // Transitions from kInit state to kAct state. 
 template <class T>
 void ActivationNode<T>::InitToAct() {
-  if (act_function_ptr_ == nullptr) {
+  auto act_functor = node_param_.get_k_act_functor();
+  if ( act_functor == nullptr) {
+    std::cout << "WARNING: InitToAct() for ActivationNode failed." << std::endl;
     std::cout << "WARNING: activation function is not defined." << std::endl;
   } else {
     activation_ptr_->array() = activation_ptr_->array(). \
-                               unaryExpr(act_function_ptr_);
+                               unaryExpr(act_functor);
   }
   current_act_state_ = kAct;
 }
@@ -99,12 +98,14 @@ template <class T>
 void ActivationNode<T>::ActToPrime() {
   // Derivative equation:
   // $df/dz=f(z)(1-f(z))$
-  if (act_prime_ptr_ == nullptr) {
+  auto act_prime_functor = node_param_.get_k_act_prime_functor();
+  if (act_prime_functor == nullptr) {
+    std::cout << "WARNING: ActToPrime() for ActivationNode failed." << std::endl;
     std::cout << "WARNING: activation prime function is not defined."
               << std::endl;
   } else {
     activation_ptr_->array() = activation_ptr_->array(). \
-                               unaryExpr(act_prime_ptr_);
+                               unaryExpr(act_prime_functor);
   }
   current_act_state_ = kPrime;
 }

@@ -35,13 +35,7 @@ class ActLossNode : public OutputNode<T> {
  public:
   ActLossNode() noexcept = default;
 
-  explicit ActLossNode(    
-      const NodeParameter& node_param,
-      const std::function<T(T)>& act_function_ptr,
-      const std::function<T(T)>& act_prime_ptr,
-      const std::function<T(const MatXX<T>&, const MatXX<T>&)>& loss_function_ptr,
-      const std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)>& \
-          loss_prime_ptr);
+  explicit ActLossNode(const NodeParameter<T>& node_param);
 
   ActLossNode(ActLossNode<T>&& rhs) noexcept = default;
 
@@ -53,11 +47,11 @@ class ActLossNode : public OutputNode<T> {
 
   ~ActLossNode() noexcept = default;
   
-  void PrintAct() const;
+  void PrintAct() const final;
 
-  void PrintDelta() const;
+  void PrintDelta() const final;
 
-  void PrintBias() const;
+  void PrintBias() const final;
 
   // Calls activation function and updates activation. Note this function calls 
   // activation function at runtime and thus has performance penalty
@@ -79,15 +73,15 @@ class ActLossNode : public OutputNode<T> {
   // penalty
   void CalcDelta_k(const MatXX<T>& data_result) final;
 
-  inline std::vector<size_t> get_c_dims() final {
+  inline std::vector<size_t> get_c_dims() const final {
     return node_param_.get_k_dims();
   }
 
-  inline const std::vector<size_t>& get_k_dims() final {
+  inline const std::vector<size_t>& get_k_dims() const final {
     return node_param_.get_k_dims();
   }
 
-  inline MatXX<T>* get_c_activation_ptr() final {
+  inline MatXX<T>* get_c_activation_ptr() const final {
     return activation_ptr_.get();
   }
 
@@ -101,7 +95,7 @@ class ActLossNode : public OutputNode<T> {
     Transition(kInit);
   }
 
-  inline MatXX<T>* get_c_bias_ptr() final {
+  inline MatXX<T>* get_c_bias_ptr() const final {
     return bias_ptr_.get();
   }
 
@@ -109,7 +103,7 @@ class ActLossNode : public OutputNode<T> {
     bias_ptr_ = std::move(bias_ptr);
   }
 
-  inline MatXX<T>* get_c_delta_ptr() final {
+  inline MatXX<T>* get_c_delta_ptr() const final {
     return delta_ptr_.get();
   }
 
@@ -124,13 +118,7 @@ class ActLossNode : public OutputNode<T> {
 
   bool Transition(ActStates state);
 
-  NodeParameter node_param_{};
-  std::function<T(T)> act_function_ptr_{nullptr};
-  std::function<T(T)> act_prime_ptr_{nullptr};
-  std::function<T(const MatXX<T>&, const MatXX<T>&)> loss_function_ptr_{nullptr};
-  // Stores derivative of loss function of activation
-  std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)> \
-      loss_prime_ptr_{nullptr};
+  NodeParameter<T> node_param_{};
 
   MatXXUPtr<T> activation_ptr_{nullptr};
   // Delta vector stores the derivative of loss function of
