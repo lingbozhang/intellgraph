@@ -12,40 +12,35 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_NODE_OUTPUT_NODE_H_
-#define INTELLGRAPH_NODE_OUTPUT_NODE_H_
+#ifndef INTELLGRAPH_NODE_INPUT_NODE_H_
+#define INTELLGRAPH_NODE_INPUT_NODE_H_
 
+#include <iostream>
 #include <memory>
 
 #include "node/node.h"
 #include "utility/common.h"
 
 namespace intellgraph {
-// OutputNode is an abstract class and contains two methods:
-// 1. GetLoss: calculates prediction loss of the neural networks
-// 2. CalcDelta: calculates $dloss/dz$
-template <class T>
-class OutputNode : public Node<T> {
- public:
-  OutputNode() noexcept = default;
-  
-  virtual ~OutputNode() noexcept = default;
-  
-  // Function name with letter 'k' indicates a reference function (which means
-  // arguments are referred in the function)
-  virtual T CalcLoss_k(const MatXX<T>* data_result_ptr) = 0;
 
-  virtual void CalcDelta_k(const MatXX<T>* data_result_ptr) = 0;
+template <class T>
+class InputNode : public Node<T> {
+ public:
+  InputNode() noexcept = default;
+  
+  virtual ~InputNode() noexcept = default;
+  
+  virtual void FeedFeature_k(MatXXSPtr<T> feature_ptr) = 0;
 
 };
 
 // Alias for unique node pointer
 template <class T>
-using OutputNodeUPtr = std::unique_ptr<OutputNode<T>>;
+using InputNodeUPtr = std::unique_ptr<InputNode<T>>;
 
 }  // namespace intellgraph
 
-#endif  // INTELLGRAPH_NODE_OUTPUT_NODE_H_
+#endif  // INTELLGRAPH_NODE_INPUT_NODE_H_
 
 
 

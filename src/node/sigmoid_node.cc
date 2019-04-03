@@ -69,12 +69,14 @@ void SigmoidNode<T>::InitToAct() {
   // Sigmoid activation function:
   // f(z)=1.0/(1.0+exp(-z))
   for (size_t i = 0; i < activation_ptr_->array().rows(); ++i) {
-    T element_value = activation_ptr_->array()(i);
-    if (element_value >= 0.0) {
-      activation_ptr_->array()(i) = 1.0 / (1.0 + std::exp(-element_value));
-    } else {
-      activation_ptr_->array()(i) = std::exp(element_value) / \
-                                    (1.0 + std::exp(element_value));
+    for (size_t j = 0; j < activation_ptr_->array().cols(); ++j) {
+      T element_value = activation_ptr_->array()(i, j);
+      if (element_value >= 0.0) {
+        activation_ptr_->array()(i, j) = 1.0 / (1.0 + std::exp(-element_value));
+      } else {
+        activation_ptr_->array()(i, j) = std::exp(element_value) / \
+                                         (1.0 + std::exp(element_value));
+      }
     }
   }
   current_act_state_ = kAct;  

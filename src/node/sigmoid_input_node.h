@@ -12,54 +12,47 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_NODE_ACT_LOSS_NODE_H_
-#define INTELLGRAPH_NODE_ACT_LOSS_NODE_H_
+#ifndef INTELLGRAPH_LAYER_SIGMOID_INPUT_NODE_H_
+#define INTELLGRAPH_LAYER_SIGMOID_INPUT_NODE_H_
 
 #include <functional>
+#include <memory>
 #include <vector>
-// Your project's .h files
-#include "node/output_node.h"
+
+#include "node/input_node.h"
 #include "node/node_parameter.h"
 #include "utility/common.h"
 
 namespace intellgraph {
-// ActLossNode allows user provided function pointers. ActLossNode 
-// constructor accepts five parameters: 
-// 1. node_param: node paramters
-// 2. act_function_ptr: activation function pointer
-// 3. act_prime_ptr: activation prime function pointer
-// 4. loss_function_ptr: loss function pointer
-// 5. loss_prime_ptr: loss function prime pointer
+// SigInputNode improves performance of CallActFxn and CalcActPrime with Eigen 
+// library and has better performance than ActivationNode. 
 template <class T>
-class ActLossNode : public OutputNode<T> {
+class SigInputNode : public InputNode<T> {
  public:
-  ActLossNode() noexcept = default;
+  SigInputNode() noexcept = default;
 
-  explicit ActLossNode(const NodeParameter<T>& node_param);
+  explicit SigInputNode(const NodeParameter<T>& node_param);
 
-  ActLossNode(ActLossNode<T>&& rhs) noexcept = default;
+  // Move constructor
+  SigInputNode(SigInputNode<T>&& rhs) noexcept = default;
 
-  ActLossNode& operator=(ActLossNode<T>&& rhs) noexcept = default;
-
-  ActLossNode(const ActLossNode<T>& rhs) = delete;
-
-  ActLossNode& operator=(const ActLossNode<T>& rhs) = delete;
-
-  ~ActLossNode() noexcept = default;
+  // Move operator
+  SigInputNode& operator=(SigInputNode<T>&& rhs) noexcept = default;
   
+  // Copy constructor and operator are explicitly deleted
+  SigInputNode(const SigInputNode<T>& rhs) = delete;
+  SigInputNode& operator=(const SigInputNode<T>& rhs) = delete;
+
+  ~SigInputNode() noexcept = default;
+
   void PrintAct() const final;
 
   void PrintDelta() const final;
 
   void PrintBias() const final;
 
-  // Calls activation function and updates activation. Note this function calls 
-  // activation function at runtime and thus has performance penalty
   void CallActFxn() final;
 
-  // Calculates derivative of the activation function and overwrites the 
-  // activation in-place. Note this function calls activation prime function at 
-  // runtime and thus has performance penalty
   void CalcActPrime() final;
 
   void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
@@ -83,7 +76,7 @@ class ActLossNode : public OutputNode<T> {
 
   inline void set_c_activation(T value) final {
     activation_ptr_->array() = value;
-    Transition(kInit);
+    Transition(kInit); 
   }
 
   inline MatXX<T>* get_c_bias_ptr() const final {
@@ -102,25 +95,20 @@ class ActLossNode : public OutputNode<T> {
     delta_ptr_ = std::move(delta_ptr);
   }
 
-  // Note this function calls loss function at runtime and thus has performance
-  // penalty
-  T CalcLoss_k(const MatXX<T>* data_result_ptr) final;
-
-  // Calculates derivative of loss function of weighted_sum variables. Note this
-  // function calls loss prime function at runtime and thus has performance
-  // penalty
-  void CalcDelta_k(const MatXX<T>* data_result_ptr) final;
+  void FeedFeature_k(MatXXSPtr<T> feature_ptr) final {
+    activation_ptr_ = feature_ptr;
+  }
 
  private:
+  // Transitions from kAct state to kPrime state and updates current_act_state_
   void ActToPrime();
-
+  // Transitions from kInit state to kAct state and updates current_act_state_
   void InitToAct();
-
+  // Transitions from current_act_state_ to state
   bool Transition(ActStates state);
-
+  
   NodeParameter<T> node_param_{};
-
-  MatXXUPtr<T> activation_ptr_{nullptr};
+  MatXXSPtr<T> activation_ptr_{nullptr};
   // Delta vector stores the derivative of loss function of
   // weighted_sum variables
   MatXXUPtr<T> delta_ptr_{nullptr};
@@ -130,12 +118,13 @@ class ActLossNode : public OutputNode<T> {
 
 };
 
+// Alias for unqiue SigInputNode pointer
 template <class T>
-using ActLossNodeUPtr = std::unique_ptr<ActLossNode<T>>;
+using SigInputNodeUPtr = std::unique_ptr<SigInputNode<T>>;
 
 }  // namespace intellgraph
 
-#endif  // INTELLGRAPH_NODE_ACT_LOSS_NODE_H_
+#endif  // INTELLGRAPH_LAYER_SIGMOID_INPUT_NODE_H_
 
 
 
@@ -143,4 +132,3 @@ using ActLossNodeUPtr = std::unique_ptr<ActLossNode<T>>;
 
 
 
-  

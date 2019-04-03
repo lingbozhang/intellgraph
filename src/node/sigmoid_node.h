@@ -114,7 +114,7 @@ class SigmoidNode : public Node<T> {
 
 };
 
-// Alias for shared SigmoidNode pointer
+// Alias for unqiue SigmoidNode pointer
 template <class T>
 using SigNodeUPtr = std::unique_ptr<SigmoidNode<T>>;
 

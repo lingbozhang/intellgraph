@@ -65,7 +65,7 @@ void ActLossNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
 }
 
 template <class T>
-T ActLossNode<T>::CalcLoss_k(const MatXX<T>& data_result) {
+T ActLossNode<T>::CalcLoss_k(const MatXX<T>* data_result_ptr) {
   T loss = 0;
   if (!Transition(kAct)) {
     std::cout << "ERROR: CalcLoss() for ActLossNode fails. " 
@@ -76,13 +76,13 @@ T ActLossNode<T>::CalcLoss_k(const MatXX<T>& data_result) {
   if (loss_functor == nullptr) {
     std::cout << "WARNING: loss function is not defined." << std::endl;
   } else {
-    loss = loss_functor(*activation_ptr_, data_result);
+    loss = loss_functor(activation_ptr_.get(), data_result_ptr);
   }
   return loss;
 }
 
 template <class T>
-void ActLossNode<T>::CalcDelta_k(const MatXX<T>& data_result) {
+void ActLossNode<T>::CalcDelta_k(const MatXX<T>* data_result_ptr) {
   if (!Transition(kAct)) {
     std::cout << "ERROR: CalcDelta() for ActLossNode fails. " 
               << "Transition to kAct fails" << std::endl;
@@ -92,7 +92,8 @@ void ActLossNode<T>::CalcDelta_k(const MatXX<T>& data_result) {
   if (loss_prime_functor == nullptr) {
     std::cout << "WARNING: loss prime function is not defined." << std::endl;
   } else {
-    loss_prime_functor(*activation_ptr_, data_result, *delta_ptr_);
+    loss_prime_functor(activation_ptr_.get(), data_result_ptr, \
+        delta_ptr_.get());
   }
   // Note CalcActPrime overwrites data in activation_ptr in-place
   if (!Transition(kPrime)) {

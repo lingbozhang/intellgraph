@@ -12,47 +12,46 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#include "node/sigmoid_l2_node.h"
+#include "node/sigmoid_input_node.h"
 
 namespace intellgraph {
 
 template <class T>
-SigL2Node<T>::SigL2Node(const NodeParameter<T>& node_param) {
-  node_param_.Clone(node_param);
-  size_t row = node_param.get_k_dims()[0];
-  size_t col = node_param.get_k_dims()[1];
+SigInputNode<T>::SigInputNode(const NodeParameter<T>& node_param) {
+    node_param_.Clone(node_param);
+    size_t row = node_param.get_k_dims()[0];
+    size_t col = node_param.get_k_dims()[1];
+    activation_ptr_ = std::make_unique<MatXX<T>>(row, col);
+    delta_ptr_ = std::make_unique<MatXX<T>>(row, col);
+    bias_ptr_ = std::make_unique<MatXX<T>>(row, col);
 
-  activation_ptr_ = std::make_unique<MatXX<T>>(row, col);
-  delta_ptr_ = std::make_unique<MatXX<T>>(row, col);
-  bias_ptr_ = std::make_unique<MatXX<T>>(row, col);
+    activation_ptr_->array() = 0.0;
+    delta_ptr_->array() = 0.0;
+    bias_ptr_->array() = 0.0;
 
-  activation_ptr_->array() = 0.0;
-  delta_ptr_->array() = 0.0;
-  bias_ptr_->array() = 0.0;
-
-  current_act_state_ = kInit;
+    current_act_state_ = kInit;
 }
 
 template <class T>
-void SigL2Node<T>::PrintAct() const {
-  std::cout << "SigL2Node: " << node_param_.get_k_id() << " Activation Vector:" 
+void SigInputNode<T>::PrintAct() const {
+  std::cout << "SigInputNode: " << node_param_.get_k_id() << " Activation Vector:"
             << std::endl << activation_ptr_->array() << std::endl;
 }
 
 template <class T>
-void SigL2Node<T>::PrintDelta() const {
-  std::cout << "SigL2Node: " << node_param_.get_k_id() << " Delta Vector:" 
+void SigInputNode<T>::PrintDelta() const {
+  std::cout << "SigInputNode: " << node_param_.get_k_id() << " Delta Vector:"
             << std::endl << delta_ptr_->array() << std::endl;
 }
 
 template <class T>
-void SigL2Node<T>::PrintBias() const {
-  std::cout << "SigL2Node: " << node_param_.get_k_id() << " Bias Vector:" 
+void SigInputNode<T>::PrintBias() const {
+  std::cout << "SigInputNode: " << node_param_.get_k_id() << " Bias Vector:"
             << std::endl << bias_ptr_->array() << std::endl;
 }
 
 template <class T>
-void SigL2Node<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
+void SigInputNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
     std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined." 
               << std::endl;
@@ -62,40 +61,11 @@ void SigL2Node<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
   }
 }
 
-template <class T>
-T SigL2Node<T>::CalcLoss_k(const MatXX<T>* data_result_ptr) {
-  T loss = 0;
-  if (!Transition(kAct)) {
-    std::cout << "ERROR: CalcDelta() for SigL2Node fails. " << std::endl;
-    exit(1);
-  }
-  loss = (activation_ptr_->array() - data_result_ptr->array()). \
-          matrix().squaredNorm();
-  return loss;
-}
-
-template <class T>
-void SigL2Node<T>::CalcDelta_k(const MatXX<T>* data_result_ptr) {
-  if (!Transition(kAct)) {
-    std::cout << "ERROR: CalcDelta() for SigL2Node fails. " 
-              << "Transition to kAct fails" << std::endl;
-    exit(1);
-  }
-  delta_ptr_->array() = 2.0 * (activation_ptr_->array() - data_result_ptr->array());
-  // Note CalcActPrime overwrites data in activation_ptr_ in-place
-  if (!Transition(kPrime)) {
-    std::cout << "ERROR: CalcDelta() for SigL2Node fails. "
-              << "Transition to kPrime fails" << std::endl;
-    exit(1);
-  } 
-  delta_ptr_->array() *= activation_ptr_->array();
-}
-
 // Transitions from kInit state to kAct state. In order to avoid overflow of 
 // exp() function, sigmoid function is calculated based on the sign of 
 // activation vector entry, as shown in the implementation below.
 template <class T>
-void SigL2Node<T>::InitToAct() {
+void SigInputNode<T>::InitToAct() {
   // Sigmoid activation function:
   // f(z)=1.0/(1.0+exp(-z))
   for (size_t i = 0; i < activation_ptr_->array().rows(); ++i) {
@@ -113,7 +83,7 @@ void SigL2Node<T>::InitToAct() {
 }
 
 template <class T>
-void SigL2Node<T>::ActToPrime() {
+void SigInputNode<T>::ActToPrime() {
   // Derivative equation:
   // $df/dz=f(z)(1-f(z))$
   activation_ptr_->array() *= (1.0 - activation_ptr_->array());
@@ -121,13 +91,13 @@ void SigL2Node<T>::ActToPrime() {
 }
 
 template <class T>
-bool SigL2Node<T>::Transition(ActStates state) {
+bool SigInputNode<T>::Transition(ActStates state) {
   if (state == kInit) {
     current_act_state_ = kInit;
     return true;
   }
   if (current_act_state_ > state) {
-    std::cout << "ERROR: Transition() for SigL2Node fails" << std::endl;
+    std::cout << "ERROR: Transition() for SigInputNode fails" << std::endl;
     return false;
   } 
   while (current_act_state_ < state) {
@@ -141,7 +111,7 @@ bool SigL2Node<T>::Transition(ActStates state) {
         break;
       }
       default: {
-        std::cout << "ERROR: Transition() for SigL2Node fails to handle"
+        std::cout << "ERROR: Transition() for SigInputNode fails to handle"
                   << "input state" << std::endl;
         return false;
       }
@@ -151,23 +121,32 @@ bool SigL2Node<T>::Transition(ActStates state) {
 }
 
 template <class T>
-void SigL2Node<T>::CallActFxn() {
+void SigInputNode<T>::CallActFxn() {
   if (!Transition(kAct)) {
-    std::cout << "ERROR: CallActFxn() for SigL2Node fails" << std::endl;
+    std::cout << "ERROR: CallActFxn() for SigInputNode fails" << std::endl;
     exit(1);
   }
 }
 
 template <class T>
-void SigL2Node<T>::CalcActPrime() {
+void SigInputNode<T>::CalcActPrime() {
   if (!Transition(kPrime)) {
-    std::cout << "ERROR: CalcActPrime() for SigL2Node fails" << std::endl;
+    std::cout << "ERROR: CalcActPrime() for SigInputNode fails" << std::endl;
     exit(1);
   }
 }
 
 // Instantiate class, otherwise compilation will fail
-template class SigL2Node<float>;
-template class SigL2Node<double>;
+template class SigInputNode<float>;
+template class SigInputNode<double>;
 
 }  // namespace intellgraph
+
+
+
+
+
+
+
+
+

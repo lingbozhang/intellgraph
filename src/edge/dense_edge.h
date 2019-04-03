@@ -19,6 +19,7 @@ Contributor(s):
 
 #include "edge/edge.h"
 #include "edge/edge_parameter.h"
+#include "node/node.h"
 #include "utility/common.h"
 
 namespace intellgraph {
@@ -47,9 +48,9 @@ class DenseEdge : public Edge<T> {
 
   void PrintNablaWeight() const final;
 
-  virtual void Forward_mute(Node<T>& node_in, Node<T>& node_out) final;
+  virtual void Forward_mute(Node<T>* node_in_ptr, Node<T>* node_out_ptr) final;
 
-  virtual void Backward_mute(Node<T>& node_in, Node<T>& node_out) final;
+  virtual void Backward_mute(Node<T>* node_in_ptr, Node<T>* node_out_ptr) final;
 
   void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
 

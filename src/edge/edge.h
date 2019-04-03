@@ -39,11 +39,11 @@ class Edge {
   // Calculates weighted sum and updates activation_ptr_ of output layer
   // in-place. Function name with a word 'mute' indicates it requires mutable
   // inputs;
-  virtual void Forward_mute(Node<T>& node_in, Node<T>& node_out) = 0;
+  virtual void Forward_mute(Node<T>* node_in_ptr, Node<T>* node_out_ptr) = 0;
 
   // Calculates nabla_weight_ and updates delta_ptr_ of input layer in-place 
   // with backpropagation
-  virtual void Backward_mute(Node<T>& node_in, Node<T>& node_out) = 0;
+  virtual void Backward_mute(Node<T>* node_in_ptr, Node<T>* node_out_ptr) = 0;
 
   // Passes a unary functor and applies it on the weight matrix
   virtual void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) = 0;

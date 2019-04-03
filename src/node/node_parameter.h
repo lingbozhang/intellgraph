@@ -29,6 +29,9 @@ namespace intellgraph {
 // accept rvalues. There are two versions of accessors:
 //   * get_c_variable_name returns a copy of the variable
 //   * get_k_variable_name returns a constant ref of the variable
+// There are two versions of mutators:
+//   * set_c_variable_name sets a variable by copy
+//   * set_m_variable_name sets a variable by move
 // NodeParameter provides a Clone method which is used to copy from other object
 // In NodeParameter, in order to implement method chaining, mutators return
 // reference of corresponding object.
@@ -136,24 +139,24 @@ class NodeParameter {
     return *this;
   }
 
-  inline const std::function<T(const MatXX<T>&, const MatXX<T>&)>& \
+  inline const std::function<T(const MatXX<T>*, const MatXX<T>*)>& \
       get_k_loss_functor() const {
     return loss_functor_;
   }
 
   inline NodeParameter& set_c_loss_functor( \
-      const std::function<T(const MatXX<T>&, const MatXX<T>&)>& functor) {
+      const std::function<T(const MatXX<T>*, const MatXX<T>*)>& functor) {
     loss_functor_ = functor;
     return *this;
   }
 
-  inline const std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)>& \
+  inline const std::function<void(const MatXX<T>*, const MatXX<T>*, MatXX<T>*)>& \
       get_k_loss_prime_functor() const {
     return loss_prime_functor_;
   }
 
   inline NodeParameter& set_c_loss_prime_functor( \
-      const std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)>& \
+      const std::function<void(const MatXX<T>*, const MatXX<T>*, MatXX<T>*)>& \
           functor) {
     loss_prime_functor_ = functor;
     return *this;
@@ -168,9 +171,9 @@ class NodeParameter {
 
   std::function<T(T)> act_functor_{nullptr};
   std::function<T(T)> act_prime_functor_{nullptr};
-  std::function<T(const MatXX<T>&, const MatXX<T>&)> loss_functor_{nullptr};
+  std::function<T(const MatXX<T>*, const MatXX<T>*)> loss_functor_{nullptr};
   // Stores derivative of loss function of activation
-  std::function<void(const MatXX<T>&, const MatXX<T>&, MatXX<T>&)> \
+  std::function<void(const MatXX<T>*, const MatXX<T>*, MatXX<T>*)> \
       loss_prime_functor_{nullptr};
 
 };

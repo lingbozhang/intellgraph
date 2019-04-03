@@ -35,7 +35,7 @@ using namespace intellgraph;
 class NodeTest : public ::testing::Test {
  protected:
   NodeTest() {
-    Registry::LoadRegistry();
+    Registry::LoadNodeRegistry();
     auto node_param1 = NodeParameter<float>(0, "SigmoidNode", {100,1});
     auto node_param2 = NodeParameter<float>(1, "SigL2Node", {100,1});
 

@@ -59,10 +59,6 @@ class SigL2Node : public OutputNode<T> {
 
   void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
 
-  T CalcLoss_k(const MatXX<T>& data_result) final;
-
-  void CalcDelta_k(const MatXX<T>& data_result) final;
-
   inline std::vector<size_t> get_c_dims() const final {
     return node_param_.get_k_dims();
   }
@@ -101,6 +97,10 @@ class SigL2Node : public OutputNode<T> {
     delta_ptr_ = std::move(delta_ptr);
   }
 
+  T CalcLoss_k(const MatXX<T>* data_result_ptr) final;
+
+  void CalcDelta_k(const MatXX<T>* data_result_ptr) final;
+
  private:
   // Transitions from kAct state to kPrime state and updates current_act_state_
   void ActToPrime();
@@ -119,7 +119,7 @@ class SigL2Node : public OutputNode<T> {
   ActStates current_act_state_{kInit};
 
 };
-// Alias for shared SigL2Node pointer
+// Alias for unique SigL2Node pointer
 template <class T>
 using SigL2NodeUPtr = std::unique_ptr<SigL2Node<T>>;
 

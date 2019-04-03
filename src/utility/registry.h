@@ -19,8 +19,11 @@ Contributor(s):
 #include "edge/edge.h"
 #include "node/activation_node.h"
 #include "node/act_loss_node.h"
+#include "node/input_node.h"
 #include "node/node.h"
 #include "node/node_factory.h"
+#include "node/output_node.h"
+#include "node/sigmoid_input_node.h"
 #include "node/sigmoid_l2_node.h"
 #include "node/sigmoid_node.h"
 
@@ -33,18 +36,29 @@ class Registry {
   ~Registry() = delete;
 
   static void LoadRegistry() {
+    LoadNodeRegistry();
+    LoadEdgeRegistry();
+  }
+
+  static void LoadNodeRegistry() {
     // Registers SigmoidNode
     DEVIMPL_REGISTERIMPL_NODE(SigmoidNode, Node);
     // Registers ActivationNode
     DEVIMPL_REGISTERIMPL_NODE(ActivationNode, Node);
+    // Regiester SigInputNode
+    DEVIMPL_REGISTERIMPL_NODE(SigInputNode, Node);
+    DEVIMPL_REGISTERIMPL_NODE(SigInputNode, InputNode);
     // Registers SigL2Node
+    DEVIMPL_REGISTERIMPL_NODE(SigL2Node, Node);
     DEVIMPL_REGISTERIMPL_NODE(SigL2Node, OutputNode);
     // Registers ActLossNode
+    DEVIMPL_REGISTERIMPL_NODE(ActLossNode, Node);
     DEVIMPL_REGISTERIMPL_NODE(ActLossNode, OutputNode);
+  }
 
+  static void LoadEdgeRegistry() {
     // Registers DenseEdge
     DEVIMPL_REGISTERIMPL_EDGE(DenseEdge, Edge);
-
   }
 };
 

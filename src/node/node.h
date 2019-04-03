@@ -84,7 +84,7 @@ class Node {
 
 };
 
-// Alias for shared node pointer
+// Alias for unique node pointer
 template <class T>
 using NodeUPtr = std::unique_ptr<Node<T>>;
 

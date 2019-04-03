@@ -77,15 +77,15 @@ namespace devimpl {
 // initialization)
 #define DEVIMPL_REGISTER_EDGE(classname, base) \
   static const EdgeFactoryRegister<float, base<float>, classname<float>> \
-      register_f_##classname; \
+      register_f_##classname##_##base; \
   static const EdgeFactoryRegister<double, base<double>, classname<double>> \
-      register_d_##classname;
+      register_d_##classname##_##base;
 
 #define DEVIMPL_REGISTERIMPL_EDGE(classname, base) \
   static const EdgeFactoryRegister<float, base<float>, classname<float>> \
-      register_f_##classname(#classname); \
+      register_f_##classname##_##base(#classname); \
   static const EdgeFactoryRegister<double, base<double>, classname<double>> \
-      register_d_##classname(#classname);
+      register_d_##classname##_##base(#classname);
 
 }  // devimp
 
