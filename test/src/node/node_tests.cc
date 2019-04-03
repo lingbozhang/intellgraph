@@ -167,7 +167,7 @@ TEST_F(NodeTest, TestCalcLoss) {
       correct_loss += (activation - data_result_ptr->array()(i)) * \
                       (activation - data_result_ptr->array()(i));
     }
-    float test_loss = sigmoid_l2_node_ptr_->CalcLoss_k(*data_result_ptr);
+    float test_loss = sigmoid_l2_node_ptr_->CalcLoss_k(data_result_ptr.get());
     EXPECT_NEAR(test_loss, correct_loss, kRelativeError_ * abs(correct_loss))
         << "Activation value: " << activation << std::endl;
   }
@@ -199,7 +199,7 @@ TEST_F(NodeTest, TestCalcDelta) {
                                  data_result_ptr->array()) * \
                                  correct_prime_ptr->array();
 
-    sigmoid_l2_node_ptr_->CalcDelta_k(*data_result_ptr);
+    sigmoid_l2_node_ptr_->CalcDelta_k(data_result_ptr.get());
     for (int i = 0; i < 100; ++i) {
       float test_value = sigmoid_l2_node_ptr_->get_c_delta_ptr()->array()(i);
       float correct_value = correct_delta_ptr->array()(i);

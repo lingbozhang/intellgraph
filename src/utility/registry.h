@@ -45,7 +45,7 @@ class Registry {
     DEVIMPL_REGISTERIMPL_NODE(SigmoidNode, Node);
     // Registers ActivationNode
     DEVIMPL_REGISTERIMPL_NODE(ActivationNode, Node);
-    // Regiester SigInputNode
+    // Register SigInputNode
     DEVIMPL_REGISTERIMPL_NODE(SigInputNode, Node);
     DEVIMPL_REGISTERIMPL_NODE(SigInputNode, InputNode);
     // Registers SigL2Node

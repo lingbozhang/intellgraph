@@ -66,7 +66,7 @@ class EdgeFactoryRegister {
           std::unique_ptr<Base> rv = std::make_unique<Derived>(edge_param);
           return rv;
         };
-    std::cout << "Registering Edge: '" << name << "'" << std::endl;
+    //std::cout << "Registering Edge: '" << name << "'" << std::endl;
   }
 };
 

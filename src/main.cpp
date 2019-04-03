@@ -34,8 +34,8 @@ int main() {
 
   Registry::LoadRegistry();
 
-  auto node_param1 = NodeParameter<float>(0, "SigInputNode", {2,4});
-  auto node_param2 = NodeParameter<float>(0, "SigL2Node", {1,4});
+  auto node_param1 = NodeParameter<float>(0, "SigInputNode", {2,1});
+  auto node_param2 = NodeParameter<float>(0, "SigL2Node", {1,1});
 
   auto edge_param1 = EdgeParameter(0, "DenseEdge", {2,1}, {1,1});
 
@@ -45,8 +45,8 @@ int main() {
       node_param2);
 
   auto edge1_ptr = EdgeFactory<float, Edge<float>>::Instantiate(edge_param1);
-  edge1_ptr->get_c_weight_ptr()->array() << -2, -2;
-  node2_ptr->get_c_bias_ptr()->array() << 3, 3, 3, 3;
+  edge1_ptr->ApplyUnaryFunctor_k(NormalFunctor<float>(0, 1));
+  node2_ptr->ApplyUnaryFunctor_k(NormalFunctor<float>(0, 1));
 
   auto train_d_ptr = std::make_shared<MatXX<float>>(2,4);
   auto train_l_ptr = std::make_shared<MatXX<float>>(1,4);
@@ -55,18 +55,6 @@ int main() {
                           0.0, 0.0, 1.0, 1.0;
 
   train_l_ptr->array() << 1, 1, 1, 0;
-
-  node1_ptr->FeedFeature_k(train_d_ptr);
-
-  edge1_ptr->Forward_mute(node1_ptr.get(), node2_ptr.get());
-
-  node2_ptr->PrintAct();
-
-  node2_ptr->CallActFxn();
-  //std::cout << node2_ptr->CalcLoss_k(*train_l_ptr) << std::endl;
-  std::cout << std::exp(-1)/ (1.0 + std::exp(-1)) << std::endl;
-  node2_ptr->PrintAct();
-
 
 
 

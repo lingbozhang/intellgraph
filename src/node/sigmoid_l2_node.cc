@@ -71,6 +71,7 @@ T SigL2Node<T>::CalcLoss_k(const MatXX<T>* data_result_ptr) {
   }
   loss = (activation_ptr_->array() - data_result_ptr->array()). \
           matrix().squaredNorm();
+  loss /= data_result_ptr->cols();  // averaged l2 norm
   return loss;
 }
 

@@ -3,8 +3,8 @@
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true" buildAllGenerated="true">
     <generated>
       <config projectName="Project" targetName="gtest_main" />
-      <config projectName="Project" targetName="intellgraph_tests" />
       <config projectName="Project" targetName="IntellGraph" />
+      <config projectName="Project" targetName="intellgraph_tests" />
       <config projectName="Project" targetName="gtest" />
       <config projectName="Project" targetName="edge" />
       <config projectName="Project" targetName="gmock" />
@@ -20,23 +20,12 @@
   <component name="ChangeListManager">
     <list default="true" id="3d0f2fc6-757e-43ed-9cf2-5d8e7e9230ed" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/edge/dense_edge.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/edge/dense_edge.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/edge/dense_edge.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/edge/dense_edge.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/edge/edge.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/edge/edge.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/edge/edge_factory.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/edge/edge_factory.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/act_loss_node.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/act_loss_node.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/act_loss_node.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/act_loss_node.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/node.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/node.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/node/node_factory.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/node_factory.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/node_parameter.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/node_parameter.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/output_node.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/output_node.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/node/sigmoid_l2_node.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/sigmoid_l2_node.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/sigmoid_l2_node.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/sigmoid_l2_node.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/sigmoid_node.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/sigmoid_node.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/sigmoid_node.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/sigmoid_node.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utility/registry.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/utility/registry.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/src/node/node_tests.cc" beforeDir="false" afterPath="$PROJECT_DIR$/test/src/node/node_tests.cc" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -51,14 +40,15 @@
     <session id="-981747886">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="13" />
+          <entry key="project.closed" value="14" />
           <entry key="project.open.time.0" value="3" />
           <entry key="project.open.time.1" value="4" />
           <entry key="project.open.time.4" value="1" />
           <entry key="project.open.time.5" value="3" />
           <entry key="project.open.time.6" value="2" />
-          <entry key="project.open.time.7" value="1" />
-          <entry key="project.opened" value="14" />
+          <entry key="project.open.time.7" value="2" />
+          <entry key="project.open.time.8" value="1" />
+          <entry key="project.opened" value="16" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -66,40 +56,40 @@
           <entry key="Makefile" value="1" />
           <entry key="a" value="1" />
           <entry key="cbp" value="1" />
-          <entry key="cc" value="161" />
+          <entry key="cc" value="181" />
           <entry key="cmake" value="1" />
-          <entry key="cpp" value="39" />
+          <entry key="cpp" value="43" />
           <entry key="functional" value="1" />
           <entry key="git-keep" value="3" />
-          <entry key="h" value="302" />
+          <entry key="h" value="330" />
           <entry key="hpp" value="3" />
           <entry key="md" value="1" />
           <entry key="memory" value="4" />
-          <entry key="txt" value="74" />
+          <entry key="txt" value="77" />
           <entry key="unordered_map" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="CMakeLists.txt" value="74" />
+          <entry key="CMakeLists.txt" value="77" />
           <entry key="Markdown" value="1" />
-          <entry key="ObjectiveC" value="511" />
+          <entry key="ObjectiveC" value="563" />
           <entry key="PLAIN_TEXT" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="cc" value="7019" />
-          <entry key="cpp" value="4311" />
-          <entry key="h" value="8724" />
+          <entry key="cc" value="8713" />
+          <entry key="cpp" value="4800" />
+          <entry key="h" value="8731" />
           <entry key="hpp" value="3" />
-          <entry key="txt" value="1016" />
+          <entry key="txt" value="1045" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="CMakeLists.txt" value="1011" />
-          <entry key="ObjectiveC" value="20057" />
+          <entry key="CMakeLists.txt" value="1040" />
+          <entry key="ObjectiveC" value="22247" />
           <entry key="PLAIN_TEXT" value="5" />
         </counts>
       </usages-collector>
@@ -113,31 +103,19 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/node/sigmoid_node.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="105" column="18" selection-start-line="105" selection-start-column="18" selection-end-line="105" selection-end-column="18" />
-              <folding>
-                <element signature="e#807#828#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/node/sigmoid_node.cc">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="562">
+            <state relative-caret-position="-446">
               <caret line="80" column="3" selection-start-line="80" selection-start-column="3" selection-end-line="80" selection-end-column="3" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="953">
-              <caret line="65" column="5" selection-start-line="65" selection-start-column="5" selection-end-line="65" selection-end-column="5" />
+            <state relative-caret-position="525">
+              <caret line="57" selection-start-line="57" selection-end-line="57" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
                 <element signature="e#125#155#0" expanded="true" />
@@ -147,14 +125,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/node/sigmoid_l2_node.h">
+        <entry file="file://$PROJECT_DIR$/src/node/activation_node.cc">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="423">
-              <caret line="92" column="13" selection-start-line="92" selection-start-column="13" selection-end-line="92" selection-end-column="13" />
-              <folding>
-                <element signature="e#809#830#0" expanded="true" />
-                <element signature="e#1266#1275#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="624">
+              <caret line="91" column="27" selection-start-line="91" selection-start-column="27" selection-end-line="91" selection-end-column="27" />
             </state>
           </provider>
         </entry>
@@ -162,7 +136,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/edge/dense_edge.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="404">
+            <state relative-caret-position="624">
               <caret line="55" selection-start-line="55" selection-end-line="55" />
               <folding>
                 <element signature="e#801#822#0" expanded="true" />
@@ -172,29 +146,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/engine/graph_engine.cc">
+        <entry file="file://$PROJECT_DIR$/src/engine/graph_engine.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="426">
-              <caret line="77" column="2" selection-start-line="77" selection-start-column="2" selection-end-line="77" selection-end-column="2" />
-              <folding>
-                <element signature="e#790#799#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/node/act_loss_node.cc">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="99">
-              <caret line="94" selection-start-line="94" selection-end-line="94" />
-              <folding>
-                <element signature="e#789#798#0" expanded="true" />
-                <element signature="e#1489#1498#0" expanded="true" />
-                <element signature="e#1693#1702#0" expanded="true" />
-                <element signature="e#1894#1903#0" expanded="true" />
-                <element signature="e#2282#2291#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="223">
+              <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -202,8 +157,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/edge/dense_edge.cc">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="213">
-              <caret line="45" selection-start-line="45" selection-end-line="45" />
+            <state relative-caret-position="331">
+              <caret line="74" column="9" selection-start-line="74" selection-start-column="9" selection-end-line="74" selection-end-column="9" />
               <folding>
                 <element signature="e#786#795#0" expanded="true" />
               </folding>
@@ -211,13 +166,13 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/edge/edge.h">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/src/edge/edge_tests.cc">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="259">
-              <caret line="39" column="42" selection-start-line="39" selection-start-column="42" selection-end-line="39" selection-end-column="42" />
+            <state relative-caret-position="391">
+              <caret line="100" column="22" lean-forward="true" selection-start-line="100" selection-start-column="22" selection-end-line="100" selection-end-column="22" />
               <folding>
-                <element signature="e#789#810#0" expanded="true" />
+                <element signature="e#718#742#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -226,10 +181,32 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/node/sigmoid_l2_node.cc">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="327">
-              <caret line="84" column="44" lean-forward="true" selection-start-line="84" selection-start-column="44" selection-end-line="84" selection-end-column="44" />
+            <state relative-caret-position="443">
+              <caret line="73" column="19" selection-start-line="73" selection-start-column="19" selection-end-line="73" selection-end-column="19" />
               <folding>
                 <element signature="e#791#800#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/node/act_loss_node.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1343">
+              <caret line="41" column="24" selection-start-line="41" selection-start-column="24" selection-end-line="41" selection-end-column="24" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/node/sigmoid_l2_node.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-119">
+              <caret line="92" column="13" selection-start-line="92" selection-start-column="13" selection-end-line="92" selection-end-column="13" />
+              <folding>
+                <element signature="e#809#830#0" expanded="true" />
+                <element signature="e#1266#1275#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -292,15 +269,16 @@
         <option value="$PROJECT_DIR$/src/node/act_loss_node.h" />
         <option value="$PROJECT_DIR$/test/src/node/node_parameter_tests.cc" />
         <option value="$PROJECT_DIR$/test/src/node/node_tests.cc" />
-        <option value="$PROJECT_DIR$/test/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/src/node/node_factory.h" />
-        <option value="$PROJECT_DIR$/src/edge/edge_factory.h" />
-        <option value="$PROJECT_DIR$/src/utility/registry.h" />
         <option value="$PROJECT_DIR$/src/node/sigmoid_input_node.h" />
         <option value="$PROJECT_DIR$/src/node/sigmoid_node.cc" />
-        <option value="$PROJECT_DIR$/src/node/sigmoid_l2_node.cc" />
         <option value="$PROJECT_DIR$/src/node/act_loss_node.cc" />
+        <option value="$PROJECT_DIR$/test/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/src/main.cpp" />
+        <option value="$PROJECT_DIR$/src/utility/registry.h" />
+        <option value="$PROJECT_DIR$/src/node/node_factory.h" />
+        <option value="$PROJECT_DIR$/src/edge/edge_factory.h" />
+        <option value="$PROJECT_DIR$/test/src/edge/edge_tests.cc" />
+        <option value="$PROJECT_DIR$/src/node/sigmoid_l2_node.cc" />
       </list>
     </option>
   </component>
@@ -312,8 +290,8 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" fullScreen="true">
-    <option name="width" value="1680" />
-    <option name="height" value="1050" />
+    <option name="width" value="1920" />
+    <option name="height" value="1080" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -335,7 +313,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -393,7 +370,7 @@
               <item name="IntellGraph" type="462c0819:PsiDirectoryNode" />
               <item name="test" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="node" type="462c0819:PsiDirectoryNode" />
+              <item name="edge" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="IntellGraph" type="b2602c69:ProjectViewProjectNode" />
@@ -404,6 +381,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -441,7 +419,7 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="IntellGraph" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="IntellGraph" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Project" RUN_TARGET_NAME="IntellGraph">
+    <configuration name="IntellGraph" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="intellgraph_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Project" RUN_TARGET_NAME="intellgraph_tests">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -527,7 +505,9 @@
       <workItem from="1553737798439" duration="1714000" />
       <workItem from="1553799633940" duration="10709000" />
       <workItem from="1553875909059" duration="51893000" />
-      <workItem from="1554224795196" duration="7984000" />
+      <workItem from="1554224795196" duration="8170000" />
+      <workItem from="1554312449627" duration="889000" />
+      <workItem from="1554315126320" duration="7308000" />
     </task>
     <servers />
   </component>
@@ -543,7 +523,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="118927000" />
+    <option name="totallyTimeSpent" value="127310000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -555,22 +535,22 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
+    <frame x="0" y="0" width="1920" height="1080" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2026862" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20660277" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32826748" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.3846154" visible="true" weight="0.3061651" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.70074546" visible="true" weight="0.3059777" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.495116" weight="0.39811912" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49946752" weight="0.32928064" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Messages" order="8" sideWeight="0.64529914" weight="0.28108674" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.61538464" side_tool="true" visible="true" weight="0.3061651" />
+      <window_info anchor="bottom" id="Messages" order="8" sideWeight="0.62247074" weight="0.28064844" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.29925454" side_tool="true" visible="true" weight="0.3059777" />
       <window_info anchor="bottom" id="Version Control" order="10" sideWeight="0.4968051" weight="0.3272543" />
       <window_info anchor="bottom" id="CMake" order="11" sideWeight="0.4884005" weight="0.24033438" />
       <window_info anchor="bottom" id="Terminal" order="12" sideWeight="0.4941427" weight="0.32826748" />
@@ -587,13 +567,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/third_party/boost/boost/graph/detail/edge.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="32" column="10" selection-start-line="32" selection-start-column="10" selection-end-line="32" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/third_party/boost/boost/graph/detail/adjacency_list.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="290">
@@ -667,13 +640,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/engine/graph_engine.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/edge/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="162">
@@ -700,64 +666,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="261">
           <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
-          <folding>
-            <element signature="e#784#803#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/activation_node.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1638">
-          <caret line="91" column="27" selection-start-line="91" selection-start-column="27" selection-end-line="91" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/act_loss_node.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="738">
-          <caret line="41" column="24" selection-start-line="41" selection-start-column="24" selection-end-line="41" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edge/edge_parameter.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="17" column="16" selection-start-line="17" selection-start-column="16" selection-end-line="17" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="10" column="45" selection-start-line="10" selection-start-column="45" selection-end-line="10" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/src/node/node_parameter_tests.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="30" column="36" selection-start-line="30" selection-start-column="36" selection-end-line="30" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/src/node/node_tests.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="321">
-          <caret line="34" column="17" selection-start-line="34" selection-start-column="17" selection-end-line="34" selection-end-column="17" />
-          <folding>
-            <element signature="e#718#734#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/main.cpp">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="10" column="35" selection-start-line="10" selection-start-column="35" selection-end-line="10" selection-end-column="35" />
         </state>
       </provider>
     </entry>
@@ -775,24 +683,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/node_parameter.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="648">
-          <caret line="55" column="16" selection-start-line="55" selection-start-column="16" selection-end-line="55" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/output_node.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="27" column="6" selection-start-line="27" selection-start-column="6" selection-end-line="27" selection-end-column="6" />
-          <folding>
-            <element signature="e#803#820#0" expanded="true" />
-            <element signature="e#1502#1511#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/node/node.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="522">
@@ -804,150 +694,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/utility/registry.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-199">
-          <caret line="25" column="36" selection-start-line="25" selection-start-column="36" selection-end-line="25" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/input_node.h">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_input_node.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="381">
-          <caret line="116" column="38" selection-start-line="116" selection-start-column="38" selection-end-line="116" selection-end-column="38" />
-          <folding>
-            <element signature="e#3638#3647#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_input_node.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="136" column="1" selection-start-line="136" selection-start-column="1" selection-end-line="136" selection-end-column="1" />
-          <folding>
-            <element signature="e#3921#3930#0" expanded="true" />
-            <element signature="e#4100#4109#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/activation_node.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="14" column="36" selection-start-line="14" selection-start-column="36" selection-end-line="14" selection-end-column="36" />
-          <folding>
-            <element signature="e#811#832#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/node_factory.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="79" column="35" selection-start-line="79" selection-start-column="35" selection-end-line="79" selection-end-column="35" />
-          <folding>
-            <element signature="e#805#826#0" expanded="true" />
-            <element signature="e#1034#1055#0" expanded="true" />
-            <element signature="e#2034#2070#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edge/edge_factory.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="84" column="46" selection-start-line="84" selection-start-column="46" selection-end-line="84" selection-end-column="46" />
-          <folding>
-            <element signature="e#805#826#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/engine/graph_engine.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="426">
-          <caret line="77" column="2" selection-start-line="77" selection-start-column="2" selection-end-line="77" selection-end-column="2" />
-          <folding>
-            <element signature="e#790#799#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_node.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="105" column="18" selection-start-line="105" selection-start-column="18" selection-end-line="105" selection-end-column="18" />
-          <folding>
-            <element signature="e#807#828#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_node.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="562">
-          <caret line="80" column="3" selection-start-line="80" selection-start-column="3" selection-end-line="80" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_l2_node.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="423">
-          <caret line="92" column="13" selection-start-line="92" selection-start-column="13" selection-end-line="92" selection-end-column="13" />
-          <folding>
-            <element signature="e#809#830#0" expanded="true" />
-            <element signature="e#1266#1275#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edge/dense_edge.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="404">
-          <caret line="55" selection-start-line="55" selection-end-line="55" />
-          <folding>
-            <element signature="e#801#822#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edge/dense_edge.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="213">
-          <caret line="45" selection-start-line="45" selection-end-line="45" />
-          <folding>
-            <element signature="e#786#795#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/edge/edge.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="259">
-          <caret line="39" column="42" selection-start-line="39" selection-start-column="42" selection-end-line="39" selection-end-column="42" />
-          <folding>
-            <element signature="e#789#810#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_l2_node.cc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="327">
-          <caret line="84" column="44" lean-forward="true" selection-start-line="84" selection-start-column="44" selection-end-line="84" selection-end-column="44" />
-          <folding>
-            <element signature="e#791#800#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/node/act_loss_node.cc">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="99">
+        <state relative-caret-position="1692">
           <caret line="94" selection-start-line="94" selection-end-line="94" />
           <folding>
             <element signature="e#789#798#0" expanded="true" />
@@ -959,13 +708,228 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/edge/edge.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="702">
+          <caret line="39" column="42" selection-start-line="39" selection-start-column="42" selection-end-line="39" selection-end-column="42" />
+          <folding>
+            <element signature="e#789#810#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="10" column="35" selection-start-line="10" selection-start-column="35" selection-end-line="10" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/src/node/node_parameter_tests.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="30" column="36" selection-start-line="30" selection-start-column="36" selection-end-line="30" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edge/edge_parameter.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="145">
+          <caret line="17" column="16" selection-start-line="17" selection-start-column="16" selection-end-line="17" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/node_parameter.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1757">
+          <caret line="55" column="16" selection-start-line="55" selection-start-column="16" selection-end-line="55" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="10" column="50" selection-start-line="10" selection-start-column="50" selection-end-line="10" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/src/node/node_tests.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="593">
+          <caret line="54" selection-start-line="54" selection-end-line="54" />
+          <folding>
+            <element signature="e#718#734#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/node_factory.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="429">
+          <caret line="70" column="6" selection-start-line="70" selection-start-column="6" selection-end-line="70" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edge/edge_factory.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="79">
+          <caret line="68" column="6" selection-start-line="68" selection-start-column="6" selection-end-line="68" selection-end-column="6" />
+          <folding>
+            <element signature="e#805#826#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_input_node.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="136" column="1" selection-start-line="136" selection-start-column="1" selection-end-line="136" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/output_node.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="27" column="6" selection-start-line="27" selection-start-column="6" selection-end-line="27" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/input_node.h">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_node.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="105" column="18" selection-start-line="105" selection-start-column="18" selection-end-line="105" selection-end-column="18" />
+          <folding>
+            <element signature="e#807#828#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/utility/registry.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="47" column="11" selection-start-line="47" selection-start-column="11" selection-end-line="47" selection-end-column="11" />
+          <folding>
+            <element signature="e#788#816#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/activation_node.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1207">
+          <caret line="14" column="36" selection-start-line="14" selection-start-column="36" selection-end-line="14" selection-end-column="36" />
+          <folding>
+            <element signature="e#811#832#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_input_node.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1932">
+          <caret line="116" column="38" selection-start-line="116" selection-start-column="38" selection-end-line="116" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/engine/graph_engine.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1386">
+          <caret line="77" column="2" selection-start-line="77" selection-start-column="2" selection-end-line="77" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/main.cpp">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/activation_node.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="624">
+          <caret line="91" column="27" selection-start-line="91" selection-start-column="27" selection-end-line="91" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/engine/graph_engine.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="223">
+          <caret line="24" column="28" selection-start-line="24" selection-start-column="28" selection-end-line="24" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edge/dense_edge.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="624">
+          <caret line="55" selection-start-line="55" selection-end-line="55" />
+          <folding>
+            <element signature="e#801#822#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/edge/dense_edge.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="331">
+          <caret line="74" column="9" selection-start-line="74" selection-start-column="9" selection-end-line="74" selection-end-column="9" />
+          <folding>
+            <element signature="e#786#795#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/act_loss_node.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1343">
+          <caret line="41" column="24" selection-start-line="41" selection-start-column="24" selection-end-line="41" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_node.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-446">
+          <caret line="80" column="3" selection-start-line="80" selection-start-column="3" selection-end-line="80" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="953">
-          <caret line="65" column="5" selection-start-line="65" selection-start-column="5" selection-end-line="65" selection-end-column="5" />
+        <state relative-caret-position="525">
+          <caret line="57" selection-start-line="57" selection-end-line="57" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
             <element signature="e#125#155#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_l2_node.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-119">
+          <caret line="92" column="13" selection-start-line="92" selection-start-column="13" selection-end-line="92" selection-end-column="13" />
+          <folding>
+            <element signature="e#809#830#0" expanded="true" />
+            <element signature="e#1266#1275#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/node/sigmoid_l2_node.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="443">
+          <caret line="73" column="19" selection-start-line="73" selection-start-column="19" selection-end-line="73" selection-end-column="19" />
+          <folding>
+            <element signature="e#791#800#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/src/edge/edge_tests.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="100" column="22" lean-forward="true" selection-start-line="100" selection-start-column="22" selection-end-line="100" selection-end-column="22" />
+          <folding>
+            <element signature="e#718#742#0" expanded="true" />
           </folding>
         </state>
       </provider>

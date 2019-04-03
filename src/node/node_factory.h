@@ -68,7 +68,7 @@ class NodeFactoryRegister {
           std::unique_ptr<Base> rv = std::make_unique<Derived>(node_param);
           return rv;
         };
-    std::cout << "Registering Node: '" << name << "'" << std::endl;
+    //std::cout << "Registering Node: '" << name << "'" << std::endl;
   }
 };
 
