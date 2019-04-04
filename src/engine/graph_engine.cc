@@ -56,14 +56,16 @@ void GraphEngine<T>::Instantiate() {
   edge_map_.clear();
   input_node_ptr_ = nullptr;
   output_node_ptr_ = nullptr;
-  // Instantiates the outputnode object
-  OutputNodeUPtr<T> output_node_ptr_ = std::move( \
-      NodeFactory<T, OutputNode<T>>::Instantiate( \
-          node_param_map_[output_node_id_]));
-  // Instantiates the inputnode object
-  InputNodeUPtr<T> input_node_ptr_ = std::move( \
-      NodeFactory<T, InputNode<T>>::Instantiate( \
-          node_param_map_[input_node_id_]));
+
+  // Instantiates the input node object
+  input_node_ptr_ = std::move(NodeFactory<T, InputNode<T>>::Instantiate( \
+      node_param_map_[input_node_id_]));
+  
+  // Instantiates the output node object
+  output_node_ptr_ = std::move(NodeFactory<T, OutputNode<T>>::Instantiate( \
+      node_param_map_[output_node_id_]));
+
+  output_node_ptr_->InitializeBias_k(NormalFunctor<T>(0.0, 1.0));
 
   // Instantiates node objects;
   for (auto& node_pair : node_param_map_) {
@@ -71,6 +73,7 @@ void GraphEngine<T>::Instantiate() {
     if (node_id != output_node_id_ && node_id != input_node_id_) {
       NodeUPtr<T> node_ptr = 
           std::move(NodeFactory<T, Node<T>>::Instantiate(node_pair.second));
+      node_ptr->InitializeBias_k(NormalFunctor<T>(0.0, 1.0));
       node_map_[node_pair.first] = std::move(node_ptr);
     }
   }

@@ -63,11 +63,42 @@ class GraphEngine {
   // Build node and edge objects based on the graph and parameters
   void Instantiate();
   //
-  void Forward() {
+  void Forward_c(MatXXSPtr<T> data_ptr) {
     order_.clear();
     topological_sort(graph_, std::back_inserter(order_));
-    for (auto it_r = order_.rbegin() + 1; it_r != order_.rend(); ++it_r) {
+    if (*order_.rbegin() != input_node_id_ || \
+        *order_.begin() != output_node_id_) {
+        std::cout << "ERROR: invalid intellgraph." << std::endl;
+        exit(1);
+    }
+    input_node_ptr_->FeedFeature_k(data_ptr);
+    for (auto it_r = order_.rbegin(); it_r != order_.rend() - 1; ++it_r) {
+      IntellGraph::out_edge_iterator ei, ei_end;
 
+      std::cout << "Forwarding node: " << *it_r << std::endl;
+
+      if (*it_r != input_node_id_ ) node_map_[*it_r]->CallActFxn();
+      for (std::tie(ei, ei_end) = out_edges(*it_r, graph_); ei != ei_end; ++ei) {
+        VertexD v = target(*ei, graph_);
+        size_t edge_id = graph_[*ei].id;
+        Node<T> *node_in_ptr, *node_out_ptr;
+
+        if (*it_r == input_node_id_) {
+          node_in_ptr = input_node_ptr_.get();
+        } else {
+          node_in_ptr = node_map_[*it_r].get();
+        }
+
+        if (v == output_node_id_) {
+          node_out_ptr = output_node_ptr_.get();
+        } else {
+          node_out_ptr = node_map_[v].get();
+        }
+
+        edge_map_[edge_id]->Forward_mute(node_in_ptr, \
+                                         node_out_ptr);
+      }
+      output_node_ptr_->CallActFxn();
     }
   }
 
@@ -93,17 +124,20 @@ class GraphEngine {
     input_node_id_ = id;
   }
 
+  inline const Node<T>* get_k_output_node_ptr() const {
+    return output_node_ptr_.get();
+  }
  //private:
   IntellGraph graph_{};
 
   size_t output_node_id_{0};
   size_t input_node_id_{0};
 
-  std::unordered_map<size_t, NodeParameter> node_param_map_{};
+  std::unordered_map<size_t, NodeParameter<T>> node_param_map_{};
   std::unordered_map<size_t, EdgeParameter> edge_param_map_{};
 
-  OutputNodeNPtr<T> output_node_ptr_{nullptr};
-  InputNodeNPtr<T> input_node_ptr_{nullptr};
+  OutputNodeUPtr<T> output_node_ptr_{nullptr};
+  InputNodeUPtr<T> input_node_ptr_{nullptr};
 
   std::unordered_map<size_t, NodeUPtr<T>> node_map_{};
   std::unordered_map<size_t, EdgeUPtr<T>> edge_map_{};
