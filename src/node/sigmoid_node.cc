@@ -61,6 +61,19 @@ void SigmoidNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
   }
 }
 
+template <class T>
+void SigmoidNode<T>::InitializeBias_k(const std::function<T(T)>& functor) {
+  if (functor == nullptr) {
+    std::cout << "WARNING: functor passed to InitializeBias_k() is not defined." 
+              << std::endl;
+  } else {
+    VecX<T> vec(bias_ptr_->array().rows());
+    vec.array() = vec.array().unaryExpr(functor);
+    bias_ptr_->matrix().colwise() = vec;
+    Transition(kInit);
+  }
+}
+
 // Transitions from kInit state to kAct state. In order to avoid overflow of 
 // exp() function, sigmoid function is calculated based on the sign of 
 // activation vector entry, as shown in the implementation below.

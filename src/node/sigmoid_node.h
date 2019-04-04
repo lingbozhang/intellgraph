@@ -57,6 +57,8 @@ class SigmoidNode : public Node<T> {
 
   void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
 
+  void InitializeBias_k(const std::function<T(T)>& functor) final;
+
   inline std::vector<size_t> get_c_dims() const final {
     return node_param_.get_k_dims();
   }

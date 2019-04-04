@@ -65,6 +65,19 @@ void ActLossNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
 }
 
 template <class T>
+void ActLossNode<T>::InitializeBias_k(const std::function<T(T)>& functor) {
+  if (functor == nullptr) {
+    std::cout << "WARNING: functor passed to InitializeBias_k() is not defined." 
+              << std::endl;
+  } else {
+    VecX<T> vec(bias_ptr_->array().rows());
+    vec.array() = vec.array().unaryExpr(functor);
+    bias_ptr_->matrix().colwise() = vec;
+    Transition(kInit);
+  }
+}
+
+template <class T>
 T ActLossNode<T>::CalcLoss_k(const MatXX<T>* data_result_ptr) {
   T loss = 0;
   if (!Transition(kAct)) {

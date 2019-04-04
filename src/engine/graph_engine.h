@@ -21,13 +21,17 @@ Contributor(s):
 
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/topological_sort.hpp"
-#include "edge/edge.h"
 #include "edge/dense_edge.h"
-#include "node/node.h"
+#include "edge/edge_factory.h"
+#include "edge/edge_parameter.h"
+#include "edge/edge.h"
+#include "node/input_node.h"
+#include "node/node_factory.h"
 #include "node/node_parameter.h"
+#include "node/node.h"
 #include "node/output_node.h"
-#include "node/sigmoid_node.h"
 #include "node/sigmoid_l2_node.h"
+#include "node/sigmoid_node.h"
 #include "utility/common.h"
 #include "utility/random.h"
 
@@ -52,8 +56,8 @@ class GraphEngine {
   // Add an edge in the neural graph. NodeParameters and EdgeParameters are 
   // stored in the GraphEngine and they will be later used to instantiate a 
   // graph object.
-  void AddEdge(const NodeParameter& node_param_in, \
-               const NodeParameter& node_param_out, \
+  void AddEdge(const NodeParameter<T>& node_param_in, \
+               const NodeParameter<T>& node_param_out, \
                const std::string& edge_name);
   
   // Build node and edge objects based on the graph and parameters
@@ -98,7 +102,8 @@ class GraphEngine {
   std::unordered_map<size_t, NodeParameter> node_param_map_{};
   std::unordered_map<size_t, EdgeParameter> edge_param_map_{};
 
-  OutputNode<T>* output_node_ptr_{nullptr};
+  OutputNodeNPtr<T> output_node_ptr_{nullptr};
+  InputNodeNPtr<T> input_node_ptr_{nullptr};
 
   std::unordered_map<size_t, NodeUPtr<T>> node_map_{};
   std::unordered_map<size_t, EdgeUPtr<T>> edge_map_{};

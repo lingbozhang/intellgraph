@@ -22,15 +22,26 @@ Contributor(s):
 #include "Eigen/Dense"
 
 namespace intellgraph {
+
 // Alias for 2-D dynamic matrix from Eigen
-template<class T>
+template <class T>
 using MatXX = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+
+template <class T>
+using VecX = Eigen::Matrix<T, Eigen::Dynamic, 1>;
+
 // Alias 2-D dynamic matrix unique pointer from Eigen
-template<class T>
+template <class T>
 using MatXXUPtr = std::unique_ptr<MatXX<T>>;
 // Alias 2-D dynamic matrix shared pointer from Eigen
-template<class T>
+template <class T>
 using MatXXSPtr = std::shared_ptr<MatXX<T>>;
+
+template <class T>
+using VecXSPtr = std::shared_ptr<VecX<T>>;
+
+template <class T>
+using VecXUPtr = std::unique_ptr<VecX<T>>;
 
 }  // namespace intelgraph
 

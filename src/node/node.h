@@ -58,8 +58,10 @@ class Node {
 
   virtual void CalcActPrime() = 0;
 
-  // Passes a functor and applies it on the activation vector
+  // Passes a functor and applies it on the activation matrix
   virtual void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) = 0;
+
+  virtual void InitializeBias_k(const std::function<T(T)>& functor) = 0;
 
   // Get layer dimensions
   virtual inline std::vector<size_t> get_c_dims() const = 0;

@@ -17,8 +17,8 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-void GraphEngine<T>::AddEdge(const NodeParameter& node_param_in, \
-                             const NodeParameter& node_param_out, \
+void GraphEngine<T>::AddEdge(const NodeParameter<T>& node_param_in, \
+                             const NodeParameter<T>& node_param_out, \
                              const std::string& edge_name) {
   // Construct node objects and put them in the node_map_
   size_t vertex_in_id = node_param_in.get_k_id();
@@ -54,16 +54,21 @@ template <class T>
 void GraphEngine<T>::Instantiate() {
   node_map_.clear();
   edge_map_.clear();
+  input_node_ptr_ = nullptr;
   output_node_ptr_ = nullptr;
-  // Instantiates the outputnode object;
-  OutputNodeUPtr<T> output_node_ptr = std::move( \
+  // Instantiates the outputnode object
+  OutputNodeUPtr<T> output_node_ptr_ = std::move( \
       NodeFactory<T, OutputNode<T>>::Instantiate( \
           node_param_map_[output_node_id_]));
-  node_map_[output_node_id_] = std::move(output_node_ptr);
-  output_node_ptr_ = output_node_ptr.get();
+  // Instantiates the inputnode object
+  InputNodeUPtr<T> input_node_ptr_ = std::move( \
+      NodeFactory<T, InputNode<T>>::Instantiate( \
+          node_param_map_[input_node_id_]));
+
   // Instantiates node objects;
   for (auto& node_pair : node_param_map_) {
-    if (node_pair.first != output_node_id_) {
+    size_t node_id = node_pair.first;
+    if (node_id != output_node_id_ && node_id != input_node_id_) {
       NodeUPtr<T> node_ptr = 
           std::move(NodeFactory<T, Node<T>>::Instantiate(node_pair.second));
       node_map_[node_pair.first] = std::move(node_ptr);
@@ -73,7 +78,8 @@ void GraphEngine<T>::Instantiate() {
   for (auto& edge_pair : edge_param_map_) {
     EdgeUPtr<T> edge_ptr = std::move(EdgeFactory<T, Edge<T>>::Instantiate( \
         edge_pair.second));
-    edge_ptr->ApplyUnaryFunctor_k(UniformFunctor<T>(0.0, 1.0));
+    // Initializes weight matrix with standard normal distribution
+    edge_ptr->ApplyUnaryFunctor_k(NormalFunctor<T>(0.0, 1.0));
     edge_map_[edge_pair.first] = std::move(edge_ptr);
   }
 }
