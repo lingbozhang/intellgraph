@@ -19,6 +19,7 @@ Contributor(s):
 #include <memory>
 #include <vector>
 
+#include "glog/logging.h"
 #include "node/input_node.h"
 #include "node/node_parameter.h"
 #include "node/sigmoid_node.h"

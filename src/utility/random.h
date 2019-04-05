@@ -19,8 +19,6 @@ Contributor(s):
 #include <iostream>
 #include <random>
 
-namespace intellgraph {
-
 static std::random_device rd;
 static std::mt19937 gen;
 
@@ -62,7 +60,5 @@ class UniformFunctor {
   std::uniform_real_distribution<> dis_{};
 
 };
-
-}  // intellgraph
 
 #endif // INTELLGRAPH_UTILITY_RANDOM_H

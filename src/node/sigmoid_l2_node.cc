@@ -20,9 +20,12 @@ template <class T>
 T SigL2Node<T>::CalcLoss(const MatXX<T>* data_result_ptr) {
   T loss = 0;
   if (!Transition(kAct)) {
-    std::cout << "ERROR: CalcLoss() for SigL2Node fails. " << std::endl;
-    exit(1);
+    LOG(ERROR) << "CalcLoss() for SigL2Node is failed.";
   }
+  CHECK_EQ(get_activation_ptr()->rows(), data_result_ptr->rows()) 
+      << "CalcLoss() for SigL2Node is failed: "
+      << "activation and data matrix dimensions are not equal!";
+
   loss = (get_activation_ptr()->array() - data_result_ptr->array()). \
           matrix().squaredNorm();
   return loss;
@@ -31,17 +34,18 @@ T SigL2Node<T>::CalcLoss(const MatXX<T>* data_result_ptr) {
 template <class T>
 void SigL2Node<T>::CalcDelta(const MatXX<T>* data_result_ptr) {
   if (!Transition(kAct)) {
-    std::cout << "ERROR: CalcDelta() for SigL2Node fails. " 
-              << "Transition to kAct fails" << std::endl;
-    exit(1);
+    LOG(ERROR) << "CalcDelta() for SigL2Node is failed." 
   }
+
+  CHECK_EQ(get_activation_ptr()->rows(), data_result_ptr->rows()) 
+      << "CalcDelta() for SigL2Node is failed: "
+      << "activation and data matrix dimensions are not equal!";
+
   get_delta_ptr()->array() = 2.0 * (get_activation_ptr()->array() \
       - data_result_ptr->array());
   // Note CalcActPrime overwrites data in activation_ptr_ in-place
   if (!Transition(kPrime)) {
-    std::cout << "ERROR: CalcDelta() for SigL2Node fails. "
-              << "Transition to kPrime fails" << std::endl;
-    exit(1);
+    LOG(ERROR) << "CalcDelta() for SigL2Node is failed."
   }
   get_delta_ptr()->array() *= get_activation_ptr()->array();
 }

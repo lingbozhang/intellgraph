@@ -4,3 +4,6 @@
 [submodule "boost"]
 	path = boost
 	url = https://github.com/boostorg/boost
+[submodule "third_party/glog"]
+	path = third_party/glog
+	url = https://github.com/google/glog

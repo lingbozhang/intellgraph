@@ -34,27 +34,29 @@ SigmoidNode<T>::SigmoidNode(const NodeParameter<T>& node_param) {
 
 template <class T>
 void SigmoidNode<T>::PrintAct() const {
-  std::cout << "Node: " << node_param_.ref_id() << " Activation Vector:"
-            << std::endl << activation_ptr_->array() << std::endl;
+  std::cout << "Node: " << node_param_.ref_id() << std::endl
+            << " Activation Vector:" << std::endl << activation_ptr_->array() 
+            << std::endl;
 }
 
 template <class T>
 void SigmoidNode<T>::PrintDelta() const {
-  std::cout << "Node: " << node_param_.ref_id() << " Delta Vector:"
-            << std::endl << delta_ptr_->array() << std::endl;
+  std::cout << "Node: " << node_param_.ref_id() << std::endl
+            << " Delta Vector:" << std::endl << delta_ptr_->array() 
+            << std::endl;
 }
 
 template <class T>
 void SigmoidNode<T>::PrintBias() const {
-  std::cout << "Node: " << node_param_.ref_id() << " Bias Vector:"
-            << std::endl << bias_ptr_->array() << std::endl;
+  std::cout << "Node: " << node_param_.ref_id() << std::endl 
+            << " Bias Vector:" << std::endl << bias_ptr_->array() 
+            << std::endl;
 }
 
 template <class T>
 void SigmoidNode<T>::InitializeAct(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
-    std::cout << "WARNING: functor passed to InitializeAct() is not defined."
-              << std::endl;
+    LOG(WARNING) << "InitializeAct() for SigmoidNode is failed."
   } else {
     activation_ptr_->array() = activation_ptr_->array().unaryExpr(functor);
     Transition(kInit);
@@ -64,8 +66,7 @@ void SigmoidNode<T>::InitializeAct(const std::function<T(T)>& functor) {
 template <class T>
 void SigmoidNode<T>::InitializeBias(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
-    std::cout << "WARNING: functor passed to InitializeBias_k() is not defined." 
-              << std::endl;
+    LOG(WARNING) << "InitializeBias() for SigmoidNode is failed." 
   } else {
     VecX<T> vec(bias_ptr_->array().rows());
     vec.array() = vec.array().unaryExpr(functor);
@@ -110,7 +111,7 @@ bool SigmoidNode<T>::Transition(ActStates state) {
     return true;
   }
   if (current_act_state_ > state) {
-    std::cout << "ERROR: Transition() for SigmoidNode fails" << std::endl;
+    LOG(ERROR) << "Transition() for SigmoidNode is failed";
     return false;
   } 
   while (current_act_state_ < state) {
@@ -124,8 +125,7 @@ bool SigmoidNode<T>::Transition(ActStates state) {
         break;
       }
       default: {
-        std::cout << "ERROR: Transition() for SigmoidNode fails to handle"
-                  << "input state" << std::endl;
+        LOG(ERROR) << "Transition() for SigmoidNode is failed";
         return false;
       }
     }
@@ -136,16 +136,14 @@ bool SigmoidNode<T>::Transition(ActStates state) {
 template <class T>
 void SigmoidNode<T>::CallActFxn() {
   if (!Transition(kAct)) {
-    std::cout << "ERROR: CallActFxn() for SigmoidNode fails" << std::endl;
-    exit(1);
+    LOG(ERROR) << "CallActFxn() for SigmoidNode is failed";
   }
 }
 
 template <class T>
 void SigmoidNode<T>::CalcActPrime() {
   if (!Transition(kPrime)) {
-    std::cout << "ERROR: CalcActPrime() for SigmoidNode fails" << std::endl;
-    exit(1);
+    LOG(ERROR) << "CalcActPrime() for SigmoidNode is failed";
   }
 }
 

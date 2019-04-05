@@ -47,7 +47,7 @@ class Example1 {
     NodeRegistry::LoadNodeRegistry();
     EdgeRegistry::LoadEdgeRegistry();
 
-    // SigInputNode is a input layer which uses Sigmoid function as activation
+    // SigInputNode is an input layer which uses Sigmoid function as activation
     // function. Note Node has two dimensions, the first dimension indicates
     // number of nodes and the second dimension is currently used for batch
     // size

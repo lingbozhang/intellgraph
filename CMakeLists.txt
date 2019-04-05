@@ -18,8 +18,10 @@ include_directories(${INTELLGRAPH_EXAMPLES_DIR})
 
 include_directories(third_party/boost)
 include_directories(third_party/eigen-git-mirror)
+include_directories(third_party/glog/src)
 
 add_subdirectory(src)
 add_subdirectory(test)
+add_subdirectory(third_party/glog)
 
 

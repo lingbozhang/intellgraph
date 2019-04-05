@@ -151,5 +151,6 @@
     <mapping directory="$PROJECT_DIR$/third_party/boost/tools/litre" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/third_party/boost/tools/quickbook" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/third_party/eigen-git-mirror" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/third_party/glog" vcs="Git" />
   </component>
 </project>
