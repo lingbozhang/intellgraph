@@ -38,22 +38,24 @@ int main() {
   EdgeRegistry::LoadEdgeRegistry();
 
   auto node_param1 = NodeParameter<float>(0, "SigInputNode", {2, 1});
-  auto node_param2 = NodeParameter<float>(1, "SigmoidNode", {3, 1});
-  auto node_param3 = NodeParameter<float>(2, "SigL2Node", {1, 1});
+  auto node_param2 = NodeParameter<float>(1, "SigL2Node", {1, 1});
 
   graph.AddEdge(node_param1, node_param2, "DenseEdge");
-  graph.AddEdge(node_param2, node_param3, "DenseEdge");
 
   graph.set_input_node_id(0);
-  graph.set_output_node_id(2);
+  graph.set_output_node_id(1);
 
   graph.Instantiate();
 
-  auto data_ptr = std::make_shared<MatXX<float>>(2,1);
-  data_ptr->array() << 2.0,
-                       1.0;
+  MatXXSPtr<float> train_data_ptr = std::make_shared<MatXX<float>>(2, 1);
+  MatXXSPtr<float> train_label_ptr = std::make_shared<MatXX<float>>(1, 1);
+  float eta = 0.2;
+  for (int epoch = 0; epoch < 2000; ++epoch) {
+    std::cout << "Epoch: " << epoch << " Learning rate: " << eta << std::endl;
+    size_t i = rand() % 4;
+    train_data_ptr->array() = train_d_ptr->col(i);
+    train_label_ptr->array() = train_l_ptr->col(i);
+    graph.Learn(train_data_ptr, train_label_ptr, eta);
+  }
 
-  graph.output_node_ptr_->PrintAct();
-  graph.Forward(data_ptr);
-  graph.output_node_ptr_->PrintAct();
 }

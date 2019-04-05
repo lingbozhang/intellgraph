@@ -44,7 +44,7 @@ struct EdgeProperty {
   size_t id;
 };
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, \
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, \
     boost::no_property, EdgeProperty> IntellGraph;
 typedef IntellGraph::vertex_descriptor VertexD;
 typedef IntellGraph::edge_descriptor EdgeD;
@@ -67,6 +67,13 @@ class GraphEngine {
   void Instantiate();
   //
   void Forward(MUTE MatXXSPtr<T> train_data_ptr);
+
+  void Backward(MUTE MatXXSPtr<T> train_label_ptr, \
+                COPY float learning_rate);
+
+  void Learn(MUTE MatXXSPtr<T> train_data_ptr, \
+             MUTE MatXXSPtr<T> train_label_ptr, \
+             COPY float learning_rate);
 
   REF inline const std::vector<size_t>& ref_order() const {
     return order_;

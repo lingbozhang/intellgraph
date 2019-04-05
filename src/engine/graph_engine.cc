@@ -103,14 +103,14 @@ void GraphEngine<T>::Forward(MUTE MatXXSPtr<T> train_data_ptr) {
   }
 
   input_node_ptr_->FeedFeature(train_data_ptr);
-  for (auto it_r = order_.rbegin(); it_r != order_.rend() - 1; ++it_r) {
-    IntellGraph::out_edge_iterator ei{}, ei_end{};
+  for (auto it_r = order_.rbegin(); it_r != order_.rend(); ++it_r) {
+    IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t node_in_id = *it_r;
-    std::cout << "Forwarding node: " << node_in_id << std::endl;
+    //std::cout << "Forwarding node: " << node_in_id << std::endl;
     if (*it_r != input_node_id_ ) node_map_[*it_r]->CallActFxn();
-    for (std::tie(ei, ei_end) = out_edges(*it_r, graph_); ei != ei_end; ++ei) {
-      size_t node_out_id = target(*ei, graph_);
-      size_t edge_id = graph_[*ei].id;
+    for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
+      size_t node_out_id = target(*eo, graph_);
+      size_t edge_id = graph_[*eo].id;
 
       Node<T> *node_in_ptr, *node_out_ptr;
 
@@ -121,6 +121,44 @@ void GraphEngine<T>::Forward(MUTE MatXXSPtr<T> train_data_ptr) {
       edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
     }
   }
+}
+
+template <class T>
+void GraphEngine<T>::Backward(MUTE MatXXSPtr<T> train_label_ptr, \
+                              float learning_rate) {
+  output_node_ptr_->CalcDelta(train_label_ptr.get());
+  for (auto it = order_.begin(); it != order_.end(); ++it) {
+    IntellGraph::in_edge_iterator ei{}, ei_end{};
+    size_t node_out_id = *it;
+    //std::cout << "Backpropagating node: " << node_out_id << std::endl;
+    for (std::tie(ei, ei_end) = in_edges(*it, graph_); ei != ei_end; ++ei) {
+      size_t node_in_id = source(*ei, graph_);
+      size_t edge_id = graph_[*ei].id;
+
+      Node<T> *node_in_ptr, *node_out_ptr;
+      Edge<T> *edge_ptr;
+
+      node_in_ptr = node_map_[node_in_id].get();       
+      node_out_ptr = node_map_[node_out_id].get();
+      edge_ptr = edge_map_[edge_id].get();
+
+      edge_ptr->Backward(node_in_ptr, node_out_ptr);
+      node_out_ptr->get_bias_ptr()->array() -= learning_rate * \
+          node_out_ptr->get_delta_ptr()->array();
+      edge_ptr->get_weight_ptr()->array() -= learning_rate * \
+          edge_ptr->get_nabla_weight_ptr()->array();
+    }
+  }
+}
+
+template <class T>
+void GraphEngine<T>::Learn(MUTE MatXXSPtr<T> train_data_ptr, \
+                           MUTE MatXXSPtr<T> train_label_ptr, \
+                           float learning_rate) {
+  Forward(train_data_ptr);
+  T loss = output_node_ptr_->CalcLoss(train_label_ptr.get());
+  std::cout << "Square Loss: " << loss << std::endl;
+  Backward(train_label_ptr, learning_rate);
 }
 
 // Instantiate class, otherwise compilation will fail
