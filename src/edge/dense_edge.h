@@ -61,7 +61,7 @@ class DenseEdge : implements Edge<T> {
     return weight_ptr_.get();
   }
 
-  MUTE inline MatXX<T>* get_nabla_weight_ptr() const final {
+  REF inline const MatXX<T>* ref_nabla_weight_ptr() const final {
     return nabla_weight_ptr_.get();
   }
 

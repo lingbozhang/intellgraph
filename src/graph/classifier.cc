@@ -12,14 +12,14 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#include "engine/graph_engine.h"
+#include "graph/classifier.h"
 
 namespace intellgraph {
 
 template <class T>
-void GraphEngine<T>::AddEdge(const NodeParameter<T>& node_param_in, \
-                             const NodeParameter<T>& node_param_out, \
-                             const std::string& edge_name) {
+void Classifier<T>::AddEdge(const NodeParameter<T>& node_param_in, \
+                            const NodeParameter<T>& node_param_out, \
+                            const std::string& edge_name) {
   // Construct node objects and put them in the node_map_
   size_t vertex_in_id = node_param_in.ref_id();
   size_t vertex_out_id = node_param_out.ref_id();
@@ -51,7 +51,7 @@ void GraphEngine<T>::AddEdge(const NodeParameter<T>& node_param_in, \
 }
 
 template <class T>
-void GraphEngine<T>::Instantiate() {
+void Classifier<T>::Instantiate() {
   node_map_.clear();
   edge_map_.clear();
   input_node_ptr_ = nullptr;
@@ -92,7 +92,8 @@ void GraphEngine<T>::Instantiate() {
 }
 
 template <class T>
-void GraphEngine<T>::Forward(MUTE MatXXSPtr<T> train_data_ptr) {
+void Classifier<T>::Forward(MatXXSPtr<T> train_data_ptr, \
+                            MatXXSPtr<T> train_label_ptr) {
   order_.clear();
   topological_sort(graph_, std::back_inserter(order_));
 
@@ -121,11 +122,14 @@ void GraphEngine<T>::Forward(MUTE MatXXSPtr<T> train_data_ptr) {
       edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
     }
   }
+  CalcLoss(train_data_ptr, train_label_ptr);
+  Evaluate(train_label_ptr);
 }
 
 template <class T>
-void GraphEngine<T>::Backward(MUTE MatXXSPtr<T> train_label_ptr, \
-                              float learning_rate) {
+void Classifier<T>::Backward(MatXXSPtr<T> train_data_ptr, \
+                             MatXXSPtr<T> train_label_ptr) {
+  Forward(train_data_ptr, train_label_ptr);
   output_node_ptr_->CalcDelta(train_label_ptr.get());
   for (auto it = order_.begin(); it != order_.end(); ++it) {
     IntellGraph::in_edge_iterator ei{}, ei_end{};
@@ -143,25 +147,32 @@ void GraphEngine<T>::Backward(MUTE MatXXSPtr<T> train_label_ptr, \
       edge_ptr = edge_map_[edge_id].get();
 
       edge_ptr->Backward(node_in_ptr, node_out_ptr);
-      node_out_ptr->get_bias_ptr()->array() -= learning_rate * \
-          node_out_ptr->get_delta_ptr()->array();
-      edge_ptr->get_weight_ptr()->array() -= learning_rate * \
-          edge_ptr->get_nabla_weight_ptr()->array();
     }
   }
 }
 
 template <class T>
-void GraphEngine<T>::Learn(MUTE MatXXSPtr<T> train_data_ptr, \
-                           MUTE MatXXSPtr<T> train_label_ptr, \
-                           float learning_rate) {
-  Forward(train_data_ptr);
+void Classifier<T>::CalcLoss(MUTE MatXXSPtr<T> train_data_ptr, \
+                             MUTE MatXXSPtr<T> train_label_ptr) {
   T loss = output_node_ptr_->CalcLoss(train_label_ptr.get());
-  std::cout << "Square Loss: " << loss << std::endl;
-  Backward(train_label_ptr, learning_rate);
+  std::cout << "Loss: " << loss << std::endl;
+}
+
+template <class T>
+void Classifier<T>::Evaluate(MatXXSPtr<T> label_ptr) {
+  MatXX<T> result = output_node_ptr_->get_activation_ptr()->matrix();
+  for (int i = 0; i < result.rows(); ++i) {
+    if (result(i, 0) > 0.5) {
+      result(i, 0) = 1;
+    } else {
+      result(i, 0) = 0;
+    }
+  }
+  std::cout << "Evaluated/Actual results: " << result
+            << "/" << label_ptr->array() << std::endl;
 }
 
 // Instantiate class, otherwise compilation will fail
-template class GraphEngine<float>;
-template class GraphEngine<double>;
+template class Classifier<float>;
+template class Classifier<double>;
 }  // intellgraph

@@ -50,7 +50,7 @@ interface Edge {
 
   MUTE virtual inline MatXX<T>* get_weight_ptr() const = 0;
 
-  MUTE virtual inline MatXX<T>* get_nabla_weight_ptr() const = 0;
+  REF virtual inline const MatXX<T>* ref_nabla_weight_ptr() const = 0;
 
 };
 
