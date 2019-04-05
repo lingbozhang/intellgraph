@@ -26,8 +26,11 @@ Contributor(s):
 
 using namespace std;
 using namespace intellgraph;
-
-class example1 {
+// Example 1 constructs and trains a simple classifer. The classifier has two
+// layers: input layer and output layer. In the output layer, the sigmoid 
+// function is used as the activation function and l2 norm is used as the loss
+// function. 
+class Example1 {
  public:
   static void run() {
     // Prepares train data
@@ -37,7 +40,7 @@ class example1 {
     // In IntellGraph, current version implements Eigen library for matrix
     // abstraction.
     train_d_ptr->array() << 0.0, 1.0,
-     0.0, 1.0;
+                            0.0, 1.0;
 
     train_l_ptr->array() << 0.0, 1.0;
 
