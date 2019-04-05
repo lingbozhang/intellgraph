@@ -21,8 +21,8 @@ void GraphEngine<T>::AddEdge(const NodeParameter<T>& node_param_in, \
                              const NodeParameter<T>& node_param_out, \
                              const std::string& edge_name) {
   // Construct node objects and put them in the node_map_
-  size_t vertex_in_id = node_param_in.get_k_id();
-  size_t vertex_out_id = node_param_out.get_k_id();
+  size_t vertex_in_id = node_param_in.ref_id();
+  size_t vertex_out_id = node_param_out.ref_id();
 
   EdgeParameter edge_param{};
   EdgeProperty edge_property{};
@@ -37,10 +37,10 @@ void GraphEngine<T>::AddEdge(const NodeParameter<T>& node_param_in, \
   edge_property.id = edge_param_map_.size();
 
   // Constructs EdgeParameter
-  edge_param.set_c_id(edge_property.id);
-  edge_param.set_c_edge_name(edge_name);
-  edge_param.set_c_dims_in(node_param_in.get_k_dims());
-  edge_param.set_c_dims_out(node_param_out.get_k_dims());
+  edge_param.set_id(edge_property.id);
+  edge_param.set_edge_name(edge_name);
+  edge_param.set_dims_in(node_param_in.ref_dims());
+  edge_param.set_dims_out(node_param_out.ref_dims());
 
   if (!boost::add_edge(vertex_in_id, vertex_out_id, edge_property, graph_). \
       second) {
@@ -58,32 +58,68 @@ void GraphEngine<T>::Instantiate() {
   output_node_ptr_ = nullptr;
 
   // Instantiates the input node object
-  input_node_ptr_ = std::move(NodeFactory<T, InputNode<T>>::Instantiate( \
+  auto input_node_ptr = std::move(NodeFactory<T, InputNode<T>>::Instantiate( \
       node_param_map_[input_node_id_]));
+  input_node_ptr_ = input_node_ptr.get();
+  node_map_[input_node_id_] = std::move(input_node_ptr);
   
   // Instantiates the output node object
-  output_node_ptr_ = std::move(NodeFactory<T, OutputNode<T>>::Instantiate( \
+  auto output_node_ptr = std::move(NodeFactory<T, OutputNode<T>>::Instantiate( \
       node_param_map_[output_node_id_]));
+  output_node_ptr_ = output_node_ptr.get();
+  node_map_[output_node_id_] = std::move(output_node_ptr);
 
-  output_node_ptr_->InitializeBias_k(NormalFunctor<T>(0.0, 1.0));
+  output_node_ptr_->InitializeBias(NormalFunctor<T>(0.0, 1.0));
 
   // Instantiates node objects;
-  for (auto& node_pair : node_param_map_) {
+  for (const auto& node_pair : node_param_map_) {
     size_t node_id = node_pair.first;
     if (node_id != output_node_id_ && node_id != input_node_id_) {
-      NodeUPtr<T> node_ptr = 
+      NodeUPtr<T> node_ptr = \
           std::move(NodeFactory<T, Node<T>>::Instantiate(node_pair.second));
-      node_ptr->InitializeBias_k(NormalFunctor<T>(0.0, 1.0));
+      node_ptr->InitializeBias(NormalFunctor<T>(0.0, 1.0));
       node_map_[node_pair.first] = std::move(node_ptr);
     }
   }
   // Instantiates edge objects;
-  for (auto& edge_pair : edge_param_map_) {
+  for (const auto& edge_pair : edge_param_map_) {
     EdgeUPtr<T> edge_ptr = std::move(EdgeFactory<T, Edge<T>>::Instantiate( \
         edge_pair.second));
     // Initializes weight matrix with standard normal distribution
-    edge_ptr->ApplyUnaryFunctor_k(NormalFunctor<T>(0.0, 1.0));
+    edge_ptr->InitializeWeight(NormalFunctor<T>(0.0, 1.0));
     edge_map_[edge_pair.first] = std::move(edge_ptr);
+  }
+}
+
+template <class T>
+void GraphEngine<T>::Forward(MUTE MatXXSPtr<T> train_data_ptr) {
+  order_.clear();
+  topological_sort(graph_, std::back_inserter(order_));
+
+  if (*order_.rbegin() != input_node_id_ || \
+    *order_.begin() != output_node_id_) {
+      std::cout << "ERROR: invalid graph." << std::endl;
+      exit(1);
+  }
+
+  input_node_ptr_->FeedFeature(train_data_ptr);
+  for (auto it_r = order_.rbegin(); it_r != order_.rend() - 1; ++it_r) {
+    IntellGraph::out_edge_iterator ei{}, ei_end{};
+    size_t node_in_id = *it_r;
+    std::cout << "Forwarding node: " << node_in_id << std::endl;
+    if (*it_r != input_node_id_ ) node_map_[*it_r]->CallActFxn();
+    for (std::tie(ei, ei_end) = out_edges(*it_r, graph_); ei != ei_end; ++ei) {
+      size_t node_out_id = target(*ei, graph_);
+      size_t edge_id = graph_[*ei].id;
+
+      Node<T> *node_in_ptr, *node_out_ptr;
+
+      node_in_ptr = node_map_[node_in_id].get();
+        
+      node_out_ptr = node_map_[node_out_id].get();
+ 
+      edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
+    }
   }
 }
 

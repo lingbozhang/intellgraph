@@ -17,8 +17,8 @@ Contributor(s):
 
 #include <functional>
 
-#include "edge/edge_factory.h"
-#include "node/node.h"
+#include "node/node_edge_interface.h"
+#include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
@@ -26,10 +26,8 @@ namespace intellgraph {
 // two nodes. It is an abstract class for all edge classes and has four member 
 // functions
 template <class T>
-class Edge {
+interface Edge {
  public:
-  Edge() noexcept = default;
-
   virtual ~Edge() noexcept = default;
 
   virtual void PrintWeight() const = 0;
@@ -39,18 +37,20 @@ class Edge {
   // Calculates weighted sum and updates activation_ptr_ of output layer
   // in-place. Function name with a word 'mute' indicates it requires mutable
   // inputs;
-  virtual void Forward_mute(Node<T>* node_in_ptr, Node<T>* node_out_ptr) = 0;
+  virtual void Forward(REF const NodeEdgeInterface<T>* node_in_ptr, \
+                       MUTE NodeEdgeInterface<T>* node_out_ptr) = 0;
 
   // Calculates nabla_weight_ and updates delta_ptr_ of input layer in-place 
   // with backpropagation
-  virtual void Backward_mute(Node<T>* node_in_ptr, Node<T>* node_out_ptr) = 0;
+  virtual void Backward(MUTE NodeEdgeInterface<T>* node_in_ptr, \
+                        MUTE NodeEdgeInterface<T>* node_out_ptr) = 0;
 
   // Passes a unary functor and applies it on the weight matrix
-  virtual void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) = 0;
+  virtual void InitializeWeight(REF const std::function<T(T)>& functor) = 0;
 
-  virtual inline MatXX<T>* get_c_weight_ptr() const = 0;
+  MUTE virtual inline MatXX<T>* get_weight_ptr() const = 0;
 
-  virtual inline MatXX<T>* get_c_nabla_weight_ptr() const = 0;
+  MUTE virtual inline MatXX<T>* get_nabla_weight_ptr() const = 0;
 
 };
 

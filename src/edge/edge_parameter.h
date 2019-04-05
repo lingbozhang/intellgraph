@@ -18,6 +18,8 @@ Contributor(s):
 #include <string>
 #include <vector>
 
+#include "utility/auxiliary_cpp.h"
+
 namespace intellgraph {
 // EdgeParamter contains edge information and is used to construct the edge 
 // object
@@ -25,93 +27,93 @@ class EdgeParameter {
  public:
   EdgeParameter() noexcept {};
 
-  explicit EdgeParameter(size_t id, const std::string& name, \
-                         const std::vector<size_t>& dims_in, \
-                         const std::vector<size_t>& dims_out)
+  explicit EdgeParameter(COPY size_t id, REF const std::string& name, \
+                         REF const std::vector<size_t>& dims_in, \
+                         REF const std::vector<size_t>& dims_out)
       : id_(id), edge_name_(name), dims_in_(dims_in), dims_out_(dims_out) {}
 
   // Move constructor
-  EdgeParameter(EdgeParameter&& rhs) noexcept = default;
+  EdgeParameter(MOVE EdgeParameter&& rhs) noexcept = default;
 
   // Move operator
-  EdgeParameter& operator=(EdgeParameter&& rhs) noexcept = default;
+  EdgeParameter& operator=(MOVE EdgeParameter&& rhs) noexcept = default;
 
   // Copy operations are explicitly deleted
-  EdgeParameter(const EdgeParameter& rhs) = delete;
-  EdgeParameter& operator=(const EdgeParameter& rhs) = delete;
+  EdgeParameter(REF const EdgeParameter& rhs) = delete;
+  EdgeParameter& operator=(REF const EdgeParameter& rhs) = delete;
 
-  inline void Clone(const EdgeParameter& rhs) {
-    id_ = rhs.get_k_id();
-    edge_name_ = rhs.get_k_edge_name();
-    dims_in_ = rhs.get_k_dims_in();
-    dims_out_ = rhs.get_k_dims_out();
+  inline void Clone(REF const EdgeParameter& rhs) {
+    id_ = rhs.ref_id();
+    edge_name_ = rhs.ref_edge_name();
+    dims_in_ = rhs.ref_dims_in();
+    dims_out_ = rhs.ref_dims_out();
   }
 
   ~EdgeParameter() noexcept = default;
 
-  inline size_t get_c_id() const {
+  COPY inline size_t get_id() const {
     return id_;
   }
  
-  inline const size_t get_k_id() const {
+  REF inline const size_t ref_id() const {
     return id_;
   }
 
-  inline EdgeParameter& set_c_id(size_t id) {
+  inline EdgeParameter& set_id(COPY size_t id) {
     id_ = id;
     return *this;
   }
 
-  inline std::string get_c_edge_name() const {
+  COPY inline std::string get_edge_name() const {
     return edge_name_;
   }
  
-  inline const std::string& get_k_edge_name() const {
+  REF inline const std::string& ref_edge_name() const {
     return edge_name_;
   }
 
-  inline EdgeParameter& set_c_edge_name(const std::string& edge_name) {
+  inline EdgeParameter& set_edge_name(REF const std::string& edge_name) {
     edge_name_ = edge_name;
     return *this;
   }
 
-  inline EdgeParameter& set_m_edge_name(std::string&& edge_name) {
+  inline EdgeParameter& move_edge_name(MOVE std::string&& edge_name) {
     edge_name_ = std::move(edge_name);
     return *this;
   }
   
-  inline std::vector<size_t> get_c_dims_in() const {
+  COPY inline std::vector<size_t> get_dims_in() const {
     return dims_in_;
   }
 
-  inline const std::vector<size_t>& get_k_dims_in() const {
+  REF inline const std::vector<size_t>& ref_dims_in() const {
     return dims_in_;
   }
 
-  inline EdgeParameter& set_c_dims_in(const std::vector<size_t>& dims_in) {
+  inline EdgeParameter& set_dims_in(REF const std::vector<size_t>& dims_in) {
     dims_in_ = dims_in;
     return *this;
   }
 
-  inline EdgeParameter& set_m_dims_in(std::vector<size_t>&& dims_in) {
+  inline EdgeParameter& move_dims_in(MOVE std::vector<size_t>&& dims_in) {
     dims_in_ = std::move(dims_in);
     return *this;
   }
 
-  inline std::vector<size_t> get_c_dims_out() const {
+  COPY inline std::vector<size_t> get_dims_out() const {
     return dims_out_;
   }
 
-  inline const std::vector<size_t>& get_k_dims_out() const {
+  REF inline const std::vector<size_t>& ref_dims_out() const {
     return dims_out_;
   }
 
-  inline EdgeParameter& set_c_dims_out(const std::vector<size_t>& dims_out) {
+  inline EdgeParameter& set_dims_out(REF const std::vector<size_t>& dims_out) {
     dims_out_ = dims_out;
     return *this;
   }
 
-  inline EdgeParameter& set_m_dims_out(std::vector<size_t>&& dims_out) {
+  inline EdgeParameter& move_dims_out(MOVE std::vector<size_t>&& dims_out) {
     dims_out_ = std::move(dims_out);
     return *this;
   }

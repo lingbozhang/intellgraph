@@ -19,8 +19,10 @@ Contributor(s):
 #include <memory>
 #include <vector>
 
-#include "node/output_node.h"
 #include "node/node_parameter.h"
+#include "node/output_node.h"
+#include "node/sigmoid_node.h"
+#include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
@@ -29,102 +31,126 @@ namespace intellgraph {
 // In SigSqrNode, sigmoid function is used as a activation function and squared
 // Euclidean norm is used as a loss function
 template<class T>
-class SigL2Node : public OutputNode<T> {
+class SigL2Node : implements OutputNode<T> {
  public:
   SigL2Node() noexcept = default;
 
-  explicit SigL2Node(const NodeParameter<T>& node_param);
+  explicit SigL2Node(REF const NodeParameter<T>& node_param) {
+    NodeParameter<T> node_param_new;
+    node_param_new.Clone(node_param);
+    node_param_new.move_node_name("SigmoidNode");
+    node_ptr_ = std::make_unique<SigmoidNode<T>>(node_param_new);
+  }
 
   // Move constructor
-  SigL2Node(SigL2Node<T>&& rhs) noexcept = default;
+  SigL2Node(MOVE SigL2Node<T>&& rhs) noexcept = default;
 
   // Move operator
-  SigL2Node& operator=(SigL2Node<T>&& rhs) noexcept = default;
+  SigL2Node& operator=(MOVE SigL2Node<T>&& rhs) noexcept = default;
 
   // Copy constructor and operator are explicitly deleted
-  SigL2Node(const SigL2Node<T>& rhs) = delete;
-  SigL2Node& operator=(const SigL2Node<T>& rhs) = delete;
+  SigL2Node(REF const SigL2Node<T>& rhs) = delete;
+  SigL2Node& operator=(REF const SigL2Node<T>& rhs) = delete;
 
-  ~SigL2Node() noexcept = default;
+  ~SigL2Node() noexcept final = default;
 
-  void PrintAct() const final;
+  COPY T CalcLoss(REF const MatXX<T>* data_result_ptr) final;
 
-  void PrintDelta() const final;
+  void CalcDelta(REF const MatXX<T>* data_result_ptr) final;
 
-  void PrintBias() const final;
-  
-  void CallActFxn() final;
-
-  void CalcActPrime() final;
-
-  void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
-
-  void InitializeBias_k(const std::function<T(T)>& functor) final;
-
-  inline std::vector<size_t> get_c_dims() const final {
-    return node_param_.get_k_dims();
+  void CalcActPrime() final {
+    node_ptr_->CalcActPrime();
   }
 
-  inline const std::vector<size_t>& get_k_dims() const final {
-    return node_param_.get_k_dims();
+  MUTE inline MatXX<T>* get_activation_ptr() const final {
+    return node_ptr_->get_activation_ptr();
   }
-
-  inline MatXX<T>* get_c_activation_ptr() const final {
-    return activation_ptr_.get();
+ 
+  inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) final {
+    node_ptr_->move_activation_ptr(std::move(activation_ptr));
   }
-
-  inline void set_m_activation_ptr(MatXXUPtr<T> activation_ptr) final {
-    activation_ptr_ = std::move(activation_ptr);
-    Transition(kInit);
-  };
-
-  inline void set_c_activation(T value) final {
-    activation_ptr_->array() = value;
-    Transition(kInit);
+ 
+  inline void set_activation(COPY T value) final {
+    node_ptr_->set_activation(value);
   }
-
-  inline MatXX<T>* get_c_bias_ptr() const final {
-    return bias_ptr_.get();
+ 
+  MUTE inline MatXX<T>* get_bias_ptr() const final {
+    return node_ptr_->get_bias_ptr();
   }
-
-  inline void set_m_bias_ptr(MatXXUPtr<T> bias_ptr) final {
-    bias_ptr_ = std::move(bias_ptr);
+ 
+  inline void move_bias_ptr(MOVE MatXXUPtr<T> bias_ptr) final {
+    node_ptr_->move_bias_ptr(std::move(bias_ptr));
   }
-
-  inline MatXX<T>* get_c_delta_ptr() const final {
-    return delta_ptr_.get();
+ 
+  MUTE inline MatXX<T>* get_delta_ptr() const final {
+    return node_ptr_->get_delta_ptr();
   }
-
-  inline void set_m_delta_ptr(MatXXUPtr<T> delta_ptr) final {
-    delta_ptr_ = std::move(delta_ptr);
+ 
+  inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) final {
+    node_ptr_->move_delta_ptr(std::move(delta_ptr));
   }
-
-  T CalcLoss_k(const MatXX<T>* data_result_ptr) final;
-
-  void CalcDelta_k(const MatXX<T>* data_result_ptr) final;
-
- private:
+ 
+  void PrintAct() const final {
+    node_ptr_->PrintAct();
+  }
+ 
+  void PrintDelta() const final {
+    node_ptr_->PrintDelta();
+  }
+ 
+  void PrintBias() const final {
+   node_ptr_->PrintBias();
+  }
+ 
+  void CallActFxn() final {
+    node_ptr_->CallActFxn();
+  }
+ 
+  // Passes a functor and applies it on the activation matrix
+  void InitializeAct(REF const std::function<T(T)>& functor) final {
+    node_ptr_->InitializeAct(functor);
+  }
+ 
+  void InitializeBias(REF const std::function<T(T)>& functor) final {
+    node_ptr_->InitializeBias(functor);
+  }
+ 
+  // Get layer dimensions
+  COPY inline std::vector<size_t> get_dims() const final {
+    return node_ptr_->get_dims();
+  }
+ 
+  REF inline const std::vector<size_t>& ref_dims() const final {
+    return node_ptr_->ref_dims();
+  }
+ 
+  REF inline const NodeParameter<T>& ref_node_param() const final {
+    return node_ptr_->ref_node_param();
+  }
+ 
   // Transitions from kAct state to kPrime state and updates current_act_state_
-  void ActToPrime();
+  void ActToPrime() final {
+    node_ptr_->ActToPrime();
+  }
+ 
   // Transitions from kInit state to kAct state and updates current_act_state_
-  void InitToAct();
+  void InitToAct() final {
+    node_ptr_->InitToAct();
+  }
+ 
   // Transitions from current_act_state_ to state
-  bool Transition(ActStates state);
-
-  NodeParameter<T> node_param_{};
-  MatXXUPtr<T> activation_ptr_{nullptr};
-  // Delta vector stores the derivative of loss function of
-  // weighted_sum variables
-  MatXXUPtr<T> delta_ptr_{nullptr};
-  MatXXUPtr<T> bias_ptr_{nullptr};
-  // Stores current state of activation vector
-  ActStates current_act_state_{kInit};
-
+  bool Transition(ActStates state) final {
+    return node_ptr_->Transition(state);
+  }
+ 
+ private:
+  NodeUPtr<T> node_ptr_;
 };
 // Alias for unique SigL2Node pointer
 template <class T>
 using SigL2NodeUPtr = std::unique_ptr<SigL2Node<T>>;
-
-}  // namespace intellgraph
-
-#endif  // INTELLGRAPH_NODE_SIGMOID_L2_NODE_H
+ 
+}   // namespace intellgraph
+ 
+# endif  // INTELLGRAPH_NODE_SIGMOID_L2_NODE_H
+ 

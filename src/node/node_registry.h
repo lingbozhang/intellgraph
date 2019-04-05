@@ -12,13 +12,11 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef NICOLE_UTILITY_REGISTRY_H_
-#define NICOLE_UTILITY_REGISTRY_H_
+#ifndef NICOLE_NODE_NODE_REGISTRY_H_
+#define NICOLE_NODE_NODE_REGISTRY_H_
 
-#include "edge/dense_edge.h"
-#include "edge/edge.h"
-#include "node/activation_node.h"
 #include "node/act_loss_node.h"
+#include "node/activation_node.h"
 #include "node/input_node.h"
 #include "node/node.h"
 #include "node/node_factory.h"
@@ -29,39 +27,27 @@ Contributor(s):
 
 namespace intellgraph {
 
-class Registry {
+class NodeRegistry {
  public:
-  Registry() = delete;
+  NodeRegistry() = delete;
 
-  ~Registry() = delete;
-
-  static void LoadRegistry() {
-    LoadNodeRegistry();
-    LoadEdgeRegistry();
-  }
+  ~NodeRegistry() = delete;
 
   static void LoadNodeRegistry() {
     // Registers SigmoidNode
     DEVIMPL_REGISTERIMPL_NODE(SigmoidNode, Node);
     // Registers ActivationNode
     DEVIMPL_REGISTERIMPL_NODE(ActivationNode, Node);
-    // Register SigInputNode
-    DEVIMPL_REGISTERIMPL_NODE(SigInputNode, Node);
-    DEVIMPL_REGISTERIMPL_NODE(SigInputNode, InputNode);
     // Registers SigL2Node
-    DEVIMPL_REGISTERIMPL_NODE(SigL2Node, Node);
     DEVIMPL_REGISTERIMPL_NODE(SigL2Node, OutputNode);
-    // Registers ActLossNode
-    DEVIMPL_REGISTERIMPL_NODE(ActLossNode, Node);
+    // Registers act_loss_node
     DEVIMPL_REGISTERIMPL_NODE(ActLossNode, OutputNode);
+    // Registers act_loss_node
+    DEVIMPL_REGISTERIMPL_NODE(SigInputNode, InputNode);
   }
-
-  static void LoadEdgeRegistry() {
-    // Registers DenseEdge
-    DEVIMPL_REGISTERIMPL_EDGE(DenseEdge, Edge);
-  }
+  
 };
 
 }  // intellgraph
 
-#endif  // NICOLE_UTILITY_REGISTRY_H_
+#endif  // NICOLE_NODE_NODE_REGISTRY_H_

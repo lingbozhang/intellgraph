@@ -18,118 +18,128 @@ Contributor(s):
 #include <functional>
 #include <vector>
 // Your project's .h files
+#include "node/activation_node.h"
 #include "node/output_node.h"
 #include "node/node_parameter.h"
+#include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
 // ActLossNode allows user provided function pointers. ActLossNode 
-// constructor accepts five parameters: 
-// 1. node_param: node paramters
-// 2. act_function_ptr: activation function pointer
-// 3. act_prime_ptr: activation prime function pointer
-// 4. loss_function_ptr: loss function pointer
-// 5. loss_prime_ptr: loss function prime pointer
+// has four functors: 
+// 1. act_function_ptr: activation function pointer
+// 2. act_prime_ptr: activation prime function pointer
+// 3. loss_function_ptr: loss function pointer
+// 4. loss_prime_ptr: loss function prime pointer
 template <class T>
-class ActLossNode : public OutputNode<T> {
+class ActLossNode : implements OutputNode<T> {
  public:
   ActLossNode() noexcept = default;
 
-  explicit ActLossNode(const NodeParameter<T>& node_param);
-
-  ActLossNode(ActLossNode<T>&& rhs) noexcept = default;
-
-  ActLossNode& operator=(ActLossNode<T>&& rhs) noexcept = default;
-
-  ActLossNode(const ActLossNode<T>& rhs) = delete;
-
-  ActLossNode& operator=(const ActLossNode<T>& rhs) = delete;
-
-  ~ActLossNode() noexcept = default;
-  
-  void PrintAct() const final;
-
-  void PrintDelta() const final;
-
-  void PrintBias() const final;
-
-  // Calls activation function and updates activation. Note this function calls 
-  // activation function at runtime and thus has performance penalty
-  void CallActFxn() final;
-
-  // Calculates derivative of the activation function and overwrites the 
-  // activation in-place. Note this function calls activation prime function at 
-  // runtime and thus has performance penalty
-  void CalcActPrime() final;
-
-  void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
-
-  void InitializeBias_k(const std::function<T(T)>& functor) final;
-
-  inline std::vector<size_t> get_c_dims() const final {
-    return node_param_.get_k_dims();
+  explicit ActLossNode(REF const NodeParameter<T>& node_param) {
+    NodeParameter<T> node_param_new;
+    node_param_new.Clone(node_param);
+    node_param_new.move_node_name("ActivationNode");
+    node_ptr_ = std::make_unique<ActivationNode<T>>(node_param_new);
   }
 
-  inline const std::vector<size_t>& get_k_dims() const final {
-    return node_param_.get_k_dims();
+  ActLossNode(MOVE ActLossNode<T>&& rhs) noexcept = default;
+
+  REF ActLossNode& operator=(MOVE ActLossNode<T>&& rhs) noexcept = default;
+
+  ActLossNode(REF const ActLossNode<T>& rhs) = delete;
+
+  REF ActLossNode& operator=(REF const ActLossNode<T>& rhs) = delete;
+
+  ~ActLossNode() noexcept final = default;
+
+  COPY T CalcLoss(REF const MatXX<T>* data_result_ptr) final;
+
+  void CalcDelta(REF const MatXX<T>* data_result_ptr) final;
+
+  void CalcActPrime() final {
+    node_ptr_->CalcActPrime();
   }
 
-  inline MatXX<T>* get_c_activation_ptr() const final {
-    return activation_ptr_.get();
+  MUTE inline MatXX<T>* get_activation_ptr() const final {
+    return node_ptr_->get_activation_ptr();
   }
 
-  inline void set_m_activation_ptr(MatXXUPtr<T> activation_ptr) final {
-    activation_ptr_ = std::move(activation_ptr);
-    Transition(kInit);
-  };
-
-  inline void set_c_activation(T value) final {
-    activation_ptr_->array() = value;
-    Transition(kInit);
+  inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) final {
+    node_ptr_->move_activation_ptr(std::move(activation_ptr));
   }
 
-  inline MatXX<T>* get_c_bias_ptr() const final {
-    return bias_ptr_.get();
+  inline void set_activation(COPY T value) final {
+    node_ptr_->set_activation(value);
   }
 
-  inline void set_m_bias_ptr(MatXXUPtr<T> bias_ptr) final {
-    bias_ptr_ = std::move(bias_ptr);
+  MUTE inline MatXX<T>* get_bias_ptr() const final {
+    return node_ptr_->get_bias_ptr();
   }
 
-  inline MatXX<T>* get_c_delta_ptr() const final {
-    return delta_ptr_.get();
+  inline void move_bias_ptr(MOVE MatXXUPtr<T> bias_ptr) final {
+    node_ptr_->move_bias_ptr(std::move(bias_ptr));
   }
 
-  inline void set_m_delta_ptr(MatXXUPtr<T> delta_ptr) final {
-    delta_ptr_ = std::move(delta_ptr);
+  MUTE inline MatXX<T>* get_delta_ptr() const final {
+    return node_ptr_->get_delta_ptr();
   }
 
-  // Note this function calls loss function at runtime and thus has performance
-  // penalty
-  T CalcLoss_k(const MatXX<T>* data_result_ptr) final;
+  inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) final {
+    node_ptr_->move_delta_ptr(std::move(delta_ptr));
+  }
 
-  // Calculates derivative of loss function of weighted_sum variables. Note this
-  // function calls loss prime function at runtime and thus has performance
-  // penalty
-  void CalcDelta_k(const MatXX<T>* data_result_ptr) final;
+  void PrintAct() const final {
+    node_ptr_->PrintAct();
+  }
 
+  void PrintDelta() const final {
+    node_ptr_->PrintDelta();
+  }
+
+  void PrintBias() const final {
+    node_ptr_->PrintBias();
+  }
+
+  void CallActFxn() final {
+    node_ptr_->CallActFxn();
+  }
+
+  // Passes a functor and applies it on the activation matrix
+  void InitializeAct(REF const std::function<T(T)>& functor) final {
+    node_ptr_->InitializeAct(functor);
+  }
+
+  void InitializeBias(REF const std::function<T(T)>& functor) final {
+    node_ptr_->InitializeBias(functor);
+  }
+
+  // Get layer dimensions
+  COPY inline std::vector<size_t> get_dims() const final {
+    return node_ptr_->get_dims();
+  }
+
+  REF inline const std::vector<size_t>& ref_dims() const final {
+    return node_ptr_->ref_dims();
+  }
+
+  REF inline const NodeParameter<T>& ref_node_param() const final {
+    return node_ptr_->ref_node_param();
+  }
+  // Transitions from kAct state to kPrime state and updates current_act_state_
+  void ActToPrime() final {
+    node_ptr_->ActToPrime();
+  }
+  // Transitions from kInit state to kAct state and updates current_act_state_
+  void InitToAct() final {
+    node_ptr_->InitToAct();
+  }
+  // Transitions from current_act_state_ to state
+  bool Transition(ActStates state) final {
+    return node_ptr_->Transition(state);
+  }
  private:
-  void ActToPrime();
-
-  void InitToAct();
-
-  bool Transition(ActStates state);
-
-  NodeParameter<T> node_param_{};
-
-  MatXXUPtr<T> activation_ptr_{nullptr};
-  // Delta vector stores the derivative of loss function of
-  // weighted_sum variables
-  MatXXUPtr<T> delta_ptr_{nullptr};
-  MatXXUPtr<T> bias_ptr_{nullptr};
-  // Stores current state of activation vector
-  ActStates current_act_state_{kInit};
-
+  NodeUPtr<T> node_ptr_;
 };
 
 template <class T>

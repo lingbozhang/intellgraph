@@ -20,15 +20,18 @@ Contributor(s):
 #include <unordered_map>
 
 #include "edge/edge_parameter.h"
+#include "utility/auxiliary_cpp.h"
 
 namespace intellgraph {
 // A Factory design pattern, EdgeFactory is used to instantiate corresponding
 // edge object.
 template <class T, class Base>
-using EdgeFunctor = std::function<std::unique_ptr<Base>(const EdgeParameter&)>;
+using EdgeFunctor = std::function<MOVE std::unique_ptr<Base>( \
+    REF const EdgeParameter&)>;
 
 template <class T, class Base>
-using EdgeRegistryMap = std::unordered_map<std::string, EdgeFunctor<T, Base>>;
+using EdgeRegistryMap = std::unordered_map<COPY std::string, \
+                                           COPY EdgeFunctor<T, Base>>;
 
 template <class T, class Base>
 class EdgeFactory {
@@ -38,8 +41,9 @@ class EdgeFactory {
   ~EdgeFactory()= delete;
 
   // use this to instantiate the proper Derived class
-  static std::unique_ptr<Base> Instantiate(const EdgeParameter& edge_param) {
-    std::string name = edge_param.get_k_edge_name();
+  MOVE static std::unique_ptr<Base> Instantiate( \
+      REF const EdgeParameter& edge_param) {
+    std::string name = edge_param.ref_edge_name();
     auto it = EdgeFactory::Registry().find(name);
     if (it == EdgeFactory::Registry().end() ) {
       std::cout << "WARNING: instantiate Edge " << name << " failed"
@@ -50,7 +54,7 @@ class EdgeFactory {
     }
   }
 
-  static EdgeRegistryMap<T, Base>& Registry() {
+  MUTE static EdgeRegistryMap<T, Base>& Registry() {
     static EdgeRegistryMap<T, Base> impl;
     return impl;
   }
@@ -60,7 +64,7 @@ class EdgeFactory {
 template<class T, class Base, class Derived>
 class EdgeFactoryRegister {
  public:
-  explicit EdgeFactoryRegister(const std::string& name) {
+  explicit EdgeFactoryRegister(REF const std::string& name) {
     EdgeFactory<T, Base>::Registry()[name] = \
         [](const EdgeParameter& edge_param) -> std::unique_ptr<Base> {
           std::unique_ptr<Base> rv = std::make_unique<Derived>(edge_param);

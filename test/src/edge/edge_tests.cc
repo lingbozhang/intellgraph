@@ -18,15 +18,16 @@ Contributor(s):
 #include "edge/edge_factory.h"
 #include "edge/edge_parameter.h"
 #include "edge/edge.h"
+#include "edge/edge_registry.h"
 #include "node/act_loss_node.h"
 #include "node/activation_node.h"
+#include "node/input_node.h"
 #include "node/node.h"
 #include "node/node_factory.h"
 #include "node/node_parameter.h"
 #include "node/output_node.h"
 #include "node/sigmoid_node.h"
 #include "node/sigmoid_l2_node.h"
-#include "utility/registry.h"
 #include "utility/random.h"
 
 using namespace std;
@@ -36,7 +37,7 @@ using namespace intellgraph;
 class EdgeTest : public ::testing::Test {
  protected:
   EdgeTest() {
-    Registry::LoadEdgeRegistry();
+    EdgeRegistry::LoadEdgeRegistry();
     trainning1_data_ptr_ = make_shared<MatXX<float>>(2, 1);
     trainning1_label_ptr_ = make_shared<MatXX<float>>(1, 1);
 
@@ -165,70 +166,70 @@ class EdgeTest : public ::testing::Test {
 
 TEST_F(EdgeTest, TestForward_mute) {
   // version 1
-  input_node_ptr_v1_->FeedFeature_k(trainning1_data_ptr_);
+  input_node_ptr_v1_->FeedFeature(trainning1_data_ptr_);
 
-  edge1_ptr_v1_->get_c_weight_ptr()->array() = weight1_ptr_v1_->array();
-  edge2_ptr_v1_->get_c_weight_ptr()->array() = weight2_ptr_v1_->array();
-  inner_node_ptr_v1_->get_c_bias_ptr()->array() = bias1_ptr_v1_->array();
-  output_node_ptr_v1_->get_c_bias_ptr()->array() = bias2_ptr_v1_->array();
+  edge1_ptr_v1_->get_weight_ptr()->array() = weight1_ptr_v1_->array();
+  edge2_ptr_v1_->get_weight_ptr()->array() = weight2_ptr_v1_->array();
+  inner_node_ptr_v1_->get_bias_ptr()->array() = bias1_ptr_v1_->array();
+  output_node_ptr_v1_->get_bias_ptr()->array() = bias2_ptr_v1_->array();
 
-  edge1_ptr_v1_->Forward_mute(input_node_ptr_v1_.get(), inner_node_ptr_v1_.get());
-  edge2_ptr_v1_->Forward_mute(inner_node_ptr_v1_.get(), output_node_ptr_v1_.get());
+  edge1_ptr_v1_->Forward(input_node_ptr_v1_.get(), inner_node_ptr_v1_.get());
+  edge2_ptr_v1_->Forward(inner_node_ptr_v1_.get(), output_node_ptr_v1_.get());
 
   MatXX<float> stage1 = weight1_ptr_v1_->transpose() * \
                         trainning1_data_ptr_->matrix() + bias1_ptr_v1_->matrix();
   MatXX<float> stage2 = weight2_ptr_v1_->transpose() * \
                         stage1 + bias2_ptr_v1_->matrix();
   float correct_value = stage2(0, 0);
-  float test_value = output_node_ptr_v1_->get_c_activation_ptr()->array()(0, 0);
+  float test_value = output_node_ptr_v1_->get_activation_ptr()->array()(0, 0);
   EXPECT_NEAR(test_value, correct_value, kAbsoluteError_);
 
   // version 2
-  input_node_ptr_v2_->FeedFeature_k(trainning2_data_ptr_);
+  input_node_ptr_v2_->FeedFeature(trainning2_data_ptr_);
 
-  edge1_ptr_v2_->get_c_weight_ptr()->array() = weight1_ptr_v2_->array();
-  edge2_ptr_v2_->get_c_weight_ptr()->array() = weight2_ptr_v2_->array();
-  inner_node_ptr_v2_->get_c_bias_ptr()->array() = bias1_ptr_v2_->array();
-  output_node_ptr_v2_->get_c_bias_ptr()->array() = bias2_ptr_v2_->array();
+  edge1_ptr_v2_->get_weight_ptr()->array() = weight1_ptr_v2_->array();
+  edge2_ptr_v2_->get_weight_ptr()->array() = weight2_ptr_v2_->array();
+  inner_node_ptr_v2_->get_bias_ptr()->array() = bias1_ptr_v2_->array();
+  output_node_ptr_v2_->get_bias_ptr()->array() = bias2_ptr_v2_->array();
 
-  edge1_ptr_v2_->Forward_mute(input_node_ptr_v2_.get(), inner_node_ptr_v2_.get());
-  edge2_ptr_v2_->Forward_mute(inner_node_ptr_v2_.get(), output_node_ptr_v2_.get());
+  edge1_ptr_v2_->Forward(input_node_ptr_v2_.get(), inner_node_ptr_v2_.get());
+  edge2_ptr_v2_->Forward(inner_node_ptr_v2_.get(), output_node_ptr_v2_.get());
 
   stage1 = weight1_ptr_v2_->transpose() * \
            trainning2_data_ptr_->matrix() + bias1_ptr_v2_->matrix();
   stage2 = weight2_ptr_v2_->transpose() * \
            stage1 + bias2_ptr_v2_->matrix();
   correct_value = stage2(0, 0);
-  test_value = output_node_ptr_v2_->get_c_activation_ptr()->array()(0, 0);
+  test_value = output_node_ptr_v2_->get_activation_ptr()->array()(0, 0);
   EXPECT_NEAR(test_value, correct_value, kAbsoluteError_);
   correct_value = stage2(0, 1);
-  test_value = output_node_ptr_v2_->get_c_activation_ptr()->array()(0, 1);
+  test_value = output_node_ptr_v2_->get_activation_ptr()->array()(0, 1);
   EXPECT_NEAR(test_value, correct_value, kAbsoluteError_);
 }
 
 TEST_F(EdgeTest, TestBackward_mute) {
   // version 1
-  input_node_ptr_v1_->FeedFeature_k(trainning1_data_ptr_);
+  input_node_ptr_v1_->FeedFeature(trainning1_data_ptr_);
 
   output_node_ptr_v1_->CallActFxn();
-  output_node_ptr_v1_->CalcDelta_k(trainning1_label_ptr_.get());
-  float test_value = output_node_ptr_v1_->get_c_delta_ptr()->array()(0, 0);
+  output_node_ptr_v1_->CalcDelta(trainning1_label_ptr_.get());
+  float test_value = output_node_ptr_v1_->get_delta_ptr()->array()(0, 0);
   float correct_value = -0.25;
   EXPECT_NEAR(test_value, correct_value, kAbsoluteError_);
 
-  edge1_ptr_v1_->get_c_weight_ptr()->array() = weight1_ptr_v1_->array();
-  edge2_ptr_v1_->get_c_weight_ptr()->array() = weight2_ptr_v1_->array();
-  inner_node_ptr_v1_->get_c_bias_ptr()->array() = bias1_ptr_v1_->array();
+  edge1_ptr_v1_->get_weight_ptr()->array() = weight1_ptr_v1_->array();
+  edge2_ptr_v1_->get_weight_ptr()->array() = weight2_ptr_v1_->array();
+  inner_node_ptr_v1_->get_bias_ptr()->array() = bias1_ptr_v1_->array();
   inner_node_ptr_v1_->CallActFxn();
 
-  output_node_ptr_v1_->get_c_bias_ptr()->array() = bias2_ptr_v1_->array();
+  output_node_ptr_v1_->get_bias_ptr()->array() = bias2_ptr_v1_->array();
 
-  edge2_ptr_v1_->Backward_mute(inner_node_ptr_v1_.get(), output_node_ptr_v1_.get());
+  edge2_ptr_v1_->Backward(inner_node_ptr_v1_.get(), output_node_ptr_v1_.get());
   for (int i = 0; i < 3; ++i) {
-    test_value = edge2_ptr_v1_->get_c_nabla_weight_ptr()->array()(i, 0);
+    test_value = edge2_ptr_v1_->get_nabla_weight_ptr()->array()(i, 0);
     correct_value = -0.5f * 0.25f;
     EXPECT_NEAR(test_value, correct_value, kAbsoluteError_);
-    test_value = inner_node_ptr_v1_->get_c_delta_ptr()->array()(i, 0);
+    test_value = inner_node_ptr_v1_->get_delta_ptr()->array()(i, 0);
     correct_value = (i + 1) * -0.25f * 0.25f;
     EXPECT_NEAR(test_value, correct_value, kAbsoluteError_);
   }

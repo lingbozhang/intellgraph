@@ -21,32 +21,32 @@ Contributor(s):
 // Your project's .h files
 #include "node/node.h"
 #include "node/node_parameter.h"
+#include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
-// ActivationNode allows user provided function pointers. The constructor 
-// accepts three parameters:
-// 1. node_param: node parameter
-// 2. act_function_ptr: activation function pointer
-// 3. act_prime_ptr: activation prime function pointer
+// ActivationNode allows user provided function pointers. ActivationNode has
+// two functors;
+// 1. act_function_ptr: activation function pointer
+// 2. act_prime_ptr: activation prime function pointer
 template <class T>
 class ActivationNode : public Node<T> {
  public:
   ActivationNode() noexcept = default;
 
-  explicit ActivationNode(const NodeParameter<T>& node_param);
+  explicit ActivationNode(REF const NodeParameter<T>& node_param);
 
-  ~ActivationNode() noexcept = default;
+  ~ActivationNode() noexcept final = default;
 
   // Move constructor
-  ActivationNode(ActivationNode<T>&& rhs) noexcept = default;
+  ActivationNode(MOVE ActivationNode<T>&& rhs) noexcept = default;
 
   // Move operator
-  ActivationNode& operator=(ActivationNode&& rhs) noexcept = default;
+  ActivationNode& operator=(MOVE ActivationNode&& rhs) noexcept = default;
   
   // Copy constructor and operator are explicitly deleted
-  ActivationNode(const ActivationNode<T>& rhs) = delete;
-  ActivationNode& operator=(const ActivationNode<T>& rhs) = delete; 
+  ActivationNode(REF const ActivationNode<T>& rhs) = delete;
+  ActivationNode& operator=(REF const ActivationNode<T>& rhs) = delete;
 
   void PrintAct() const final;
 
@@ -63,55 +63,58 @@ class ActivationNode : public Node<T> {
   // runtime and thus has performance penalty
   void CalcActPrime() final;
 
-  void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
+  void InitializeAct(REF const std::function<T(T)>& functor) final;
 
-  void InitializeBias_k(const std::function<T(T)>& functor) final;
+  void InitializeBias(REF const std::function<T(T)>& functor) final;
 
-  inline std::vector<size_t> get_c_dims() const final {
-    return node_param_.get_k_dims();
+  COPY inline std::vector<size_t> get_dims() const final {
+    return node_param_.ref_dims();
   }
 
-  inline const std::vector<size_t>& get_k_dims() const final {
-    return node_param_.get_k_dims();
+  REF inline const std::vector<size_t>& ref_dims() const final {
+    return node_param_.ref_dims();
   }
 
-  inline MatXX<T>* get_c_activation_ptr() const final {
+  MUTE inline MatXX<T>* get_activation_ptr() const final {
     return activation_ptr_.get();
   }
 
-  inline void set_m_activation_ptr(MatXXUPtr<T> activation_ptr) final {
+  inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) final {
     activation_ptr_ = std::move(activation_ptr);
     Transition(kInit);
   };
 
-  inline void set_c_activation(T value) final {
+  inline void set_activation(COPY T value) final {
     activation_ptr_->array() = value;
-    Transition(kInit);
   }
 
-  inline MatXX<T>* get_c_delta_ptr() const final {
+  MUTE inline MatXX<T>* get_delta_ptr() const final {
     return delta_ptr_.get();
   }
 
-  inline void set_m_delta_ptr(MatXXUPtr<T> delta_ptr) final {
+  inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) final {
     delta_ptr_ = std::move(delta_ptr);
   }
 
-  inline MatXX<T>* get_c_bias_ptr() const final {
+  MUTE inline MatXX<T>* get_bias_ptr() const final {
     return bias_ptr_.get();
   }
 
-  inline void set_m_bias_ptr(MatXXUPtr<T> bias_ptr) final {
+  inline void move_bias_ptr(MOVE MatXXUPtr<T> bias_ptr) final {
     bias_ptr_ = std::move(bias_ptr);
   }
 
+  REF inline const NodeParameter<T>& ref_node_param() const final {
+    return node_param_;
+  }
+
+  void ActToPrime() final;
+
+  void InitToAct() final;
+
+  bool Transition(ActStates state) final;
+
  private:
-  void ActToPrime();
-
-  void InitToAct();
-
-  bool Transition(ActStates state);
-
   NodeParameter<T> node_param_{};
 
   MatXXUPtr<T> activation_ptr_{nullptr};

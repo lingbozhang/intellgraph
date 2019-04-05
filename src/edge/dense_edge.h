@@ -19,46 +19,49 @@ Contributor(s):
 
 #include "edge/edge.h"
 #include "edge/edge_parameter.h"
-#include "node/node.h"
+#include "node/node_edge_interface.h"
+#include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
 // DenseEdge is a edge class that used to build fully connected neural networks.
 // In DenseEdge, weight is updated based on the backpropagation. 
 template <class T>
-class DenseEdge : public Edge<T> {
+class DenseEdge : implements Edge<T> {
  public:
   DenseEdge() noexcept = default;
 
-  explicit DenseEdge(const EdgeParameter& edge_param);
+  explicit DenseEdge(REF const EdgeParameter& edge_param);
   
   // Move constructor
-  DenseEdge(DenseEdge<T>&& rhs) noexcept = default;
+  DenseEdge(MOVE DenseEdge<T>&& rhs) noexcept = default;
 
   // Move operator
-  DenseEdge& operator=(DenseEdge<T>&& rhs) noexcept = default;
+  DenseEdge& operator=(MOVE DenseEdge<T>&& rhs) noexcept = default;
 
   // Copy constructor and operator are deleted
-  DenseEdge(const DenseEdge<T>& rhs) = delete;
-  DenseEdge& operator=(const DenseEdge<T>& rhs) = delete;
+  DenseEdge(REF const DenseEdge<T>& rhs) = delete;
+  DenseEdge& operator=(REF const DenseEdge<T>& rhs) = delete;
 
-  ~DenseEdge() noexcept = default;
+  ~DenseEdge() noexcept final = default;
 
   void PrintWeight() const final;
 
   void PrintNablaWeight() const final;
 
-  virtual void Forward_mute(Node<T>* node_in_ptr, Node<T>* node_out_ptr) final;
+  virtual void Forward(REF const NodeEdgeInterface<T>* node_in_ptr, \
+                       MUTE NodeEdgeInterface<T>* node_out_ptr) final;
 
-  virtual void Backward_mute(Node<T>* node_in_ptr, Node<T>* node_out_ptr) final;
+  virtual void Backward(MUTE NodeEdgeInterface<T>* node_in_ptr, \
+                        MUTE NodeEdgeInterface<T>* node_out_ptr) final;
 
-  void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
+  void InitializeWeight(REF const std::function<T(T)>& functor) final;
 
-  inline MatXX<T>* get_c_weight_ptr() const final {
+  MUTE inline MatXX<T>* get_weight_ptr() const final {
     return weight_ptr_.get();
   }
 
-  inline MatXX<T>* get_c_nabla_weight_ptr() const final {
+  MUTE inline MatXX<T>* get_nabla_weight_ptr() const final {
     return nabla_weight_ptr_.get();
   }
 

@@ -19,8 +19,8 @@ namespace intellgraph {
 template <class T>
 SigmoidNode<T>::SigmoidNode(const NodeParameter<T>& node_param) {
     node_param_.Clone(node_param);
-    size_t row = node_param.get_k_dims()[0];
-    size_t col = node_param.get_k_dims()[1];
+    size_t row = node_param.ref_dims()[0];
+    size_t col = node_param.ref_dims()[1];
     activation_ptr_ = std::make_unique<MatXX<T>>(row, col);
     delta_ptr_ = std::make_unique<MatXX<T>>(row, col);
     bias_ptr_ = std::make_unique<MatXX<T>>(row, col);
@@ -34,26 +34,26 @@ SigmoidNode<T>::SigmoidNode(const NodeParameter<T>& node_param) {
 
 template <class T>
 void SigmoidNode<T>::PrintAct() const {
-  std::cout << "SigmoidNode: " << node_param_.get_k_id() << " Activation Vector:"
+  std::cout << "Node: " << node_param_.ref_id() << " Activation Vector:"
             << std::endl << activation_ptr_->array() << std::endl;
 }
 
 template <class T>
 void SigmoidNode<T>::PrintDelta() const {
-  std::cout << "SigmoidNode: " << node_param_.get_k_id() << " Delta Vector:"
+  std::cout << "Node: " << node_param_.ref_id() << " Delta Vector:"
             << std::endl << delta_ptr_->array() << std::endl;
 }
 
 template <class T>
 void SigmoidNode<T>::PrintBias() const {
-  std::cout << "SigmoidNode: " << node_param_.get_k_id() << " Bias Vector:"
+  std::cout << "Node: " << node_param_.ref_id() << " Bias Vector:"
             << std::endl << bias_ptr_->array() << std::endl;
 }
 
 template <class T>
-void SigmoidNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
+void SigmoidNode<T>::InitializeAct(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
-    std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined." 
+    std::cout << "WARNING: functor passed to InitializeAct() is not defined."
               << std::endl;
   } else {
     activation_ptr_->array() = activation_ptr_->array().unaryExpr(functor);
@@ -62,7 +62,7 @@ void SigmoidNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
 }
 
 template <class T>
-void SigmoidNode<T>::InitializeBias_k(const std::function<T(T)>& functor) {
+void SigmoidNode<T>::InitializeBias(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
     std::cout << "WARNING: functor passed to InitializeBias_k() is not defined." 
               << std::endl;

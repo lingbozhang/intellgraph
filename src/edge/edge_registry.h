@@ -1,4 +1,4 @@
-/* Copyright 2019 The IntellGraph Authors. All Rights Reserved.
+/* Copyright 2019 The Nicole Authors. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -12,21 +12,28 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#include "node/sigmoid_input_node.h"
+#ifndef NICOLE_EDGE_EDGE_REGISTRY_H_
+#define NICOLE_EDGE_EDGE_REGISTRY_H_
+
+#include "edge/dense_edge.h"
+#include "edge/edge_factory.h"
+#include "edge/edge_parameter.h"
+#include "edge/edge.h"
 
 namespace intellgraph {
 
-// Instantiate class, otherwise compilation will fail
-template class SigInputNode<float>;
-template class SigInputNode<double>;
+class EdgeRegistry {
+ public:
+  EdgeRegistry() = delete;
 
-}  // namespace intellgraph
+  ~EdgeRegistry() = delete;
 
+  static void LoadEdgeRegistry() {
+    // Registers DenseEdge
+    DEVIMPL_REGISTERIMPL_EDGE(DenseEdge, Edge);
+  }
+};
 
+}  // intellgraph
 
-
-
-
-
-
-
+#endif  // NICOLE_EDGE_EDGE_REGISTRY_H_

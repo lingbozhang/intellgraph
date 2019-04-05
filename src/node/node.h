@@ -19,7 +19,9 @@ Contributor(s):
 #include <memory>
 #include <vector>
 
-#include "node/node_factory.h"
+#include "node/node_edge_interface.h"
+#include "node/node_parameter.h"
+#include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
@@ -37,15 +39,15 @@ enum ActStates {
 };
 // In IntellGraph, node is a basic building block that represents a neural
 // network layer, all node class in /node directory should use node class as 
-// a base class. In Node classes, in order to save memory, only one vector 
+// a base interface. In Node classes, in order to save memory, only one vector 
 // (activation vector) is used to store all weighted_sum, activation, and 
 // activation prime results, hence, a state pattern is implemented to control 
 // state transitions of the activation vector.
 template <class T>
-class Node {
+interface Node : implements NodeEdgeInterface<T> {
  public:
-  Node() noexcept = default;
-
+  // All interfaces should have virtual destructor in order to allow memory
+  // release from interfaces
   virtual ~Node() noexcept = default;
 
   virtual void PrintAct() const = 0;
@@ -56,33 +58,28 @@ class Node {
 
   virtual void CallActFxn() = 0;
 
-  virtual void CalcActPrime() = 0;
-
   // Passes a functor and applies it on the activation matrix
-  virtual void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) = 0;
+  virtual void InitializeAct(REF const std::function<T(T)>& functor) = 0;
 
-  virtual void InitializeBias_k(const std::function<T(T)>& functor) = 0;
+  virtual void InitializeBias(REF const std::function<T(T)>& functor) = 0;
+
+  virtual void set_activation(COPY T value) = 0;
 
   // Get layer dimensions
-  virtual inline std::vector<size_t> get_c_dims() const = 0;
+  COPY virtual inline std::vector<size_t> get_dims() const = 0;
 
-  virtual inline const std::vector<size_t>& get_k_dims() const = 0;
+  REF virtual inline const std::vector<size_t>& ref_dims() const = 0;
 
-  virtual inline MatXX<T>* get_c_activation_ptr() const = 0;
+  REF virtual inline const NodeParameter<T>& ref_node_param() const = 0;
 
-  // Setters named with letter 'm' indicates a move setter (which means 
-  // argument ownerships are moved into the function)
-  virtual inline void set_m_activation_ptr(MatXXUPtr<T> activation_ptr) = 0;
+  // Transitions from kAct state to kPrime state and updates current_act_state_
+  virtual void ActToPrime() = 0;
 
-  virtual inline void set_c_activation(T value) = 0;
+  // Transitions from kInit state to kAct state and updates current_act_state_
+  virtual void InitToAct() = 0;
 
-  virtual inline MatXX<T>* get_c_bias_ptr() const = 0;
-
-  virtual inline void set_m_bias_ptr(MatXXUPtr<T> bias_ptr) = 0;
-
-  virtual inline MatXX<T>* get_c_delta_ptr() const = 0;
-
-  virtual inline void set_m_delta_ptr(MatXXUPtr<T> delta_ptr) = 0;
+  // Transitions from current_act_state_ to state
+  virtual bool Transition(ActStates state) = 0;
 
 };
 

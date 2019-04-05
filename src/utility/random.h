@@ -20,6 +20,7 @@ Contributor(s):
 #include <random>
 
 namespace intellgraph {
+
 static std::random_device rd;
 static std::mt19937 gen;
 
@@ -38,9 +39,10 @@ class NormalFunctor {
   }
 
  private:
-  T mean_;
-  T standard_deviation_;
-  std::normal_distribution<T> nd_;
+  T mean_{0};
+  T standard_deviation_{0};
+  std::normal_distribution<T> nd_{};
+
 };
 
 template <class T>
@@ -55,9 +57,9 @@ class UniformFunctor {
   }
 
  private:
-  T a_;
-  T b_;
-  std::uniform_real_distribution<> dis_;
+  T a_{0};
+  T b_{0};
+  std::uniform_real_distribution<> dis_{};
 
 };
 

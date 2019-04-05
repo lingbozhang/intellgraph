@@ -12,43 +12,35 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_NODE_OUTPUT_NODE_H_
-#define INTELLGRAPH_NODE_OUTPUT_NODE_H_
+#ifndef INTELLGRAPH_NODE_NODE_EDGE_INTERFACE_H_
+#define INTELLGRAPH_NODE_NODE_EDGE_INTERFACE_H_
 
-#include <memory>
-
-#include "node/node.h"
-#include "node/node_parameter.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
-// OutputNode interface has two member methods:
-// 1. Calculates value of loss function
-// 2. Calculates delta $dl/dz$
+
 template <class T>
-interface OutputNode : implements Node<T> {
+interface NodeEdgeInterface {
  public:
-  virtual ~OutputNode() noexcept = default;
+  virtual ~NodeEdgeInterface() noexcept = default;
 
-  COPY virtual T CalcLoss(REF const MatXX<T>* data_result_ptr) = 0;
+  virtual void CalcActPrime() = 0;
 
-  virtual void CalcDelta(REF const MatXX<T>* data_result_ptr) = 0;
+  MUTE virtual inline MatXX<T>* get_activation_ptr() const = 0;
+
+  virtual inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) = 0;
+
+  MUTE virtual inline MatXX<T>* get_bias_ptr() const = 0;
+
+  virtual inline void move_bias_ptr(MOVE MatXXUPtr<T> bias_ptr) = 0;
+
+  MUTE virtual inline MatXX<T>* get_delta_ptr() const = 0;
+
+  virtual inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) = 0;
 
 };
 
-// Alias for unique node pointer
-template <class T>
-using OutputNodeUPtr = std::unique_ptr<OutputNode<T>>;
+}  // intellgraph
 
-}  // namespace intellgraph
-
-#endif  // INTELLGRAPH_NODE_OUTPUT_NODE_H_
-
-
-
-
-
-
-
-  
+#endif  // INTELLGRAPH_NODE_NODE_EDGE_INTERFACE_H_

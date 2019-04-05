@@ -20,15 +20,18 @@ Contributor(s):
 #include <unordered_map>
 
 #include "node/node_parameter.h"
+#include "utility/auxiliary_cpp.h"
 
 namespace intellgraph {
 // A Factory design pattern, NodeFactory is used to instantiate corresponding
 // node object.
 template <class T, class Base>
-using NodeFunctor = std::function<std::unique_ptr<Base>(const NodeParameter<T>&)>;
+using NodeFunctor = std::function<MOVE std::unique_ptr<Base>( \
+    REF const NodeParameter<T>&)>;
 
 template <class T, class Base>
-using NodeRegistryMap = std::unordered_map<std::string, NodeFunctor<T, Base>>;
+using NodeRegistryMap = std::unordered_map<COPY std::string, \
+                                           COPY NodeFunctor<T, Base>>;
 
 template <class T, class Base>
 class NodeFactory {
@@ -39,10 +42,11 @@ class NodeFactory {
 
   // use this to instantiate the proper Derived class
   // static functions have no this parameter. They need no cv-qualifiers.
-  static std::unique_ptr<Base> Instantiate(const NodeParameter<T>& node_param) {
-    std::string name = node_param.get_c_node_name();
-    auto it = NodeFactory::Registry().find(name);
-    if (it == NodeFactory::Registry().end()) {
+  MOVE static std::unique_ptr<Base> Instantiate(REF const NodeParameter<T>& \
+                                                node_param) {
+    std::string name = node_param.ref_node_name();
+    auto it = NodeFactory<T, Base>::Registry().find(name);
+    if (it == NodeFactory<T, Base>::Registry().end()) {
       std::cout << "WARNING: instantiate node " << name << " failed"
                 << std::endl;
       return nullptr;
@@ -51,7 +55,7 @@ class NodeFactory {
     }
   }
 
-  static NodeRegistryMap<T, Base>& Registry() {
+  MUTE static NodeRegistryMap<T, Base>& Registry() {
     static NodeRegistryMap<T, Base> impl;
     return impl;
   }
@@ -61,7 +65,7 @@ class NodeFactory {
 template <class T, class Base, class Derived>
 class NodeFactoryRegister {
  public:
-  explicit NodeFactoryRegister(const std::string& name) {
+  explicit NodeFactoryRegister(REF const std::string& name) {
     NodeFactory<T, Base>::Registry()[name] = \
         [](const NodeParameter<T>& node_param) -> std::unique_ptr<Base> {
             // (C++14 feature)

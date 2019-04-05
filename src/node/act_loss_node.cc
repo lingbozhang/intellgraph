@@ -17,96 +17,34 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-ActLossNode<T>::ActLossNode(const NodeParameter<T>& node_param) {
-  node_param_.Clone(node_param);
-
-  size_t row = node_param.get_k_dims()[0];
-  size_t col = node_param.get_k_dims()[1];
-
-  activation_ptr_ = std::make_unique<MatXX<T>>(row, col);
-  delta_ptr_ = std::make_unique<MatXX<T>>(row, col);
-  bias_ptr_ = std::make_unique<MatXX<T>>(row, col);
-
-  activation_ptr_->array() = 0.0;
-  delta_ptr_->array() = 0.0;
-  bias_ptr_->array() = 0.0;
-  
-  Transition(kInit);
-}
-
-template <class T>
-void ActLossNode<T>::PrintAct() const {
-  std::cout << "ActLossNode: " << node_param_.get_k_id() << " Activation Vector:" 
-            << std::endl << activation_ptr_->array() << std::endl;
-}
-
-template <class T>
-void ActLossNode<T>::PrintDelta() const {
-  std::cout << "ActLossNode: " << node_param_.get_k_id() << " Delta Vector:" 
-            << std::endl << delta_ptr_->array() << std::endl;
-}
-
-template <class T>
-void ActLossNode<T>::PrintBias() const {
-  std::cout << "ActLossNode: " << node_param_.get_k_id() << " Bias Vector:" 
-            << std::endl << bias_ptr_->array() << std::endl;
-}
-
-template <class T>
-void ActLossNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
-  if (functor == nullptr) {
-    std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined." 
-              << std::endl;
-  } else {
-    activation_ptr_->array() = activation_ptr_->array(). \
-                               unaryExpr(functor);
-    Transition(kInit);
-  }
-}
-
-template <class T>
-void ActLossNode<T>::InitializeBias_k(const std::function<T(T)>& functor) {
-  if (functor == nullptr) {
-    std::cout << "WARNING: functor passed to InitializeBias_k() is not defined." 
-              << std::endl;
-  } else {
-    VecX<T> vec(bias_ptr_->array().rows());
-    vec.array() = vec.array().unaryExpr(functor);
-    bias_ptr_->matrix().colwise() = vec;
-    Transition(kInit);
-  }
-}
-
-template <class T>
-T ActLossNode<T>::CalcLoss_k(const MatXX<T>* data_result_ptr) {
+T ActLossNode<T>::CalcLoss(const MatXX<T>* data_result_ptr) {
   T loss = 0;
   if (!Transition(kAct)) {
     std::cout << "ERROR: CalcLoss() for ActLossNode fails. " 
               << "Transition to kAct fails" << std::endl;
     exit(1);
   }
-  auto loss_functor = node_param_.get_k_loss_functor();
+  auto loss_functor = ref_node_param().ref_loss_functor();
   if (loss_functor == nullptr) {
     std::cout << "WARNING: loss function is not defined." << std::endl;
   } else {
-    loss = loss_functor(activation_ptr_.get(), data_result_ptr);
+    loss = loss_functor(get_activation_ptr(), data_result_ptr);
   }
   return loss;
 }
 
 template <class T>
-void ActLossNode<T>::CalcDelta_k(const MatXX<T>* data_result_ptr) {
+void ActLossNode<T>::CalcDelta(const MatXX<T>* data_result_ptr) {
   if (!Transition(kAct)) {
     std::cout << "ERROR: CalcDelta() for ActLossNode fails. " 
               << "Transition to kAct fails" << std::endl;
     exit(1);
   }
-  auto loss_prime_functor = node_param_.get_k_loss_prime_functor();
+  auto loss_prime_functor = ref_node_param().ref_loss_prime_functor();
   if (loss_prime_functor == nullptr) {
     std::cout << "WARNING: loss prime function is not defined." << std::endl;
   } else {
-    loss_prime_functor(activation_ptr_.get(), data_result_ptr, \
-        delta_ptr_.get());
+    loss_prime_functor(get_activation_ptr(), data_result_ptr, get_delta_ptr());
   }
   // Note CalcActPrime overwrites data in activation_ptr in-place
   if (!Transition(kPrime)) {
@@ -114,83 +52,7 @@ void ActLossNode<T>::CalcDelta_k(const MatXX<T>* data_result_ptr) {
               << "Transition to kPrime fails" << std::endl;
     exit(1);
   }
-  delta_ptr_->array() *= activation_ptr_->array();
-}
-
-// Transitions from kInit state to kAct state. 
-template <class T>
-void ActLossNode<T>::InitToAct() {
-  auto act_functor = node_param_.get_k_act_functor();
-  if (act_functor == nullptr) {
-    std::cout << "WARNING: InitToAct() for ActLossNode failed." << std::endl;
-    std::cout << "WARNING: activation function is not defined." << std::endl;
-  } else {
-    activation_ptr_->array() = activation_ptr_->array(). \
-                               unaryExpr(act_functor);
-  }
-  current_act_state_ = kAct;
-}
-
-template <class T>
-void ActLossNode<T>::ActToPrime() {
-  // Derivative equation:
-  // $df/dz=f(z)(1-f(z))$
-  auto act_prime_functor = node_param_.get_k_act_prime_functor();
-  if (act_prime_functor == nullptr) {
-    std::cout << "WARNING: ActToPrime() for ActLossNode failed." << std::endl;
-    std::cout << "WARNING: activation prime function is not defined."
-              << std::endl;
-  } else {
-    activation_ptr_->array() = activation_ptr_->array(). \
-                               unaryExpr(act_prime_functor);
-  }
-  current_act_state_ = kPrime;
-}
-
-template <class T>
-bool ActLossNode<T>::Transition(ActStates state) {
-  if (state == kInit) {
-    current_act_state_ = kInit;
-    return true;
-  }
-  if (current_act_state_ > state) {
-    std::cout << "ERROR: Transition() for ActLossNode fails" << std::endl;
-    return false;
-  }
-  while (current_act_state_ < state) {
-    switch (current_act_state_) {
-      case kInit: {
-        InitToAct();
-        break;
-      }
-      case kAct: {
-        ActToPrime();
-        break;
-      }
-      default: {
-        std::cout << "ERROR: Transition() for ActLossNode fails to handle"
-                  << "input state" << std::endl;
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-template <class T>
-void ActLossNode<T>::CallActFxn() {
-  if (!Transition(kAct)) {
-    std::cout << "ERROR: CallActFxn() for ActLossNode fails" << std::endl;
-    exit(1);
-  }
-}
-
-template <class T>
-void ActLossNode<T>::CalcActPrime() {
-  if (!Transition(kPrime)) {
-    std::cout << "ERROR: CalcActPrime() for ActLossNode fails" << std::endl;
-    exit(1);
-  }
+  get_delta_ptr()->array() *= get_activation_ptr()->array();
 }
 
 // Instantiate class, otherwise compilation will fail

@@ -19,19 +19,19 @@ Contributor(s):
 #include <memory>
 
 #include "node/node.h"
+#include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
-
+// InputNode is an abstract class implemented with decorator pattern and
+// contains one additional method:
+// 1. FeedFeature(): feeds trainning data
 template <class T>
-class InputNode : public Node<T> {
+interface InputNode : implements Node<T> {
  public:
-  InputNode() noexcept = default;
-  
   virtual ~InputNode() noexcept = default;
-  
-  virtual void FeedFeature_k(MatXXSPtr<T> feature_ptr) = 0;
 
+  virtual void FeedFeature(MUTE MatXXSPtr<T> train_data_ptr) = 0;
 };
 
 // Alias for unique node pointer

@@ -20,8 +20,8 @@ template <class T>
 ActivationNode<T>::ActivationNode(const NodeParameter<T>& node_param) {
     node_param_.Clone(node_param);
 
-    size_t row = node_param.get_k_dims()[0];
-    size_t col = node_param.get_k_dims()[1];
+    size_t row = node_param.ref_dims()[0];
+    size_t col = node_param.ref_dims()[1];
     
     activation_ptr_ = std::make_unique<MatXX<T>>(row, col);
     delta_ptr_ = std::make_unique<MatXX<T>>(row, col);
@@ -36,20 +36,20 @@ ActivationNode<T>::ActivationNode(const NodeParameter<T>& node_param) {
 
 template <class T>
 void ActivationNode<T>::PrintAct() const {
-  std::cout << "ActivationNode: " << node_param_.get_k_id() 
+  std::cout << "ActivationNode: " << node_param_.ref_id()
             << " Activation Vector:" << std::endl << activation_ptr_->array() 
             << std::endl;
 }
 
 template <class T>
 void ActivationNode<T>::PrintDelta() const {
-  std::cout << "ActivationNode: " << node_param_.get_k_id() << " Delta Vector:" 
+  std::cout << "ActivationNode: " << node_param_.ref_id() << " Delta Vector:"
             << std::endl << delta_ptr_->array() << std::endl;
 }
 
 template <class T>
 void ActivationNode<T>::PrintBias() const {
-  std::cout << "ActivationNode: " << node_param_.get_k_id() << " Bias Vector:" 
+  std::cout << "ActivationNode: " << node_param_.ref_id() << " Bias Vector:"
             << std::endl << bias_ptr_->array() << std::endl;
 }
 
@@ -70,7 +70,7 @@ void ActivationNode<T>::CalcActPrime() {
 }
 
 template <class T>
-void ActivationNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) {
+void ActivationNode<T>::InitializeAct(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
     std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined."
               << std::endl;
@@ -81,7 +81,7 @@ void ActivationNode<T>::ApplyUnaryFunctor_k(const std::function<T(T)>& functor) 
 }
 
 template <class T>
-void ActivationNode<T>::InitializeBias_k(const std::function<T(T)>& functor) {
+void ActivationNode<T>::InitializeBias(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
     std::cout << "WARNING: functor passed to InitializeBias_k() is not defined."
               << std::endl;
@@ -96,7 +96,7 @@ void ActivationNode<T>::InitializeBias_k(const std::function<T(T)>& functor) {
 // Transitions from kInit state to kAct state. 
 template <class T>
 void ActivationNode<T>::InitToAct() {
-  auto act_functor = node_param_.get_k_act_functor();
+  auto act_functor = node_param_.ref_act_functor();
   if ( act_functor == nullptr) {
     std::cout << "WARNING: InitToAct() for ActivationNode failed." << std::endl;
     std::cout << "WARNING: activation function is not defined." << std::endl;
@@ -111,7 +111,7 @@ template <class T>
 void ActivationNode<T>::ActToPrime() {
   // Derivative equation:
   // $df/dz=f(z)(1-f(z))$
-  auto act_prime_functor = node_param_.get_k_act_prime_functor();
+  auto act_prime_functor = node_param_.ref_act_prime_functor();
   if (act_prime_functor == nullptr) {
     std::cout << "WARNING: ActToPrime() for ActivationNode failed." << std::endl;
     std::cout << "WARNING: activation prime function is not defined."

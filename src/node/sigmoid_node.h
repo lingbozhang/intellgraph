@@ -21,29 +21,30 @@ Contributor(s):
 
 #include "node/node.h"
 #include "node/node_parameter.h"
+#include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
 // SigmoidNode improves performance of CallActFxn and CalcActPrime with Eigen 
 // library and has better performance than ActivationNode. 
 template <class T>
-class SigmoidNode : public Node<T> {
+class SigmoidNode : implements Node<T> {
  public:
   SigmoidNode() noexcept = default;
 
-  explicit SigmoidNode(const NodeParameter<T>& node_param);
+  explicit SigmoidNode(REF const NodeParameter<T>& node_param);
 
   // Move constructor
-  SigmoidNode(SigmoidNode<T>&& rhs) noexcept = default;
+  SigmoidNode(MOVE SigmoidNode<T>&& rhs) noexcept = default;
 
   // Move operator
-  SigmoidNode& operator=(SigmoidNode<T>&& rhs) noexcept = default;
+  SigmoidNode& operator=(MOVE SigmoidNode<T>&& rhs) noexcept = default;
   
   // Copy constructor and operator are explicitly deleted
-  SigmoidNode(const SigmoidNode<T>& rhs) = delete;
-  SigmoidNode& operator=(const SigmoidNode<T>& rhs) = delete;
+  SigmoidNode(REF const SigmoidNode<T>& rhs) = delete;
+  SigmoidNode& operator=(REF const SigmoidNode<T>& rhs) = delete;
 
-  ~SigmoidNode() noexcept = default;
+  ~SigmoidNode() noexcept final = default;
 
   void PrintAct() const final;
 
@@ -55,56 +56,60 @@ class SigmoidNode : public Node<T> {
 
   void CalcActPrime() final;
 
-  void ApplyUnaryFunctor_k(const std::function<T(T)>& functor) final;
+  void InitializeAct(REF const std::function<T(T)>& functor) final;
 
-  void InitializeBias_k(const std::function<T(T)>& functor) final;
+  void InitializeBias(REF const std::function<T(T)>& functor) final;
 
-  inline std::vector<size_t> get_c_dims() const final {
-    return node_param_.get_k_dims();
+  COPY inline std::vector<size_t> get_dims() const final {
+    return node_param_.ref_dims();
   }
 
-  inline const std::vector<size_t>& get_k_dims() const final {
-    return node_param_.get_k_dims();
+  REF inline const std::vector<size_t>& ref_dims() const final {
+    return node_param_.ref_dims();
   }
 
-  inline MatXX<T>* get_c_activation_ptr() const final {
+  MUTE inline MatXX<T>* get_activation_ptr() const final {
     return activation_ptr_.get();
   }
 
-  inline void set_m_activation_ptr(MatXXUPtr<T> activation_ptr) final {
+  inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) final {
     activation_ptr_ = std::move(activation_ptr);
     Transition(kInit);
   };
 
-  inline void set_c_activation(T value) final {
+  inline void set_activation(COPY T value) final {
     activation_ptr_->array() = value;
-    Transition(kInit); 
+    Transition(kInit);
   }
 
-  inline MatXX<T>* get_c_bias_ptr() const final {
+  MUTE inline MatXX<T>* get_bias_ptr() const final {
     return bias_ptr_.get();
   }
 
-  inline void set_m_bias_ptr(MatXXUPtr<T> bias_ptr) final {
+  inline void move_bias_ptr(MOVE MatXXUPtr<T> bias_ptr) final {
     bias_ptr_ = std::move(bias_ptr);
   }
 
-  inline MatXX<T>* get_c_delta_ptr() const final {
+  MUTE inline MatXX<T>* get_delta_ptr() const final {
     return delta_ptr_.get();
   }
 
-  inline void set_m_delta_ptr(MatXXUPtr<T> delta_ptr) final {
+  inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) final {
     delta_ptr_ = std::move(delta_ptr);
   }
 
- private:
+  REF inline const NodeParameter<T>& ref_node_param() const final {
+    return node_param_;
+  }
+
   // Transitions from kAct state to kPrime state and updates current_act_state_
-  void ActToPrime();
+  void ActToPrime() final;
   // Transitions from kInit state to kAct state and updates current_act_state_
-  void InitToAct();
+  void InitToAct() final;
   // Transitions from current_act_state_ to state
-  bool Transition(ActStates state);
-  
+  bool Transition(ActStates state) final;
+
+ private:
   NodeParameter<T> node_param_{};
   MatXXUPtr<T> activation_ptr_{nullptr};
   // Delta vector stores the derivative of loss function of

@@ -34,23 +34,23 @@ class NodeParamTest : public ::testing::Test {
 };
 
 TEST_F(NodeParamTest, TestAccesors) {
-  EXPECT_EQ(0, node_param1_.get_k_id());
-  EXPECT_EQ("data1", node_param1_.get_k_node_name());
-  EXPECT_EQ(dims_, node_param1_.get_k_dims());
+  EXPECT_EQ(0, node_param1_.ref_id());
+  EXPECT_EQ("data1", node_param1_.ref_node_name());
+  EXPECT_EQ(dims_, node_param1_.ref_dims());
 
-  EXPECT_EQ(0, node_param1_.get_k_id());
-  EXPECT_EQ("data1", node_param1_.get_k_node_name());
-  EXPECT_EQ(dims_, node_param1_.get_k_dims());  
+  EXPECT_EQ(0, node_param1_.ref_id());
+  EXPECT_EQ("data1", node_param1_.ref_node_name());
+  EXPECT_EQ(dims_, node_param1_.ref_dims());
 }
 
 TEST_F(NodeParamTest, TestMutators) {
-  EXPECT_EQ(10, node_param1_.set_c_id(10).get_k_id());
-  EXPECT_EQ("hello", node_param1_.set_c_node_name("hello").get_k_node_name());
+  EXPECT_EQ(10, node_param1_.set_id(10).ref_id());
+  EXPECT_EQ("hello", node_param1_.set_node_name("hello").ref_node_name());
   dims_[0] = 3;
-  EXPECT_EQ(dims_, node_param1_.set_c_dims({3}).get_k_dims());
+  EXPECT_EQ(dims_, node_param1_.set_dims({3}).ref_dims());
 }
 
 TEST_F(NodeParamTest, TestMoveAssignment) {
   node_param1_ = move(node_param2_);
-  EXPECT_EQ("data2", node_param1_.get_k_node_name());
+  EXPECT_EQ("data2", node_param1_.ref_node_name());
 }
