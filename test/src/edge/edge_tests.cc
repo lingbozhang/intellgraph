@@ -226,7 +226,7 @@ TEST_F(EdgeTest, TestBackward_mute) {
 
   edge2_ptr_v1_->Backward(inner_node_ptr_v1_.get(), output_node_ptr_v1_.get());
   for (int i = 0; i < 3; ++i) {
-    test_value = edge2_ptr_v1_->get_nabla_weight_ptr()->array()(i, 0);
+    test_value = edge2_ptr_v1_->ref_nabla_weight_ptr()->array()(i, 0);
     correct_value = -0.5f * 0.25f;
     EXPECT_NEAR(test_value, correct_value, kAbsoluteError_);
     test_value = inner_node_ptr_v1_->get_delta_ptr()->array()(i, 0);

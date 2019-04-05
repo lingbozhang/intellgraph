@@ -26,9 +26,10 @@ Contributor(s):
 #include "utility/common.h"
 
 namespace intellgraph {
-// SigSqrNode improves performance of GetLoss, CalcDelta, GetLoss, and 
+// SigL2Node uses decorator pattern (see https://dzone.com/articles/is-inheritance-dead)
+// SigL2Node improves performance of GetLoss, CalcDelta, GetLoss, and 
 // CalcDelta with Eigen library and has better performance than ActLossNode.
-// In SigSqrNode, sigmoid function is used as a activation function and squared
+// In SigL2Node, sigmoid function is used as a activation function and squared
 // Euclidean norm is used as a loss function
 template<class T>
 class SigL2Node : implements OutputNode<T> {

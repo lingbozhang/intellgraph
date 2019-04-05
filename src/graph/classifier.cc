@@ -161,13 +161,6 @@ void Classifier<T>::CalcLoss(MUTE MatXXSPtr<T> train_data_ptr, \
 template <class T>
 void Classifier<T>::Evaluate(MatXXSPtr<T> label_ptr) {
   MatXX<T> result = output_node_ptr_->get_activation_ptr()->matrix();
-  for (int i = 0; i < result.rows(); ++i) {
-    if (result(i, 0) > 0.5) {
-      result(i, 0) = 1;
-    } else {
-      result(i, 0) = 0;
-    }
-  }
   std::cout << "Evaluated/Actual results: " << result
             << "/" << label_ptr->array() << std::endl;
 }

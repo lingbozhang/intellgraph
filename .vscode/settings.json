@@ -87,7 +87,8 @@
 		"unordered_set": "cpp",
 		"variant": "cpp",
 		"slist": "cpp",
-		"cfenv": "cpp"
+		"cfenv": "cpp",
+		"*.ipp": "cpp"
 	},
     "files.exclude": {
         "**/.classpath": true,
