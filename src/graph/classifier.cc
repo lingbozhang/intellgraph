@@ -113,13 +113,14 @@ void Classifier<T>::Forward(MatXXSPtr<T> train_data_ptr, \
   }
   if (*order_.rbegin() != input_node_id_ || *order_.begin() != output_node_id_) {
       LOG(ERROR) << "Forward() in the Classifier is failed.";
+      exit(1);
   }
 
   input_node_ptr_->FeedFeature(train_data_ptr);
   for (auto it_r = order_.rbegin(); it_r != order_.rend(); ++it_r) {
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t node_in_id = *it_r;
-    LOG(INFO) << "Forwarding node: " << node_in_id;
+    //LOG(INFO) << "Forwarding node: " << node_in_id;
     if (*it_r != input_node_id_ ) node_map_[*it_r]->CallActFxn();
     for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
       size_t node_out_id = target(*eo, graph_);
@@ -185,7 +186,7 @@ void Classifier<T>::Backward(MatXXSPtr<T> train_data_ptr, \
   for (auto it = order_.begin(); it != order_.end(); ++it) {
     IntellGraph::in_edge_iterator ei{}, ei_end{};
     size_t node_out_id = *it;
-    LOG(INFO) << "Backpropagating node: " << node_out_id;
+    //LOG(INFO) << "Backpropagating node: " << node_out_id;
     for (std::tie(ei, ei_end) = in_edges(*it, graph_); ei != ei_end; ++ei) {
       size_t node_in_id = source(*ei, graph_);
       size_t edge_id = graph_[*ei].id;
