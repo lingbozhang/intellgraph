@@ -56,23 +56,29 @@ void SigmoidNode<T>::PrintBias() const {
 template <class T>
 void SigmoidNode<T>::InitializeAct(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
-    LOG(WARNING) << "InitializeAct() for SigmoidNode is failed."
+    LOG(WARNING) << "InitializeAct() for SigmoidNode is failed: "
+                 << "Initializes activation with standard normal distribution";
+    activation_ptr_->array() = activation_ptr_->array().unaryExpr( \
+        std::function<T(T)>(NormalFunctor<T>(0.0, 1.0)));
   } else {
     activation_ptr_->array() = activation_ptr_->array().unaryExpr(functor);
-    Transition(kInit);
   }
+  Transition(kInit);
 }
 
 template <class T>
 void SigmoidNode<T>::InitializeBias(const std::function<T(T)>& functor) {
+  VecX<T> vec(bias_ptr_->array().rows());
   if (functor == nullptr) {
-    LOG(WARNING) << "InitializeBias() for SigmoidNode is failed." 
+    LOG(WARNING) << "InitializeBias() for SigmoidNode is failed:" 
+                 << "Initializes bias with standard normal distribution";
+    vec.array() = vec.array().unaryExpr(std::function<T(T)>( \
+        NormalFunctor<T>(0.0, 1.0)));
   } else {
-    VecX<T> vec(bias_ptr_->array().rows());
     vec.array() = vec.array().unaryExpr(functor);
-    bias_ptr_->matrix().colwise() = vec;
-    Transition(kInit);
   }
+  bias_ptr_->matrix().colwise() = vec;
+  Transition(kInit);
 }
 
 // Transitions from kInit state to kAct state. In order to avoid overflow of 
@@ -134,17 +140,21 @@ bool SigmoidNode<T>::Transition(ActStates state) {
 }
 
 template <class T>
-void SigmoidNode<T>::CallActFxn() {
+bool SigmoidNode<T>::CallActFxn() {
   if (!Transition(kAct)) {
     LOG(ERROR) << "CallActFxn() for SigmoidNode is failed";
+    return false;
   }
+  return true;
 }
 
 template <class T>
-void SigmoidNode<T>::CalcActPrime() {
+bool SigmoidNode<T>::CalcActPrime() {
   if (!Transition(kPrime)) {
     LOG(ERROR) << "CalcActPrime() for SigmoidNode is failed";
+    return false;
   }
+  return true;
 }
 
 // Instantiate class, otherwise compilation will fail

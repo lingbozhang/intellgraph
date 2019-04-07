@@ -51,8 +51,8 @@ class SigInputNode : implements InputNode<T> {
 
   ~SigInputNode() noexcept final = default;
 
-  void CalcActPrime() final {
-    node_ptr_->CalcActPrime();
+  bool CalcActPrime() final {
+    return node_ptr_->CalcActPrime();
   }
 
   MUTE inline MatXX<T>* get_activation_ptr() const final {
@@ -95,8 +95,8 @@ class SigInputNode : implements InputNode<T> {
     node_ptr_->PrintBias();
   }
 
-  void CallActFxn() final {
-    node_ptr_->CallActFxn();
+  bool CallActFxn() final {
+    return node_ptr_->CallActFxn();
   }
 
   // Passes a functor and applies it on the activation matrix
@@ -141,6 +141,9 @@ class SigInputNode : implements InputNode<T> {
   }
 
   void FeedFeature(MUTE MatXXSPtr<T> feature_ptr) final {
+    CHECK_EQ(this->get_activation_ptr()->size(), feature_ptr->size()) 
+        << "FeedFeature() in SigInputNode is failed: "
+        << "activation and feature dimensions are not equal!";
     this->get_activation_ptr()->array() = feature_ptr->array();
   }
 

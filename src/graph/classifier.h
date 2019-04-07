@@ -19,6 +19,7 @@ Contributor(s):
 #include <unordered_map>
 #include <vector>
 
+#include "glog/logging.h"
 #include "graph/graph.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
@@ -44,6 +45,8 @@ class Classifier : implements Graph<T> {
   void Instantiate() final;
 
   void Reset() final {
+    instantiated_ = false;
+
     output_node_id_ = 0;
     input_node_id_ = 0;
 
@@ -65,16 +68,22 @@ class Classifier : implements Graph<T> {
   void Backward(MUTE MatXXSPtr<T> train_data_ptr, \
                 MUTE MatXXSPtr<T> train_label_ptr) final;
 
+  void Predict(MUTE MatXXSPtr<T> test_data_ptr) final;
+
   MUTE inline MatXX<T>* get_edge_weight(COPY size_t node_in_id, \
                                         COPY size_t node_out_id) final {
     auto edge_pair = boost::edge(node_in_id, node_out_id, graph_);
+    if (!edge_pair.second) {
+      LOG(ERROR) << "Edge connects Nodes: " << node_in_id << " and "
+                 << node_out_id << "dose not exist";
+      return nullptr; 
+    }
     EdgeD edge_descriptor = edge_pair.first;
     size_t edge_id = graph_[edge_descriptor].id;
     if (edge_map_.count(edge_id) > 0) {
       return edge_map_[edge_id].get()->get_weight_ptr();
     } else {
-      std::cout << "WARNING: edge: " << edge_id << "does not exist." 
-                << std::endl;
+      LOG(ERROR) << "Edge: " << edge_id << "does not exist in the table."; 
       return nullptr;
     }
   }
@@ -82,13 +91,17 @@ class Classifier : implements Graph<T> {
   REF inline const MatXX<T>* get_edge_nabla(COPY size_t node_in_id, \
                                             COPY size_t node_out_id) final {
     auto edge_pair = boost::edge(node_in_id, node_out_id, graph_);
+    if (!edge_pair.second) {
+      LOG(ERROR) << "Edge connects Nodes: " << node_in_id << " and "
+                 << node_out_id << "dose not exist";
+      return nullptr; 
+    }
     EdgeD edge_descriptor = edge_pair.first;
     size_t edge_id = graph_[edge_descriptor].id;
     if (edge_map_.count(edge_id) > 0) {
       return edge_map_[edge_id].get()->ref_nabla_weight_ptr();
     } else {
-      std::cout << "WARNING: edge: " << edge_id << "does not exist." 
-                << std::endl;
+      LOG(ERROR) << "Edge: " << edge_id << "does not exist in the table"; 
       return nullptr;
     }
   }
@@ -97,8 +110,7 @@ class Classifier : implements Graph<T> {
     if (node_map_.count(node_id) > 0) {
       return node_map_[node_id]->get_bias_ptr();
     } else {
-      std::cout << "WARNING: node: " << node_id << "does not exist." 
-                << std::endl;
+      LOG(ERROR) << "node: " << node_id << "does not exist.";
       return nullptr;
     }
   }
@@ -107,37 +119,44 @@ class Classifier : implements Graph<T> {
     if (node_map_.count(node_id) > 0) {
       return node_map_[node_id]->get_delta_ptr();
     } else {
-      std::cout << "WARNING: node: " << node_id << "does not exist." 
-                << std::endl;
+      LOG(ERROR) << "node: " << node_id << "does not exist."; 
       return nullptr;
     }
   }
 
-  void CalcLoss(MUTE MatXXSPtr<T> train_data_ptr, \
-                MUTE MatXXSPtr<T> train_label_ptr) final;
-
-  inline void set_output_node_id(COPY const size_t id) final {
+  inline bool set_output_node_id(COPY const size_t id) final {
     if (node_param_map_.count(id) == 0) {
-      std::cout << "WARNING: node: " << id << " does not exist in the graph" 
-                << std::endl;
-      return;
+      LOG(ERROR) << "node: " << id << " does not exist in the graph." ;
+      return false;
     }
     output_node_id_ = id;
+    return true;
   }
 
-  inline void set_input_node_id(COPY const size_t id) final {
+  inline bool set_input_node_id(COPY const size_t id) final {
     if (node_param_map_.count(id) == 0) {
-      std::cout << "WARNING: node: " << id << " does not exist in the graph" 
-                << std::endl;
-      return;
+      LOG(ERROR) << "node: " << id << " does not exist in the graph."; 
+      return false;
     }
     input_node_id_ = id;
+    return true;
   }
 
  private:
-  void Evaluate(MUTE MatXXSPtr<T> label_ptr);
+  inline void CalcLoss(MUTE MatXXSPtr<T> train_label_ptr) {
+    T loss = output_node_ptr_->CalcLoss(train_label_ptr.get());
+    std::cout << "Loss: " << loss << std::endl;
+  }
+
+  inline void Evaluate(MatXXSPtr<T> label_ptr) {
+    MatXX<T> result = output_node_ptr_->get_activation_ptr()->matrix();
+    std::cout << "Evaluated/Actual results: " << result
+              << "/" << label_ptr->array() << std::endl;
+  }  
 
   IntellGraph graph_{};
+
+  bool instantiated_{false};
 
   size_t output_node_id_{0};
   size_t input_node_id_{0};

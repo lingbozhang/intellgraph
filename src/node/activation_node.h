@@ -19,10 +19,12 @@ Contributor(s):
 #include <memory>
 #include <vector>
 // Your project's .h files
+#include "glog/logging.h"
 #include "node/node.h"
 #include "node/node_parameter.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
+#include "utility/random.h"
 
 namespace intellgraph {
 // ActivationNode allows user provided function pointers. ActivationNode has
@@ -56,12 +58,12 @@ class ActivationNode : public Node<T> {
 
   // Calls activation function and updates activation. Note this function calls 
   // activation function at runtime and thus has performance penalty
-  void CallActFxn() final;
+  bool CallActFxn() final;
 
   // Calculates derivative of the activation function and overwrites the 
   // activation in-place. Note this function calls activation prime function at 
   // runtime and thus has performance penalty
-  void CalcActPrime() final;
+  bool CalcActPrime() final;
 
   void InitializeAct(REF const std::function<T(T)>& functor) final;
 
@@ -80,6 +82,9 @@ class ActivationNode : public Node<T> {
   }
 
   inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) final {
+    CHECK_EQ(activation_ptr_->size(), activation_ptr->size())
+        << "move_activation_ptr() for ActivationNode is failed"
+        << "activation dimensions are not equal";
     activation_ptr_ = std::move(activation_ptr);
     Transition(kInit);
   };
@@ -93,6 +98,9 @@ class ActivationNode : public Node<T> {
   }
 
   inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) final {
+    CHECK_EQ(delta_ptr_->size(), delta_ptr->size())
+        << "move_delta_ptr() for ActivationNode is failed"
+        << "delta dimensions are not equal";
     delta_ptr_ = std::move(delta_ptr);
   }
 
@@ -101,6 +109,9 @@ class ActivationNode : public Node<T> {
   }
 
   inline void move_bias_ptr(MOVE MatXXUPtr<T> bias_ptr) final {
+    CHECK_EQ(bias_ptr_->size(), bias_ptr->size())
+        << "move_bias_ptr() for ActivationNode is failed"
+        << "bias dimensions are not equal";
     bias_ptr_ = std::move(bias_ptr);
   }
 

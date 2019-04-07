@@ -15,18 +15,25 @@ Contributor(s):
 #include "node/act_loss_node.h"
 
 namespace intellgraph {
+template <class T>
+ActLossNode<T>::ActLossNode(REF const NodeParameter<T>& node_param) {
+  NodeParameter<T> node_param_new;
+  node_param_new.Clone(node_param);
+  node_param_new.move_node_name("ActivationNode");
+  node_ptr_ = std::make_unique<ActivationNode<T>>(node_param_new);
+}
 
 template <class T>
 T ActLossNode<T>::CalcLoss(const MatXX<T>* data_result_ptr) {
   T loss = 0;
   if (!Transition(kAct)) {
-    std::cout << "ERROR: CalcLoss() for ActLossNode fails. " 
-              << "Transition to kAct fails" << std::endl;
-    exit(1);
+    LOG(ERROR) << "CalcLoss() for ActLossNode is failed.";
+    return -1;
   }
   auto loss_functor = ref_node_param().ref_loss_functor();
   if (loss_functor == nullptr) {
-    std::cout << "WARNING: loss function is not defined." << std::endl;
+    LOG(ERROR) << "loss function is not defined.";
+    return -1;
   } else {
     loss = loss_functor(get_activation_ptr(), data_result_ptr);
   }
@@ -34,25 +41,25 @@ T ActLossNode<T>::CalcLoss(const MatXX<T>* data_result_ptr) {
 }
 
 template <class T>
-void ActLossNode<T>::CalcDelta(const MatXX<T>* data_result_ptr) {
+bool ActLossNode<T>::CalcDelta(const MatXX<T>* data_result_ptr) {
   if (!Transition(kAct)) {
-    std::cout << "ERROR: CalcDelta() for ActLossNode fails. " 
-              << "Transition to kAct fails" << std::endl;
-    exit(1);
+    LOG(ERROR) << "CalcDelta() for ActLossNode is failed."; 
+    return false;
   }
   auto loss_prime_functor = ref_node_param().ref_loss_prime_functor();
   if (loss_prime_functor == nullptr) {
-    std::cout << "WARNING: loss prime function is not defined." << std::endl;
+    LOG(ERROR) << "loss prime function is not defined.";
+    return false;
   } else {
     loss_prime_functor(get_activation_ptr(), data_result_ptr, get_delta_ptr());
   }
   // Note CalcActPrime overwrites data in activation_ptr in-place
   if (!Transition(kPrime)) {
-    std::cout << "ERROR: CalcDelta() for ActLossNode fails. " 
-              << "Transition to kPrime fails" << std::endl;
-    exit(1);
+    LOG(ERROR) << "CalcDelta() for ActLossNode is failed.";
+    return false;
   }
   get_delta_ptr()->array() *= get_activation_ptr()->array();
+  return true;
 }
 
 // Instantiate class, otherwise compilation will fail

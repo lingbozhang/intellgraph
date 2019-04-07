@@ -24,6 +24,7 @@ Contributor(s):
 #include "node/node_parameter.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
+#include "utility/random.h"
 
 namespace intellgraph {
 // SigmoidNode improves performance of CallActFxn and CalcActPrime with Eigen 
@@ -53,9 +54,9 @@ class SigmoidNode : implements Node<T> {
 
   void PrintBias() const final;
 
-  void CallActFxn() final;
+  bool CallActFxn() final;
 
-  void CalcActPrime() final;
+  bool CalcActPrime() final;
 
   void InitializeAct(REF const std::function<T(T)>& functor) final;
 
@@ -75,7 +76,7 @@ class SigmoidNode : implements Node<T> {
 
   inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) final {
     CHECK_EQ(activation_ptr_->size(), activation_ptr->size()) 
-        << "move_activation_ptr() for SigmoidNode is failed: "
+        << "move_activation_ptr() for SigmoidNode is failed: ";
     activation_ptr_ = std::move(activation_ptr);
     Transition(kInit);
   };
@@ -90,7 +91,7 @@ class SigmoidNode : implements Node<T> {
   }
 
   inline void move_bias_ptr(MOVE MatXXUPtr<T> bias_ptr) final {
-    CHECK_EQ(bias_ptr_size(), bias_ptr->size())
+    CHECK_EQ(bias_ptr_->size(), bias_ptr->size())
         << "move_bias_ptr() for SigmoidNode is failed";
     bias_ptr_ = std::move(bias_ptr);
   }
@@ -100,6 +101,8 @@ class SigmoidNode : implements Node<T> {
   }
 
   inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) final {
+    CHECK_EQ(delta_ptr_->size(), delta_ptr->size())
+        << "move_delta_ptr() for SigmoidNode is failed";
     delta_ptr_ = std::move(delta_ptr);
   }
 

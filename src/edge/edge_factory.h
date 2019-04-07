@@ -19,6 +19,7 @@ Contributor(s):
 #include <iostream>
 #include <unordered_map>
 
+#include "glog/logging.h"
 #include "edge/edge_parameter.h"
 #include "utility/auxiliary_cpp.h"
 
@@ -46,8 +47,7 @@ class EdgeFactory {
     std::string name = edge_param.ref_edge_name();
     auto it = EdgeFactory::Registry().find(name);
     if (it == EdgeFactory::Registry().end() ) {
-      std::cout << "WARNING: instantiate Edge " << name << " failed"
-                << std::endl;
+      LOG(ERROR) << "Instantiate Edge " << name << "is failed";
       return nullptr;
     } else {
       return (it->second)(edge_param);
@@ -70,7 +70,6 @@ class EdgeFactoryRegister {
           std::unique_ptr<Base> rv = std::make_unique<Derived>(edge_param);
           return rv;
         };
-    //std::cout << "Registering Edge: '" << name << "'" << std::endl;
   }
 };
 

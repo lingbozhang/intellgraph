@@ -45,6 +45,14 @@ void DenseEdge<T>::PrintNablaWeight() const {
 template <class T>
 void DenseEdge<T>::Forward(const NodeEdgeInterface<T>* node_in_ptr, \
     NodeEdgeInterface<T>* node_out_ptr) {
+  CHECK_EQ(weight_ptr_->rows(), node_in_ptr->get_activation_ptr()->rows())
+      << "Forward() in DenseEdge is failed:"
+      << "Dimensions of weight and activation from input node are not equal.";
+  
+  CHECK_EQ(weight_ptr_->cols(), node_out_ptr->get_activation_ptr()->rows())
+      << "Forward() in DenseEdge is failed:"
+      << "Dimensions of weight and activation from output node are not equal.";
+  
   MatXXUPtr<T> weighted_sum_ptr = std::make_unique<MatXX<T>>(
       weight_ptr_->transpose() * node_in_ptr->get_activation_ptr()->matrix() + \
       node_out_ptr->get_bias_ptr()->matrix());
@@ -72,8 +80,10 @@ void DenseEdge<T>::Backward(NodeEdgeInterface<T>* node_in_ptr, \
 template <class T>
 void DenseEdge<T>::InitializeWeight(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
-    std::cout << "WARNING: functor passed to InitializeWeight() is not defined."
-              << std::endl;
+    LOG(WARNING) << "functor passed to InitializeWeight() is not defined: "
+                 << "Initializes weight with standard normal distribution.";
+    weight_ptr_->array() = weight_ptr_->array().unaryExpr( \
+        std::function<T(T)>(NormalFunctor<T>(0.0, 1.0)));
   } else {
     weight_ptr_->array() = weight_ptr_->array().unaryExpr(functor);
   }

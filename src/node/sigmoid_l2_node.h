@@ -37,12 +37,7 @@ class SigL2Node : implements OutputNode<T> {
  public:
   SigL2Node() noexcept = default;
 
-  explicit SigL2Node(REF const NodeParameter<T>& node_param) {
-    NodeParameter<T> node_param_new;
-    node_param_new.Clone(node_param);
-    node_param_new.move_node_name("SigmoidNode");
-    node_ptr_ = std::make_unique<SigmoidNode<T>>(node_param_new);
-  }
+  explicit SigL2Node(REF const NodeParameter<T>& node_param);
 
   // Move constructor
   SigL2Node(MOVE SigL2Node<T>&& rhs) noexcept = default;
@@ -58,10 +53,10 @@ class SigL2Node : implements OutputNode<T> {
 
   COPY T CalcLoss(REF const MatXX<T>* data_result_ptr) final;
 
-  void CalcDelta(REF const MatXX<T>* data_result_ptr) final;
+  bool CalcDelta(REF const MatXX<T>* data_result_ptr) final;
 
-  void CalcActPrime() final {
-    node_ptr_->CalcActPrime();
+  bool CalcActPrime() final {
+    return node_ptr_->CalcActPrime();
   }
 
   MUTE inline MatXX<T>* get_activation_ptr() const final {
@@ -101,11 +96,11 @@ class SigL2Node : implements OutputNode<T> {
   }
  
   void PrintBias() const final {
-   node_ptr_->PrintBias();
+    node_ptr_->PrintBias();
   }
  
-  void CallActFxn() final {
-    node_ptr_->CallActFxn();
+  bool CallActFxn() final {
+    return node_ptr_->CallActFxn();
   }
  
   // Passes a functor and applies it on the activation matrix

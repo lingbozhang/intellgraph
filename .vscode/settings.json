@@ -88,7 +88,10 @@
 		"variant": "cpp",
 		"slist": "cpp",
 		"cfenv": "cpp",
-		"*.ipp": "cpp"
+		"*.ipp": "cpp",
+		"hash_map": "cpp",
+		"hash_set": "cpp",
+		"rope": "cpp"
 	},
     "files.exclude": {
         "**/.classpath": true,

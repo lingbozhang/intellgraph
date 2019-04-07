@@ -36,61 +36,66 @@ ActivationNode<T>::ActivationNode(const NodeParameter<T>& node_param) {
 
 template <class T>
 void ActivationNode<T>::PrintAct() const {
-  std::cout << "ActivationNode: " << node_param_.ref_id()
-            << " Activation Vector:" << std::endl << activation_ptr_->array() 
-            << std::endl;
+  std::cout << "Node: " << node_param_.ref_id() << std::endl
+            << " Activation Vector:" << std::endl 
+            << activation_ptr_->array() << std::endl;
 }
 
 template <class T>
 void ActivationNode<T>::PrintDelta() const {
-  std::cout << "ActivationNode: " << node_param_.ref_id() << " Delta Vector:"
-            << std::endl << delta_ptr_->array() << std::endl;
+  std::cout << "Node: " << node_param_.ref_id() << std::endl
+            << " Delta Vector:" << std::endl 
+            << delta_ptr_->array() << std::endl;
 }
 
 template <class T>
 void ActivationNode<T>::PrintBias() const {
-  std::cout << "ActivationNode: " << node_param_.ref_id() << " Bias Vector:"
-            << std::endl << bias_ptr_->array() << std::endl;
+  std::cout << "Node: " << node_param_.ref_id() << std::endl
+            << " Bias Vector:" << std::endl 
+            << bias_ptr_->array() << std::endl;
 }
 
 template <class T>
-void ActivationNode<T>::CallActFxn() {
+bool ActivationNode<T>::CallActFxn() {
   if (!Transition(kAct)) {
-    std::cout << "ERROR: CallActFxn() for ActivationNode fails" << std::endl;
-    exit(1);
+    LOG(ERROR) << "CallActFxn() for ActivationNode is failed.";
+    return false;
   }
+  return true;
 }
 
 template <class T>
-void ActivationNode<T>::CalcActPrime() {
+bool ActivationNode<T>::CalcActPrime() {
   if (!Transition(kPrime)) {
-    std::cout << "ERROR: CalcActPrime() for ActivationNode fails" << std::endl;
-    exit(1);
+    LOG(ERROR) << "CalcActPrime() for ActivationNode is failed";
+    return false;
   }
+  return true;
 }
 
 template <class T>
 void ActivationNode<T>::InitializeAct(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
-    std::cout << "WARNING: functor passed to ApplyUnaryFunctor() is not defined."
-              << std::endl;
+    LOG(WARNING) << "functor passed to ApplyUnaryFunctor() is not defined."
+                 << "Initializes activation with standard normal distribution";
+    activation_ptr_->array() = activation_ptr_->array().unaryExpr( \
+        std::function<T(T)>(NormalFunctor<T>(0.0, 1.0)));
   } else {
     activation_ptr_->array() = activation_ptr_->array().unaryExpr(functor);
-    Transition(kInit);
   }
+  Transition(kInit);
 }
 
 template <class T>
 void ActivationNode<T>::InitializeBias(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
-    std::cout << "WARNING: functor passed to InitializeBias_k() is not defined."
-              << std::endl;
-  } else {
-    VecX<T> vec(bias_ptr_->array().rows());
-    vec.array() = vec.array().unaryExpr(functor);
-    bias_ptr_->matrix().colwise() = vec;
-    Transition(kInit);
+    LOG(WARNING) << "functor passed to InitializeBias() is not defined."
+                 << "Initializes bias with standard normal distribution";
   }
+  VecX<T> vec(bias_ptr_->array().rows());
+  vec.array() = vec.array().unaryExpr(functor);
+  bias_ptr_->matrix().colwise() = vec;
+  Transition(kInit);
 }
 
 // Transitions from kInit state to kAct state. 
@@ -98,8 +103,9 @@ template <class T>
 void ActivationNode<T>::InitToAct() {
   auto act_functor = node_param_.ref_act_functor();
   if ( act_functor == nullptr) {
-    std::cout << "WARNING: InitToAct() for ActivationNode failed." << std::endl;
-    std::cout << "WARNING: activation function is not defined." << std::endl;
+    LOG(ERROR) << "InitToAct() for ActivationNode is failed."
+               << "activation function is not defined.";
+    exit(1);
   } else {
     activation_ptr_->array() = activation_ptr_->array(). \
                                unaryExpr(act_functor);
@@ -113,9 +119,9 @@ void ActivationNode<T>::ActToPrime() {
   // $df/dz=f(z)(1-f(z))$
   auto act_prime_functor = node_param_.ref_act_prime_functor();
   if (act_prime_functor == nullptr) {
-    std::cout << "WARNING: ActToPrime() for ActivationNode failed." << std::endl;
-    std::cout << "WARNING: activation prime function is not defined."
-              << std::endl;
+    LOG(ERROR) << "ActToPrime() for ActivationNode is failed."
+               << "activation prime function is not defined.";
+    exit(1);
   } else {
     activation_ptr_->array() = activation_ptr_->array(). \
                                unaryExpr(act_prime_functor);
@@ -130,7 +136,7 @@ bool ActivationNode<T>::Transition(ActStates state) {
     return true;
   }
   if (current_act_state_ > state) {
-    std::cout << "ERROR: Transition() for ActivationNode fails" << std::endl;
+    LOG(ERROR) << "Transition() for ActivationNode is failed";
     return false;
   }
   while (current_act_state_ < state) {
@@ -144,8 +150,7 @@ bool ActivationNode<T>::Transition(ActStates state) {
         break;
       }
       default: {
-        std::cout << "ERROR: Transition() for ActivationNode fails to handle"
-                  << "input state" << std::endl;
+        LOG(ERROR) << "Transition() for ActivationNode is failed";
         return false;
       }
     }

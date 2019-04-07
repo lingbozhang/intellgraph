@@ -17,11 +17,13 @@ Contributor(s):
 
 #include <functional>
 
+#include "glog/logging.h"
 #include "edge/edge.h"
 #include "edge/edge_parameter.h"
 #include "node/node_edge_interface.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
+#include "utility/random.h"
 
 namespace intellgraph {
 // DenseEdge is a edge class that used to build fully connected neural networks.

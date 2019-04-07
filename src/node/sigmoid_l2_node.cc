@@ -17,12 +17,21 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
+SigL2Node<T>::SigL2Node(REF const NodeParameter<T>& node_param) {
+  NodeParameter<T> node_param_new;
+  node_param_new.Clone(node_param);
+  node_param_new.move_node_name("SigmoidNode");
+  node_ptr_ = std::make_unique<SigmoidNode<T>>(node_param_new);
+}
+
+template <class T>
 T SigL2Node<T>::CalcLoss(const MatXX<T>* data_result_ptr) {
   T loss = 0;
   if (!Transition(kAct)) {
     LOG(ERROR) << "CalcLoss() for SigL2Node is failed.";
+    return -1.0;
   }
-  CHECK_EQ(get_activation_ptr()->rows(), data_result_ptr->rows()) 
+  CHECK_EQ(get_activation_ptr()->size(), data_result_ptr->size()) 
       << "CalcLoss() for SigL2Node is failed: "
       << "activation and data matrix dimensions are not equal!";
 
@@ -32,12 +41,13 @@ T SigL2Node<T>::CalcLoss(const MatXX<T>* data_result_ptr) {
 }
 
 template <class T>
-void SigL2Node<T>::CalcDelta(const MatXX<T>* data_result_ptr) {
+bool SigL2Node<T>::CalcDelta(const MatXX<T>* data_result_ptr) {
   if (!Transition(kAct)) {
-    LOG(ERROR) << "CalcDelta() for SigL2Node is failed." 
+    LOG(ERROR) << "CalcDelta() for SigL2Node is failed.";
+    return false;
   }
 
-  CHECK_EQ(get_activation_ptr()->rows(), data_result_ptr->rows()) 
+  CHECK_EQ(get_activation_ptr()->size(), data_result_ptr->size()) 
       << "CalcDelta() for SigL2Node is failed: "
       << "activation and data matrix dimensions are not equal!";
 
@@ -45,9 +55,11 @@ void SigL2Node<T>::CalcDelta(const MatXX<T>* data_result_ptr) {
       - data_result_ptr->array());
   // Note CalcActPrime overwrites data in activation_ptr_ in-place
   if (!Transition(kPrime)) {
-    LOG(ERROR) << "CalcDelta() for SigL2Node is failed."
+    LOG(ERROR) << "CalcDelta() for SigL2Node is failed.";
+    return false;
   }
   get_delta_ptr()->array() *= get_activation_ptr()->array();
+  return true;
 }
 
 // Instantiate class, otherwise compilation will fail

@@ -19,6 +19,7 @@ Contributor(s):
 #include "edge/edge_factory.h"
 #include "edge/edge_parameter.h"
 #include "edge/edge.h"
+#include "glog/logging.h"
 
 namespace intellgraph {
 
@@ -30,6 +31,7 @@ class EdgeRegistry {
 
   static void LoadEdgeRegistry() {
     // Registers DenseEdge
+    LOG(INFO) << "Registering DenseEdge"; 
     DEVIMPL_REGISTERIMPL_EDGE(DenseEdge, Edge);
   }
 };

@@ -34,6 +34,7 @@ void Classifier<T>::AddEdge(const NodeParameter<T>& node_param_in, \
   if (node_param_map_.count(vertex_out_id) == 0) {
     node_param_map_[vertex_out_id].Clone(node_param_out);
   }
+  
   edge_property.id = edge_param_map_.size();
 
   // Constructs EdgeParameter
@@ -44,7 +45,7 @@ void Classifier<T>::AddEdge(const NodeParameter<T>& node_param_in, \
 
   if (!boost::add_edge(vertex_in_id, vertex_out_id, edge_property, graph_). \
       second) {
-    std::cout << "WARNING: Edge has already been added" << std::endl;
+    LOG(WARNING) << "Edge has already been added";
     return;
   }
   edge_param_map_[edge_property.id].Clone(edge_param);
@@ -69,6 +70,7 @@ void Classifier<T>::Instantiate() {
   output_node_ptr_ = output_node_ptr.get();
   node_map_[output_node_id_] = std::move(output_node_ptr);
 
+  LOG(INFO) << "Initializes output node with standard normal distribution";
   output_node_ptr_->InitializeBias(NormalFunctor<T>(0.0, 1.0));
 
   // Instantiates node objects;
@@ -77,6 +79,8 @@ void Classifier<T>::Instantiate() {
     if (node_id != output_node_id_ && node_id != input_node_id_) {
       NodeUPtr<T> node_ptr = \
           std::move(NodeFactory<T, Node<T>>::Instantiate(node_pair.second));
+      LOG(INFO) << "Initializes node: " << node_id
+                << ", with standard normal distribution";
       node_ptr->InitializeBias(NormalFunctor<T>(0.0, 1.0));
       node_map_[node_pair.first] = std::move(node_ptr);
     }
@@ -86,28 +90,36 @@ void Classifier<T>::Instantiate() {
     EdgeUPtr<T> edge_ptr = std::move(EdgeFactory<T, Edge<T>>::Instantiate( \
         edge_pair.second));
     // Initializes weight matrix with standard normal distribution
+    LOG(INFO) << "Initializes edge: " << edge_pair.first
+              << ", with standard normal distribution";
     edge_ptr->InitializeWeight(NormalFunctor<T>(0.0, 1.0));
     edge_map_[edge_pair.first] = std::move(edge_ptr);
   }
+
+  order_.clear();
+  LOG(INFO) << "Determines Forward() orders by topological sorting";
+  topological_sort(graph_, std::back_inserter(order_));
+
+  instantiated_ = true;
 }
 
 template <class T>
 void Classifier<T>::Forward(MatXXSPtr<T> train_data_ptr, \
                             MatXXSPtr<T> train_label_ptr) {
-  order_.clear();
-  topological_sort(graph_, std::back_inserter(order_));
-
-  if (*order_.rbegin() != input_node_id_ || \
-    *order_.begin() != output_node_id_) {
-      std::cout << "ERROR: invalid graph." << std::endl;
-      exit(1);
+  if (!instantiated_) {
+     LOG(WARNING) << "Classifier is not instantiated: "
+                  << "Try to instantiate it";
+     Instantiate();
+  }
+  if (*order_.rbegin() != input_node_id_ || *order_.begin() != output_node_id_) {
+      LOG(ERROR) << "Forward() in the Classifier is failed.";
   }
 
   input_node_ptr_->FeedFeature(train_data_ptr);
   for (auto it_r = order_.rbegin(); it_r != order_.rend(); ++it_r) {
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t node_in_id = *it_r;
-    //std::cout << "Forwarding node: " << node_in_id << std::endl;
+    LOG(INFO) << "Forwarding node: " << node_in_id;
     if (*it_r != input_node_id_ ) node_map_[*it_r]->CallActFxn();
     for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
       size_t node_out_id = target(*eo, graph_);
@@ -122,8 +134,47 @@ void Classifier<T>::Forward(MatXXSPtr<T> train_data_ptr, \
       edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
     }
   }
-  CalcLoss(train_data_ptr, train_label_ptr);
+ 
+  CalcLoss(train_label_ptr);
   Evaluate(train_label_ptr);
+}
+
+template <class T>
+void Classifier<T>::Predict(MatXXSPtr<T> train_data_ptr) {
+  if (*order_.rbegin() != input_node_id_ || *order_.begin() != output_node_id_) {
+      LOG(ERROR) << "Forward() in the Classifier is failed.";
+  }
+
+  input_node_ptr_->FeedFeature(train_data_ptr);
+  for (auto it_r = order_.rbegin(); it_r != order_.rend(); ++it_r) {
+    IntellGraph::out_edge_iterator eo{}, eo_end{};
+    size_t node_in_id = *it_r;
+    LOG(INFO) << "Forwarding node: " << node_in_id;
+    if (*it_r != input_node_id_ ) node_map_[*it_r]->CallActFxn();
+    for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
+      size_t node_out_id = target(*eo, graph_);
+      size_t edge_id = graph_[*eo].id;
+
+      Node<T> *node_in_ptr, *node_out_ptr;
+
+      node_in_ptr = node_map_[node_in_id].get();
+        
+      node_out_ptr = node_map_[node_out_id].get();
+ 
+      edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
+    }
+  }
+
+  for (size_t i = 0; i < output_node_ptr_->get_activation_ptr()->rows(); ++i) {
+    if (output_node_ptr_->get_activation_ptr()->array()(i, 1) > 0.5) {
+      output_node_ptr_->get_activation_ptr()->array()(i, 1) = 1;
+    } else {
+      output_node_ptr_->get_activation_ptr()->array()(i, 1) = 0;
+    }
+  }
+
+  MatXX<T> result = output_node_ptr_->get_activation_ptr()->matrix();
+  std::cout << "Evaluated/results: " << result << std::endl;
 }
 
 template <class T>
@@ -134,7 +185,7 @@ void Classifier<T>::Backward(MatXXSPtr<T> train_data_ptr, \
   for (auto it = order_.begin(); it != order_.end(); ++it) {
     IntellGraph::in_edge_iterator ei{}, ei_end{};
     size_t node_out_id = *it;
-    //std::cout << "Backpropagating node: " << node_out_id << std::endl;
+    LOG(INFO) << "Backpropagating node: " << node_out_id;
     for (std::tie(ei, ei_end) = in_edges(*it, graph_); ei != ei_end; ++ei) {
       size_t node_in_id = source(*ei, graph_);
       size_t edge_id = graph_[*ei].id;
@@ -149,20 +200,6 @@ void Classifier<T>::Backward(MatXXSPtr<T> train_data_ptr, \
       edge_ptr->Backward(node_in_ptr, node_out_ptr);
     }
   }
-}
-
-template <class T>
-void Classifier<T>::CalcLoss(MUTE MatXXSPtr<T> train_data_ptr, \
-                             MUTE MatXXSPtr<T> train_label_ptr) {
-  T loss = output_node_ptr_->CalcLoss(train_label_ptr.get());
-  std::cout << "Loss: " << loss << std::endl;
-}
-
-template <class T>
-void Classifier<T>::Evaluate(MatXXSPtr<T> label_ptr) {
-  MatXX<T> result = output_node_ptr_->get_activation_ptr()->matrix();
-  std::cout << "Evaluated/Actual results: " << result
-            << "/" << label_ptr->array() << std::endl;
 }
 
 // Instantiate class, otherwise compilation will fail

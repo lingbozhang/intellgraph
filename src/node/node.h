@@ -56,7 +56,7 @@ interface Node : implements NodeEdgeInterface<T> {
 
   virtual void PrintBias() const = 0;
 
-  virtual void CallActFxn() = 0;
+  virtual bool CallActFxn() = 0;
 
   // Passes a functor and applies it on the activation matrix
   virtual void InitializeAct(REF const std::function<T(T)>& functor) = 0;

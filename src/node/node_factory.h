@@ -19,6 +19,7 @@ Contributor(s):
 #include <iostream>
 #include <unordered_map>
 
+#include "glog/logging.h"
 #include "node/node_parameter.h"
 #include "utility/auxiliary_cpp.h"
 
@@ -47,8 +48,7 @@ class NodeFactory {
     std::string name = node_param.ref_node_name();
     auto it = NodeFactory<T, Base>::Registry().find(name);
     if (it == NodeFactory<T, Base>::Registry().end()) {
-      std::cout << "WARNING: instantiate node " << name << " failed"
-                << std::endl;
+      LOG(ERROR) << "Instantiate node " << name << " failed";
       return nullptr;
     } else {
       return (it->second)(node_param);
@@ -72,7 +72,6 @@ class NodeFactoryRegister {
           std::unique_ptr<Base> rv = std::make_unique<Derived>(node_param);
           return rv;
         };
-    //std::cout << "Registering Node: '" << name << "'" << std::endl;
   }
 };
 

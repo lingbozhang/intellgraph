@@ -33,7 +33,7 @@ interface OutputNode : implements Node<T> {
 
   COPY virtual T CalcLoss(REF const MatXX<T>* data_result_ptr) = 0;
 
-  virtual void CalcDelta(REF const MatXX<T>* data_result_ptr) = 0;
+  virtual bool CalcDelta(REF const MatXX<T>* data_result_ptr) = 0;
 
 };
 

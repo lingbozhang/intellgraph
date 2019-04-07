@@ -18,6 +18,7 @@ Contributor(s):
 #include <functional>
 #include <vector>
 // Your project's .h files
+#include "glog/logging.h"
 #include "node/activation_node.h"
 #include "node/output_node.h"
 #include "node/node_parameter.h"
@@ -36,12 +37,7 @@ class ActLossNode : implements OutputNode<T> {
  public:
   ActLossNode() noexcept = default;
 
-  explicit ActLossNode(REF const NodeParameter<T>& node_param) {
-    NodeParameter<T> node_param_new;
-    node_param_new.Clone(node_param);
-    node_param_new.move_node_name("ActivationNode");
-    node_ptr_ = std::make_unique<ActivationNode<T>>(node_param_new);
-  }
+  explicit ActLossNode(REF const NodeParameter<T>& node_param); 
 
   ActLossNode(MOVE ActLossNode<T>&& rhs) noexcept = default;
 
@@ -55,10 +51,10 @@ class ActLossNode : implements OutputNode<T> {
 
   COPY T CalcLoss(REF const MatXX<T>* data_result_ptr) final;
 
-  void CalcDelta(REF const MatXX<T>* data_result_ptr) final;
+  bool CalcDelta(REF const MatXX<T>* data_result_ptr) final;
 
-  void CalcActPrime() final {
-    node_ptr_->CalcActPrime();
+  bool CalcActPrime() final {
+    return node_ptr_->CalcActPrime();
   }
 
   MUTE inline MatXX<T>* get_activation_ptr() const final {
@@ -101,8 +97,8 @@ class ActLossNode : implements OutputNode<T> {
     node_ptr_->PrintBias();
   }
 
-  void CallActFxn() final {
-    node_ptr_->CallActFxn();
+  bool CallActFxn() final {
+    return node_ptr_->CallActFxn();
   }
 
   // Passes a functor and applies it on the activation matrix

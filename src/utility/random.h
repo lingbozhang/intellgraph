@@ -32,7 +32,7 @@ class NormalFunctor {
     nd_ = std::normal_distribution<T>(mean, standard_deviation);
   }
   // Operator takes dummy argument and returns normal distribution result.
-  inline T operator () (const T dummy) {
+  inline T operator()(const T dummy) {
     return nd_(gen);
   }
 
@@ -50,7 +50,7 @@ class UniformFunctor {
     gen = std::mt19937(rd());
     dis_ = std::uniform_real_distribution<>(a,b);
   }
-  inline T operator () (const T dummy) {
+  inline T operator()(const T dummy) {
     return dis_(gen);
   }
 

@@ -25,7 +25,7 @@ interface NodeEdgeInterface {
  public:
   virtual ~NodeEdgeInterface() noexcept = default;
 
-  virtual void CalcActPrime() = 0;
+  virtual bool CalcActPrime() = 0;
 
   MUTE virtual inline MatXX<T>* get_activation_ptr() const = 0;
 

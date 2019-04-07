@@ -63,13 +63,12 @@ interface Graph {
 
   REF virtual inline const MatXX<T>* get_node_delta(COPY size_t node_id) = 0;
 
-  virtual void CalcLoss(MUTE MatXXSPtr<T> train_data_ptr, \
-                        MUTE MatXXSPtr<T> train_label_ptr) = 0;
-
-  virtual inline void set_output_node_id(COPY const size_t id) = 0;
+  virtual inline bool set_output_node_id(COPY const size_t id) = 0;
 
 
-  virtual inline void set_input_node_id(COPY const size_t id) = 0;
+  virtual inline bool set_input_node_id(COPY const size_t id) = 0;
+
+  virtual void Predict(MUTE MatXXSPtr<T> test_data_ptr) = 0;
 
 };
 

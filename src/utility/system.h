@@ -15,6 +15,8 @@ Contributor(s):
 #ifndef INTELLGRAPH_UTILITY_SYSTEM_H_
 #define INTELLGRAPH_UTILITY_SYSTEM_H_
 
+#include <libc.h>
+
 #include <string>
 #include "utility/auxiliary_cpp.h"
 
