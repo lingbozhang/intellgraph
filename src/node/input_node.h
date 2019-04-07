@@ -32,6 +32,8 @@ interface InputNode : implements Node<T> {
   virtual ~InputNode() noexcept = default;
 
   virtual void FeedFeature(MUTE MatXXSPtr<T> train_data_ptr) = 0;
+
+  
 };
 
 // Alias for unique node pointer
