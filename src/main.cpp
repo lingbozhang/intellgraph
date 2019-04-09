@@ -1,6 +1,8 @@
+
 #include "glog/logging.h"
+#include "transformer/internal_representation.h"
 #include "mnist/mnist_reader.hpp"
-#include "example/simple_classifier.h"
+#include "simple_classifier.h"
 #include "utility/system.h"
 
 int main(int argc, char* argv[]) {
@@ -16,6 +18,7 @@ int main(int argc, char* argv[]) {
 
   fLS::FLAGS_log_dir = log_path;
   google::InitGoogleLogging(argv[0]);
-  //Example1::run();
+
+  Example1::run();
   return 0;
 }

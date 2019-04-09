@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(IntellGraph)
 
+add_subdirectory(transformer)
 add_subdirectory(graph)
 add_subdirectory(edge)
 add_subdirectory(node)
