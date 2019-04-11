@@ -34,28 +34,28 @@ class Example1 {
  public:
   static void run() {
     // Prepares train data
-    auto train_d_ptr = std::make_shared<MatXX<float>>(2, 2);
-    auto train_l_ptr = std::make_shared<MatXX<float>>(1, 2);
+    auto train_d_ptr = std::make_shared<MatXX<float>>(2, 6);
+    auto train_l_ptr = std::make_shared<MatXX<float>>(1, 6);
 
     // In IntellGraph, current version implements Eigen library for matrix
     // abstraction.
-    train_d_ptr->array() << 0.0, 1.0,
-                            0.0, 1.0;
+    train_d_ptr->array() << 0.0, 1.0, 0.5,   1,   0, 0.5,
+                            0.0, 1.0,   1, 0.5, 0.5, 0.0;
 
-    train_l_ptr->array() << 0.0, 1.0;
+    train_l_ptr->array() << 0.0, 1.0, 1, 1, 0.0, 0.0;
 
     NodeRegistry::LoadNodeRegistry();
     EdgeRegistry::LoadEdgeRegistry();
 
-    // SigInputNode is an input layer which uses Sigmoid function as activation
+    // SigmoidNode is an internal node which uses Sigmoid function as activation
     // function. Note Node has two dimensions, the first dimension indicates
-    // number of nodes and the second dimension is currently used for batch
-    // size
-    auto node_param1 = NodeParameter<float>(0, "SigInputNode", {2, 1});
+    // dimension of neural layers  and the second dimension is currently used 
+    // for batch size
+    auto node_param1 = NodeParameter(0, "SigmoidNode", {2, 1});
 
     // SigL2Node uses Sigmoid function as activation function and l2 norm as
     // loss function.
-    auto node_param2 = NodeParameter<float>(1, "SigL2Node", {1, 1});
+    auto node_param2 = NodeParameter(1, "SigL2Node", {1, 1});
 
     // IntellGraph implements Boost Graph library and stores node and edge
     // information in the adjacency list.
@@ -72,21 +72,22 @@ class Example1 {
     MatXXSPtr<float> train_label_ptr = std::make_shared<MatXX<float>>(1, 1);
 
     float eta = 1;
-    float lambda = 0;
-    int loops = 1500;
-    int data_num = 2;
+    int loops = 1000;
+    int data_num = 6;
     for (int epoch = 0; epoch < loops; ++epoch) {
       std::cout << "Epoch: " << epoch << "/" << loops << std::endl;
-      int i = rand() % data_num;
-      train_data_ptr->array() = train_d_ptr->col(i);
-      train_label_ptr->array() = train_l_ptr->col(i);
-      classifier.Backward(train_data_ptr, train_label_ptr);
-      // Stochastic gradient decent
-      classifier.get_edge_weight(0, 1)->array() = \
-        (1.0 - eta * lambda) * classifier.get_edge_weight(0, 1)->array() - \
-        eta * classifier.get_edge_nabla(0, 1)->array();
-      classifier.get_node_bias(1)->array() -= eta * \
-        classifier.get_node_delta(1)->array();
+      for (int j = 0; j < 6; ++j) {
+        size_t i = rand() % data_num;
+        train_data_ptr->array() = train_d_ptr->col(i);
+        train_label_ptr->array() = train_l_ptr->col(i);
+        classifier.Backward(train_data_ptr, train_label_ptr);
+        // Stochastic gradient decent
+        classifier.get_edge_weight(0, 1)->array() -= \
+            eta * classifier.get_edge_nabla(0, 1)->array();
+        classifier.get_node_bias(1)->array() -= eta * \
+            classifier.get_node_delta(1)->array();
+      }
+      classifier.Evaluate(train_data_ptr, train_label_ptr);
     }
     std::cout << "Complete" << std::endl;
   }

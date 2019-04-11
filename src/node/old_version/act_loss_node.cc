@@ -24,7 +24,7 @@ ActLossNode<T>::ActLossNode(REF const NodeParameter<T>& node_param) {
 }
 
 template <class T>
-T ActLossNode<T>::CalcLoss(const MatXX<T>* data_result_ptr) {
+T ActLossNode<T>::CalcLoss(const MatXX<T>* result_data_ptr) {
   T loss = 0;
   if (!Transition(kAct)) {
     LOG(ERROR) << "CalcLoss() for ActLossNode is failed.";
@@ -35,13 +35,13 @@ T ActLossNode<T>::CalcLoss(const MatXX<T>* data_result_ptr) {
     LOG(ERROR) << "loss function is not defined.";
     return -1;
   } else {
-    loss = loss_functor(get_activation_ptr(), data_result_ptr);
+    loss = loss_functor(get_activation_ptr(), result_data_ptr);
   }
   return loss;
 }
 
 template <class T>
-bool ActLossNode<T>::CalcDelta(const MatXX<T>* data_result_ptr) {
+bool ActLossNode<T>::CalcDelta(const MatXX<T>* result_data_ptr) {
   if (!Transition(kAct)) {
     LOG(ERROR) << "CalcDelta() for ActLossNode is failed."; 
     return false;
@@ -51,7 +51,7 @@ bool ActLossNode<T>::CalcDelta(const MatXX<T>* data_result_ptr) {
     LOG(ERROR) << "loss prime function is not defined.";
     return false;
   } else {
-    loss_prime_functor(get_activation_ptr(), data_result_ptr, get_delta_ptr());
+    loss_prime_functor(get_activation_ptr(), result_data_ptr, get_delta_ptr());
   }
   // Note CalcActPrime overwrites data in activation_ptr in-place
   if (!Transition(kPrime)) {

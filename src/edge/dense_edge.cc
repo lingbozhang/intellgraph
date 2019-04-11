@@ -43,8 +43,8 @@ void DenseEdge<T>::PrintNablaWeight() const {
 }
 
 template <class T>
-void DenseEdge<T>::Forward(const NodeEdgeInterface<T>* node_in_ptr, \
-    NodeEdgeInterface<T>* node_out_ptr) {
+void DenseEdge<T>::Forward(const IntNode<T>* node_in_ptr, \
+    IntNode<T>* node_out_ptr) {
   CHECK_EQ(weight_ptr_->rows(), node_in_ptr->get_activation_ptr()->rows())
       << "Forward() in DenseEdge is failed:"
       << "Dimensions of weight and activation from input node are not equal.";
@@ -52,29 +52,32 @@ void DenseEdge<T>::Forward(const NodeEdgeInterface<T>* node_in_ptr, \
   CHECK_EQ(weight_ptr_->cols(), node_out_ptr->get_activation_ptr()->rows())
       << "Forward() in DenseEdge is failed:"
       << "Dimensions of weight and activation from output node are not equal.";
-  
-  MatXXUPtr<T> weighted_sum_ptr = std::make_unique<MatXX<T>>(
-      weight_ptr_->transpose() * node_in_ptr->get_activation_ptr()->matrix() + \
-      node_out_ptr->get_bias_ptr()->matrix());
-  
-  node_out_ptr->move_activation_ptr(std::move(weighted_sum_ptr));
+
+  node_out_ptr->get_activation_ptr()->matrix().noalias() = \
+      (weight_ptr_->transpose() * \
+      node_in_ptr->get_activation_ptr()->matrix()).colwise() + \
+      *node_out_ptr->get_bias_ptr();
+  // Updates the activation matrix state
+  node_out_ptr->ResetActState();
 }
 
 template <class T>
-void DenseEdge<T>::Backward(NodeEdgeInterface<T>* node_in_ptr, \
-    NodeEdgeInterface<T>* node_out_ptr) {
+void DenseEdge<T>::Backward(IntNode<T>* node_in_ptr, \
+    IntNode<T>* node_out_ptr) {
   // $\nabla W^{l}=a^{l-1}(\delta^{l})^T$
-  nabla_weight_ptr_->matrix() = node_in_ptr->get_activation_ptr()->matrix() * \
-                                node_out_ptr->get_delta_ptr()->transpose();
+  size_t batch_size = node_in_ptr->get_activation_ptr()->cols();
+  nabla_weight_ptr_->matrix().noalias() = \
+      (node_in_ptr->get_activation_ptr()->matrix() * \
+      node_out_ptr->get_delta_ptr()->transpose()) / batch_size;
   // Calculates delta_ptr_ of input node
   // $\delta^l= \mathcal{D}[f^\prime(z^l)]W^{l+1}\delta^{l+1}$
-  MatXXUPtr<T> delta_in_ptr = std::make_unique<MatXX<T>>(
-      weight_ptr_->matrix() * node_out_ptr->get_delta_ptr()->matrix());
+  node_in_ptr->get_delta_ptr()->matrix().noalias() = \
+      weight_ptr_->matrix() * node_out_ptr->get_delta_ptr()->matrix();
 
   node_in_ptr->CalcActPrime();
-  delta_in_ptr->array() *= node_in_ptr->get_activation_ptr()->array();
 
-  node_in_ptr->move_delta_ptr(std::move(delta_in_ptr));
+  node_in_ptr->get_delta_ptr()->array() *= \
+      node_in_ptr->get_activation_ptr()->array();
 }
 
 template <class T>

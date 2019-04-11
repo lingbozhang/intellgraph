@@ -17,7 +17,7 @@ Contributor(s):
 
 #include <functional>
 
-#include "node/node_edge_interface.h"
+#include "node/internal_node.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
@@ -26,7 +26,7 @@ namespace intellgraph {
 // two nodes. It is an abstract class for all edge classes and has four member 
 // functions
 template <class T>
-interface Edge {
+class Edge {
  public:
   virtual ~Edge() noexcept = default;
 
@@ -37,13 +37,13 @@ interface Edge {
   // Calculates weighted sum and updates activation_ptr_ of output layer
   // in-place. Function name with a word 'mute' indicates it requires mutable
   // inputs;
-  virtual void Forward(REF const NodeEdgeInterface<T>* node_in_ptr, \
-                       MUTE NodeEdgeInterface<T>* node_out_ptr) = 0;
+  virtual void Forward(REF const IntNode<T>* node_in_ptr, \
+                       MUTE IntNode<T>* node_out_ptr) = 0;
 
   // Calculates nabla_weight_ and updates delta_ptr_ of input layer in-place 
   // with backpropagation
-  virtual void Backward(MUTE NodeEdgeInterface<T>* node_in_ptr, \
-                        MUTE NodeEdgeInterface<T>* node_out_ptr) = 0;
+  virtual void Backward(MUTE IntNode<T>* node_in_ptr, \
+                        MUTE IntNode<T>* node_out_ptr) = 0;
 
   // Passes a unary functor and applies it on the weight matrix
   virtual void InitializeWeight(REF const std::function<T(T)>& functor) = 0;

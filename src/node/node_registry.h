@@ -16,13 +16,7 @@ Contributor(s):
 #define NICOLE_NODE_NODE_REGISTRY_H_
 
 #include "glog/logging.h"
-#include "node/act_loss_node.h"
-#include "node/activation_node.h"
-#include "node/input_node.h"
-#include "node/node.h"
 #include "node/node_factory.h"
-#include "node/output_node.h"
-#include "node/sigmoid_input_node.h"
 #include "node/sigmoid_l2_node.h"
 #include "node/sigmoid_node.h"
 
@@ -37,19 +31,11 @@ class NodeRegistry {
   static void LoadNodeRegistry() {
     // Registers SigmoidNode
     LOG(INFO) << "Registering SigmoidNode";
-    DEVIMPL_REGISTERIMPL_NODE(SigmoidNode, Node);
-    // Registers ActivationNode
-    LOG(INFO) << "Registering ActivationNode";
-    DEVIMPL_REGISTERIMPL_NODE(ActivationNode, Node);
+    DEVIMPL_REGISTERIMPL_NODE(SigmoidNode, IntNode);
     // Registers SigL2Node
     LOG(INFO) << "Registering SigL2Node";
     DEVIMPL_REGISTERIMPL_NODE(SigL2Node, OutputNode);
-    // Registers act_loss_node
-    LOG(INFO) << "Registering ActLossNode";
-    DEVIMPL_REGISTERIMPL_NODE(ActLossNode, OutputNode);
-    // Registers act_loss_node
-    LOG(INFO) << "Registering SigInputNode";
-    DEVIMPL_REGISTERIMPL_NODE(SigInputNode, InputNode);
+
   }
   
 };

@@ -12,38 +12,33 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_NODE_OUTPUT_NODE_H_
-#define INTELLGRAPH_NODE_OUTPUT_NODE_H_
+#ifndef INTELLGRAPH_NODE_NODE_ESTIMATOR_H_
+#define INTELLGRAPH_NODE_NODE_ESTIMATOR_H_
 
 #include <memory>
 
-#include "node/evaluable.h"
-#include "node/internal_node.h"
-#include "node/node_parameter.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
 
 template <class T>
-class OutputNode : public IntNode<T>, implements evaluable<T> {
+interface Estimator {
  public:
-  virtual ~OutputNode() noexcept = default;
+  virtual ~Estimator() noexcept = default;
+  
+  virtual T CalcLoss(REF const MatXX<T>* activation_ptr, \
+                     REF const MatXX<T>* labels_ptr) = 0;
+
+  virtual void CalcLossPrime(REF const MatXX<T>* activation_ptr, \
+                             REF const MatXX<T>* labels_ptr, \
+                             MUTE MatXX<T>* delta_ptr) = 0;
 
 };
 
-// Alias for unique node pointer
 template <class T>
-using OutputNodeUPtr = std::unique_ptr<OutputNode<T>>;
+using EstimatorUPtr = std::unique_ptr<Estimator<T>>;
 
-}  // namespace intellgraph
+}  // intellgraph
 
-#endif  // INTELLGRAPH_NODE_OUTPUT_NODE_H_
-
-
-
-
-
-
-
-  
+#endif  // INTELLGRAPH_NODE_NODE_ESTIMATOR_H_

@@ -28,7 +28,7 @@ namespace intellgraph {
 // node object.
 template <class T, class Base>
 using NodeFunctor = std::function<MOVE std::unique_ptr<Base>( \
-    REF const NodeParameter<T>&)>;
+    REF const NodeParameter&)>;
 
 template <class T, class Base>
 using NodeRegistryMap = std::unordered_map<COPY std::string, \
@@ -43,7 +43,7 @@ class NodeFactory {
 
   // use this to instantiate the proper Derived class
   // static functions have no this parameter. They need no cv-qualifiers.
-  MOVE static std::unique_ptr<Base> Instantiate(REF const NodeParameter<T>& \
+  MOVE static std::unique_ptr<Base> Instantiate(REF const NodeParameter& \
                                                 node_param) {
     std::string name = node_param.ref_node_name();
     auto it = NodeFactory<T, Base>::Registry().find(name);
@@ -67,7 +67,7 @@ class NodeFactoryRegister {
  public:
   explicit NodeFactoryRegister(REF const std::string& name) {
     NodeFactory<T, Base>::Registry()[name] = \
-        [](const NodeParameter<T>& node_param) -> std::unique_ptr<Base> {
+        [](const NodeParameter& node_param) -> std::unique_ptr<Base> {
             // (C++14 feature)
           std::unique_ptr<Base> rv = std::make_unique<Derived>(node_param);
           return rv;

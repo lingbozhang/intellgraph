@@ -39,19 +39,22 @@ interface Graph {
  public:
   virtual ~Graph() noexcept = default;
 
-  virtual void AddEdge(REF const NodeParameter<T>& node_param_in, \
-                       REF const NodeParameter<T>& node_param_out, \
+  virtual void AddEdge(REF const NodeParameter& node_param_in, \
+                       REF const NodeParameter& node_param_out, \
                        REF const std::string& edge_name) = 0;
 
   virtual void Instantiate() = 0;
 
   virtual void Reset() = 0;
 
-  virtual void Forward(MUTE MatXXSPtr<T> train_data_ptr, \
-                       MUTE MatXXSPtr<T> train_label_ptr) = 0;
+  virtual void Forward(REF const MatXXSPtr<T>& train_data_ptr, \
+                       REF const MatXXSPtr<T>& train_label_ptr) = 0;
 
-  virtual void Backward(MUTE MatXXSPtr<T> train_data_ptr, \
-                        MUTE MatXXSPtr<T> train_label_ptr) = 0;
+  virtual void Backward(REF const MatXXSPtr<T>& train_data_ptr, \
+                        REF const MatXXSPtr<T>& train_label_ptr) = 0;
+
+  virtual void Evaluate(REF const MatXXSPtr<T>& test_data_ptr, \
+                        REF const MatXXSPtr<T>& test_label_ptr) = 0;
 
   MUTE virtual inline MatXX<T>* get_edge_weight(COPY size_t node_in_id, \
                                                 COPY size_t node_out_id) = 0;
@@ -59,16 +62,13 @@ interface Graph {
   REF virtual inline const MatXX<T>* get_edge_nabla(COPY size_t node_in_id, \
                                                     COPY size_t node_out_id) = 0;
 
-  MUTE virtual inline MatXX<T>* get_node_bias(COPY size_t node_id) = 0;
+  MUTE virtual inline VecX<T>* get_node_bias(COPY size_t node_id) = 0;
 
   REF virtual inline const MatXX<T>* get_node_delta(COPY size_t node_id) = 0;
 
-  virtual inline bool set_output_node_id(COPY const size_t id) = 0;
+  virtual inline bool set_output_node_id(COPY size_t id) = 0;
 
-
-  virtual inline bool set_input_node_id(COPY const size_t id) = 0;
-
-  virtual void Predict(MUTE MatXXSPtr<T> test_data_ptr) = 0;
+  virtual inline bool set_input_node_id(COPY size_t id) = 0;
 
 };
 

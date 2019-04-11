@@ -25,8 +25,9 @@ Contributor(s):
 namespace intellgraph {
 // IntRepr class is used to achieve data transfomation between different data
 // types. It uses 1D array as its internal data abstraction. Note current IntRepr
-// transforms data through copy, therefore it will have some performance penalty
-// when transforming large data structures.  
+// transforms data through copying, therefore has some performance penalties for
+// large data structures. In the IntRepr, internal buffer will be deleted at the 
+// end of conversion.
 template <class T>
 class IntRepr {
  public:
@@ -58,7 +59,11 @@ class IntRepr {
     }    
   }
 
-  ~IntRepr() {delete buffer_;}
+  ~IntRepr() {
+   if (buffer_ != nullptr) {
+     delete buffer_;
+   }
+  }
 
   COPY std::vector<T> ToStdVec(COPY size_t len) {
     if (buffer_ == nullptr || len > size_) {
@@ -66,6 +71,8 @@ class IntRepr {
                    << "vector is returned";
       return {};
     } else {
+      delete buffer_;
+      buffer_ = nullptr;
       return std::vector<T>(buffer_, buffer_ + len);
     }
   }
@@ -82,22 +89,26 @@ class IntRepr {
           rv[r][c] = buffer_[r + (c * row)];
         }
       }
+      delete buffer_;
+      buffer_ = nullptr;
       return rv;
     }
   }
 
-  MOVE MatXXUPtr<T> ToMatXXUPtr(COPY size_t row, COPY size_t col) {
+  MOVE MatXXSPtr<float> ToMatXXUPtr(COPY size_t row, COPY size_t col) {
     if (buffer_ == nullptr || row * col != size_) {
       LOG(WARNING) << "ToMatXXPtr() for IntRepr is failed, an empty "
                    << "nullptr is returned";
       return nullptr;
     } else {
-      MatXXUPtr<T> rv_ptr = std::make_unique<MatXX<T>>(row, col);
+      MatXXUPtr<float> rv_ptr = std::make_unique<MatXX<float>>(row, col);
       for (size_t r = 0; r < row; ++r) {
         for (size_t c = 0; c < col; ++c) {
-          rv_ptr->array()(r, c) = buffer_[r + (c * row)];
+          rv_ptr->array()(r, c) = static_cast<float>(buffer_[r + (c * row)]);
         }
       }
+      delete buffer_;
+      buffer_ = nullptr;
       return rv_ptr;
     }
   }

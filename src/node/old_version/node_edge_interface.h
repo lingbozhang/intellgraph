@@ -19,7 +19,18 @@ Contributor(s):
 #include "utility/common.h"
 
 namespace intellgraph {
-
+// Activation vector has three states and are used to determine behaviors of
+// node methods.
+enum ActStates {
+  // Activation vector is initialized or overwritten with weighted_sum
+   kInit = 0,
+  // CallActFxn() is invoked and activation vector is overwritten with
+  // activation values.
+   kAct = 1,
+  // CalcPrime() is invoked and activation vector is overwritten with prime
+  // values.
+   kPrime = 3,
+};
 template <class T>
 interface NodeEdgeInterface {
  public:
@@ -31,14 +42,22 @@ interface NodeEdgeInterface {
 
   virtual inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) = 0;
 
-  MUTE virtual inline MatXX<T>* get_bias_ptr() const = 0;
+  MUTE virtual inline VecX<T>* get_bias_ptr() const = 0;
 
-  virtual inline void move_bias_ptr(MOVE MatXXUPtr<T> bias_ptr) = 0;
+  virtual inline void move_bias_ptr(MOVE VecXUPtr<T> bias_ptr) = 0;
 
   MUTE virtual inline MatXX<T>* get_delta_ptr() const = 0;
 
   virtual inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) = 0;
 
+  // Transitions from kAct state to kPrime state and updates current_act_state_
+  virtual void ActToPrime() = 0;
+
+  // Transitions from kInit state to kAct state and updates current_act_state_
+  virtual void InitToAct() = 0;
+
+  // Transitions from current_act_state_ to state
+  virtual bool Transition(ActStates state) = 0;
 };
 
 }  // intellgraph

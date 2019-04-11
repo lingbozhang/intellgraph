@@ -19,67 +19,59 @@ Contributor(s):
 #include <memory>
 #include <vector>
 
-#include "node/node_edge_interface.h"
 #include "node/node_parameter.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
-// Activation vector has three states and are used to determine behaviors of 
-// node methods.
-enum ActStates {
-  // Activation vector is initialized or overwritten with weighted_sum
-  kInit = 0, 
-  // CallActFxn() is invoked and activation vector is overwritten with 
-  // activation values.
-  kAct = 1,
-  // CalcPrime() is invoked and activation vector is overwritten with prime
-  // values.
-  kPrime = 3,
-};
+
 // In IntellGraph, node is a basic building block that represents a neural
-// network layer, all node class in /node directory should use node class as 
-// a base interface. In Node classes, in order to save memory, only one vector 
-// (activation vector) is used to store all weighted_sum, activation, and 
+// network layer, all node class in /node directory should implement node class 
+// as a base class. In Node classes, in order to save memory, only one 
+// matrix (activation matrix) is used to store all weighted_sum, activation, and 
 // activation prime results, hence, a state pattern is implemented to control 
-// state transitions of the activation vector.
+// the state transitions of the activation matrix.
 template <class T>
-interface Node : implements NodeEdgeInterface<T> {
+class Node {
  public:
-  // All interfaces should have virtual destructor in order to allow memory
-  // release from interfaces
+  // All interfaces/abstract classes should have virtual destructor in order to 
+  // release memory of derived object from interfaces/abstract classes
   virtual ~Node() noexcept = default;
+
+  COPY virtual inline std::vector<size_t> get_dims() const = 0;
+
+  REF virtual inline const std::vector<size_t>& ref_dims() const = 0;
+
+  // Accessable operations for the activation matrix
+  MUTE virtual inline MatXX<T>* get_activation_ptr() const = 0;
+
+  // Accessable operations for the bias vector
+  MUTE virtual inline VecX<T>* get_bias_ptr() const = 0;
+
+  // Accessable operations for the delta matrix
+  MUTE virtual inline MatXX<T>* get_delta_ptr() const = 0;
+
+  // Accessable operations for the node parameter
+  REF virtual inline const NodeParameter& ref_node_param() const = 0;
+
+  virtual inline void set_activation(COPY T value) = 0;
+  
+  virtual inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) = 0;
+  
+  // Passes a functor and applies it on the activation matrix
+  virtual void InitializeAct(REF const std::function<T(T)>& functor) = 0;
+
+  virtual inline void move_bias_ptr(MOVE VecXUPtr<T> bias_ptr) = 0;
+
+  virtual void InitializeBias(REF const std::function<T(T)>& functor) = 0;
+
+  virtual inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) = 0;
 
   virtual void PrintAct() const = 0;
 
   virtual void PrintDelta() const = 0;
 
   virtual void PrintBias() const = 0;
-
-  virtual bool CallActFxn() = 0;
-
-  // Passes a functor and applies it on the activation matrix
-  virtual void InitializeAct(REF const std::function<T(T)>& functor) = 0;
-
-  virtual void InitializeBias(REF const std::function<T(T)>& functor) = 0;
-
-  virtual void set_activation(COPY T value) = 0;
-
-  // Get layer dimensions
-  COPY virtual inline std::vector<size_t> get_dims() const = 0;
-
-  REF virtual inline const std::vector<size_t>& ref_dims() const = 0;
-
-  REF virtual inline const NodeParameter<T>& ref_node_param() const = 0;
-
-  // Transitions from kAct state to kPrime state and updates current_act_state_
-  virtual void ActToPrime() = 0;
-
-  // Transitions from kInit state to kAct state and updates current_act_state_
-  virtual void InitToAct() = 0;
-
-  // Transitions from current_act_state_ to state
-  virtual bool Transition(ActStates state) = 0;
 
 };
 

@@ -12,47 +12,53 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_LAYER_SIGMOID_INPUT_NODE_H_
-#define INTELLGRAPH_LAYER_SIGMOID_INPUT_NODE_H_
+#ifndef INTELLGRAPH_NODE_ACT_LOSS_NODE_H_
+#define INTELLGRAPH_NODE_ACT_LOSS_NODE_H_
 
 #include <functional>
-#include <memory>
 #include <vector>
-
+// Your project's .h files
 #include "glog/logging.h"
-#include "node/input_node.h"
+#include "node/activation_node.h"
+#include "node/output_node.h"
 #include "node/node_parameter.h"
-#include "node/sigmoid_node.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
-// SigInputNode improves performance of CallActFxn and CalcActPrime with Eigen 
-// library and has better performance than ActivationNode. 
+// ActLossNode allows user provided function pointers. ActLossNode 
+// has four functors: 
+// 1. act_function_ptr: activation function pointer
+// 2. act_prime_ptr: activation prime function pointer
+// 3. loss_function_ptr: loss function pointer
+// 4. loss_prime_ptr: loss function prime pointer
 template <class T>
-class SigInputNode : implements InputNode<T> {
+class ActLossNode : implements OutputNode<T> {
  public:
-  explicit SigInputNode(REF const NodeParameter<T>& node_param) {
-    NodeParameter<T> node_param_new;
-    node_param_new.Clone(node_param);
-    node_param_new.move_node_name("SigmoidNode");
-    node_ptr_ = std::make_unique<SigmoidNode<T>>(node_param_new);
-  }
-  
-  // Move constructor   
-  SigInputNode(MOVE SigInputNode<T>&& rhs) noexcept = default;
+  ActLossNode() noexcept = default;
 
-  // Move operator
-  SigInputNode<T>& operator=(MOVE SigInputNode<T>&& rhs) noexcept = default;
-  
-  // Copy constructor and operator are deleted
-  SigInputNode(REF const SigInputNode<T>& rhs) = delete;
-  SigInputNode<T>& operator=(REF const SigInputNode<T>& rhs) = delete;
+  explicit ActLossNode(REF const NodeParameter<T>& node_param); 
 
-  ~SigInputNode() noexcept final = default;
+  ActLossNode(MOVE ActLossNode<T>&& rhs) noexcept = default;
+
+  REF ActLossNode& operator=(MOVE ActLossNode<T>&& rhs) noexcept = default;
+
+  ActLossNode(REF const ActLossNode<T>& rhs) = delete;
+
+  REF ActLossNode& operator=(REF const ActLossNode<T>& rhs) = delete;
+
+  ~ActLossNode() noexcept final = default;
+
+  COPY T CalcLoss(REF const MatXX<T>* result_data_ptr) final;
+
+  bool CalcDelta(REF const MatXX<T>* result_data_ptr) final;
 
   bool CalcActPrime() final {
     return node_ptr_->CalcActPrime();
+  }
+
+  void Evaluate(MUTE MatXXSPtr<T> result_data_ptr) final {
+    node_ptr_->Evaluate(result_data_ptr);
   }
 
   MUTE inline MatXX<T>* get_activation_ptr() const final {
@@ -67,11 +73,15 @@ class SigInputNode : implements InputNode<T> {
     node_ptr_->set_activation(value);
   }
 
-  MUTE inline MatXX<T>* get_bias_ptr() const final {
+  inline void link_activation_ptr(COPY MatXXSPtr<T> activation_ptr) final {
+    node_ptr_->link_activation_ptr(activation_ptr);
+  }
+
+  MUTE inline VecX<T>* get_bias_ptr() const final {
     return node_ptr_->get_bias_ptr();
   }
 
-  inline void move_bias_ptr(MOVE MatXXUPtr<T> bias_ptr) final {
+  inline void move_bias_ptr(MOVE VecXUPtr<T> bias_ptr) final {
     node_ptr_->move_bias_ptr(std::move(bias_ptr));
   }
 
@@ -120,45 +130,28 @@ class SigInputNode : implements InputNode<T> {
   REF inline const NodeParameter<T>& ref_node_param() const final {
     return node_ptr_->ref_node_param();
   }
-
   // Transitions from kAct state to kPrime state and updates current_act_state_
   void ActToPrime() final {
     node_ptr_->ActToPrime();
   }
-
   // Transitions from kInit state to kAct state and updates current_act_state_
   void InitToAct() final {
     node_ptr_->InitToAct();
   }
-
   // Transitions from current_act_state_ to state
   bool Transition(ActStates state) final {
     return node_ptr_->Transition(state);
   }
-
-  MUTE virtual inline Node<T>* get_node_ptr() const {
-    return node_ptr_.get();
-  }
-
-  void FeedFeature(MUTE MatXXSPtr<T> feature_ptr) final {
-    CHECK_EQ(this->get_activation_ptr()->size(), feature_ptr->size()) 
-        << "FeedFeature() in SigInputNode is failed: "
-        << "activation and feature dimensions are not equal!";
-    this->get_activation_ptr()->array() = feature_ptr->array();
-  }
-
  private:
   NodeUPtr<T> node_ptr_;
-
 };
 
-// Alias for unqiue SigInputNode pointer
 template <class T>
-using SigInputNodeUPtr = std::unique_ptr<SigInputNode<T>>;
+using ActLossNodeUPtr = std::unique_ptr<ActLossNode<T>>;
 
 }  // namespace intellgraph
 
-#endif  // INTELLGRAPH_LAYER_SIGMOID_INPUT_NODE_H_
+#endif  // INTELLGRAPH_NODE_ACT_LOSS_NODE_H_
 
 
 
@@ -166,3 +159,4 @@ using SigInputNodeUPtr = std::unique_ptr<SigInputNode<T>>;
 
 
 
+  

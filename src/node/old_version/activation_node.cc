@@ -23,9 +23,9 @@ ActivationNode<T>::ActivationNode(const NodeParameter<T>& node_param) {
     size_t row = node_param.ref_dims()[0];
     size_t col = node_param.ref_dims()[1];
     
-    activation_ptr_ = std::make_unique<MatXX<T>>(row, col);
+    activation_ptr_ = std::make_shared<MatXX<T>>(row, col);
     delta_ptr_ = std::make_unique<MatXX<T>>(row, col);
-    bias_ptr_ = std::make_unique<MatXX<T>>(row, col);
+    bias_ptr_ = std::make_unique<VecX<T>>(row);
 
     activation_ptr_->array() = 0.0;
     delta_ptr_->array() = 0.0;
@@ -91,10 +91,11 @@ void ActivationNode<T>::InitializeBias(const std::function<T(T)>& functor) {
   if (functor == nullptr) {
     LOG(WARNING) << "functor passed to InitializeBias() is not defined."
                  << "Initializes bias with standard normal distribution";
+    bias_ptr_->array() = bias_ptr_->unaryExpr( \
+        std::function<T(T)>(NormalFunctor<T>(0.0, 1.0)));
+  } else {
+    bias_ptr_->array() = bias_ptr_->unaryExpr(functor);
   }
-  VecX<T> vec(bias_ptr_->array().rows());
-  vec.array() = vec.array().unaryExpr(functor);
-  bias_ptr_->matrix().colwise() = vec;
   Transition(kInit);
 }
 

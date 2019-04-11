@@ -17,8 +17,8 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-void Classifier<T>::AddEdge(const NodeParameter<T>& node_param_in, \
-                            const NodeParameter<T>& node_param_out, \
+void Classifier<T>::AddEdge(const NodeParameter& node_param_in, \
+                            const NodeParameter& node_param_out, \
                             const std::string& edge_name) {
   // Construct node objects and put them in the node_map_
   size_t vertex_in_id = node_param_in.ref_id();
@@ -59,7 +59,7 @@ void Classifier<T>::Instantiate() {
   output_node_ptr_ = nullptr;
 
   // Instantiates the input node object
-  auto input_node_ptr = std::move(NodeFactory<T, InputNode<T>>::Instantiate( \
+  auto input_node_ptr = std::move(NodeFactory<T, IntNode<T>>::Instantiate( \
       node_param_map_[input_node_id_]));
   input_node_ptr_ = input_node_ptr.get();
   node_map_[input_node_id_] = std::move(input_node_ptr);
@@ -77,8 +77,8 @@ void Classifier<T>::Instantiate() {
   for (const auto& node_pair : node_param_map_) {
     size_t node_id = node_pair.first;
     if (node_id != output_node_id_ && node_id != input_node_id_) {
-      NodeUPtr<T> node_ptr = \
-          std::move(NodeFactory<T, Node<T>>::Instantiate(node_pair.second));
+      IntNodeUPtr<T> node_ptr = \
+          std::move(NodeFactory<T, IntNode<T>>::Instantiate(node_pair.second));
       LOG(INFO) << "Initializes node: " << node_id
                 << ", with standard normal distribution";
       node_ptr->InitializeBias(NormalFunctor<T>(0.0, 1.0));
@@ -104,8 +104,8 @@ void Classifier<T>::Instantiate() {
 }
 
 template <class T>
-void Classifier<T>::Forward(MatXXSPtr<T> train_data_ptr, \
-                            MatXXSPtr<T> train_label_ptr) {
+void Classifier<T>::Forward(const MatXXSPtr<T>& train_data_ptr, \
+                            const MatXXSPtr<T>& train_label_ptr) {
   if (!instantiated_) {
      LOG(WARNING) << "Classifier is not instantiated: "
                   << "Try to instantiate it";
@@ -120,13 +120,13 @@ void Classifier<T>::Forward(MatXXSPtr<T> train_data_ptr, \
   for (auto it_r = order_.rbegin(); it_r != order_.rend(); ++it_r) {
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t node_in_id = *it_r;
-    //LOG(INFO) << "Forwarding node: " << node_in_id;
+    LOG(INFO) << "Forwarding node: " << node_in_id;
     if (*it_r != input_node_id_ ) node_map_[*it_r]->CallActFxn();
     for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
       size_t node_out_id = target(*eo, graph_);
       size_t edge_id = graph_[*eo].id;
 
-      Node<T> *node_in_ptr, *node_out_ptr;
+      IntNode<T> *node_in_ptr, *node_out_ptr;
 
       node_in_ptr = node_map_[node_in_id].get();
         
@@ -136,17 +136,44 @@ void Classifier<T>::Forward(MatXXSPtr<T> train_data_ptr, \
     }
   }
  
-  CalcLoss(train_label_ptr);
-  Evaluate(train_label_ptr);
+  //CalcLoss(train_label_ptr);
+  //Evaluate(train_label_ptr);
 }
 
 template <class T>
-void Classifier<T>::Predict(MatXXSPtr<T> train_data_ptr) {
+void Classifier<T>::Backward(const MatXXSPtr<T>& train_data_ptr, \
+                             const MatXXSPtr<T>& train_label_ptr) {
+  Forward(train_data_ptr, train_label_ptr);
+  output_node_ptr_->CalcDelta(train_label_ptr.get());
+  for (auto it = order_.begin(); it != order_.end(); ++it) {
+    IntellGraph::in_edge_iterator ei{}, ei_end{};
+    size_t node_out_id = *it;
+    LOG(INFO) << "Backpropagating node: " << node_out_id;
+    for (std::tie(ei, ei_end) = in_edges(*it, graph_); ei != ei_end; ++ei) {
+      size_t node_in_id = source(*ei, graph_);
+      size_t edge_id = graph_[*ei].id;
+
+      IntNode<T> *node_in_ptr, *node_out_ptr;
+      Edge<T> *edge_ptr;
+
+      node_in_ptr = node_map_[node_in_id].get();
+      node_out_ptr = node_map_[node_out_id].get();
+      edge_ptr = edge_map_[edge_id].get();
+
+      edge_ptr->Backward(node_in_ptr, node_out_ptr);
+    }
+  }
+}
+
+template <class T>
+void Classifier<T>::Evaluate(const MatXXSPtr<T>& test_data_ptr, \
+                             const MatXXSPtr<T>& test_label_ptr) {
   if (*order_.rbegin() != input_node_id_ || *order_.begin() != output_node_id_) {
-      LOG(ERROR) << "Forward() in the Classifier is failed.";
+    LOG(ERROR) << "Evaluate() in the Classifier is failed.";
+    exit(1);
   }
 
-  input_node_ptr_->FeedFeature(train_data_ptr);
+  input_node_ptr_->FeedFeature(test_data_ptr);
   for (auto it_r = order_.rbegin(); it_r != order_.rend(); ++it_r) {
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t node_in_id = *it_r;
@@ -156,51 +183,16 @@ void Classifier<T>::Predict(MatXXSPtr<T> train_data_ptr) {
       size_t node_out_id = target(*eo, graph_);
       size_t edge_id = graph_[*eo].id;
 
-      Node<T> *node_in_ptr, *node_out_ptr;
+      IntNode<T> *node_in_ptr, *node_out_ptr;
 
       node_in_ptr = node_map_[node_in_id].get();
-        
+
       node_out_ptr = node_map_[node_out_id].get();
- 
+
       edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
     }
   }
-
-  for (size_t i = 0; i < output_node_ptr_->get_activation_ptr()->rows(); ++i) {
-    if (output_node_ptr_->get_activation_ptr()->array()(i, 1) > 0.5) {
-      output_node_ptr_->get_activation_ptr()->array()(i, 1) = 1;
-    } else {
-      output_node_ptr_->get_activation_ptr()->array()(i, 1) = 0;
-    }
-  }
-
-  MatXX<T> result = output_node_ptr_->get_activation_ptr()->matrix();
-  std::cout << "Evaluated/results: " << result << std::endl;
-}
-
-template <class T>
-void Classifier<T>::Backward(MatXXSPtr<T> train_data_ptr, \
-                             MatXXSPtr<T> train_label_ptr) {
-  Forward(train_data_ptr, train_label_ptr);
-  output_node_ptr_->CalcDelta(train_label_ptr.get());
-  for (auto it = order_.begin(); it != order_.end(); ++it) {
-    IntellGraph::in_edge_iterator ei{}, ei_end{};
-    size_t node_out_id = *it;
-    //LOG(INFO) << "Backpropagating node: " << node_out_id;
-    for (std::tie(ei, ei_end) = in_edges(*it, graph_); ei != ei_end; ++ei) {
-      size_t node_in_id = source(*ei, graph_);
-      size_t edge_id = graph_[*ei].id;
-
-      Node<T> *node_in_ptr, *node_out_ptr;
-      Edge<T> *edge_ptr;
-
-      node_in_ptr = node_map_[node_in_id].get();       
-      node_out_ptr = node_map_[node_out_id].get();
-      edge_ptr = edge_map_[edge_id].get();
-
-      edge_ptr->Backward(node_in_ptr, node_out_ptr);
-    }
-  }
+  output_node_ptr_->Evaluate(test_label_ptr.get());
 }
 
 // Instantiate class, otherwise compilation will fail

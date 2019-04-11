@@ -1,4 +1,4 @@
-/* Copyright 2019 The Nicole Authors. All Rights Reserved.
+/* Copyright 2019 The IntellGraph Authors. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -12,18 +12,28 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef NICOLE_LAYER_LAYER_PARAMETER_H_
-#define NICOLE_LAYER_LAYER_PARAMETER_H_
+#ifndef INTELLGRPAH_NODE_INTERNAL_NODE_H_
+#define INTELLGRPAH_NODE_INTERNAL_NODE_H_
 
-#include <vector>
+#include <memory>
 
-namespace nicole {
-// LayerParamter contains layer information
-// and is used to construct the layer object
-struct LayerParameter {
-  size_t id;
-  std::vector<size_t> dims;
+#include "node/activable.h"
+#include "node/feedable.h"
+#include "node/node.h"
+
+namespace intellgraph {
+
+template <class T>
+class IntNode : public Node<T>, implements activable<T>, implements feedable<T> {
+ public:
+  virtual ~IntNode() noexcept = default;
+
 };
 
-}  // namespace nicole
-#endif  // NICOLE_LAYER_LAYER_PARAMETER_H_
+// Alias for unique node pointer
+template <class T>
+using IntNodeUPtr = std::unique_ptr<IntNode<T>>;
+
+}  // intellgraph
+
+#endif  // INTELLGRPAH_NODE_INTERNAL_NODE_H_

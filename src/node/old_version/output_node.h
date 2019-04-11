@@ -12,37 +12,38 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_NODE_INPUT_NODE_H_
-#define INTELLGRAPH_NODE_INPUT_NODE_H_
+#ifndef INTELLGRAPH_NODE_OUTPUT_NODE_H_
+#define INTELLGRAPH_NODE_OUTPUT_NODE_H_
 
-#include <iostream>
 #include <memory>
 
 #include "node/node.h"
+#include "node/node_parameter.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
 namespace intellgraph {
-// InputNode is an abstract class implemented with decorator pattern and
-// contains one additional method:
-// 1. FeedFeature(): feeds trainning data
+// OutputNode interface has two member methods:
+// 1. Calculates value of loss function
+// 2. Calculates delta $dl/dz$
 template <class T>
-interface InputNode : implements Node<T> {
+interface OutputNode : implements Node<T> {
  public:
-  virtual ~InputNode() noexcept = default;
+  virtual ~OutputNode() noexcept = default;
 
-  virtual void FeedFeature(MUTE MatXXSPtr<T> train_data_ptr) = 0;
+  COPY virtual T CalcLoss(REF const MatXX<T>* result_data_ptr) = 0;
 
-  
+  virtual bool CalcDelta(REF const MatXX<T>* result_data_ptr) = 0;
+
 };
 
 // Alias for unique node pointer
 template <class T>
-using InputNodeUPtr = std::unique_ptr<InputNode<T>>;
+using OutputNodeUPtr = std::unique_ptr<OutputNode<T>>;
 
 }  // namespace intellgraph
 
-#endif  // INTELLGRAPH_NODE_INPUT_NODE_H_
+#endif  // INTELLGRAPH_NODE_OUTPUT_NODE_H_
 
 
 

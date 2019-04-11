@@ -65,6 +65,10 @@ class ActivationNode : public Node<T> {
   // runtime and thus has performance penalty
   bool CalcActPrime() final;
 
+  void Evaluate(MUTE MatXXSPtr<T> result_data_ptr) final {
+    LOG(WARNING) << "Evaluate() is not defined for ActivationNode.";
+  }
+
   void InitializeAct(REF const std::function<T(T)>& functor) final;
 
   void InitializeBias(REF const std::function<T(T)>& functor) final;
@@ -93,6 +97,10 @@ class ActivationNode : public Node<T> {
     activation_ptr_->array() = value;
   }
 
+  inline void link_activation_ptr(COPY MatXXSPtr<T> activation_ptr) final {
+    activation_ptr_ = activation_ptr;
+  }
+
   MUTE inline MatXX<T>* get_delta_ptr() const final {
     return delta_ptr_.get();
   }
@@ -104,11 +112,11 @@ class ActivationNode : public Node<T> {
     delta_ptr_ = std::move(delta_ptr);
   }
 
-  MUTE inline MatXX<T>* get_bias_ptr() const final {
+  MUTE inline VecX<T>* get_bias_ptr() const final {
     return bias_ptr_.get();
   }
 
-  inline void move_bias_ptr(MOVE MatXXUPtr<T> bias_ptr) final {
+  inline void move_bias_ptr(MOVE VecXUPtr<T> bias_ptr) final {
     CHECK_EQ(bias_ptr_->size(), bias_ptr->size())
         << "move_bias_ptr() for ActivationNode is failed"
         << "bias dimensions are not equal";
@@ -128,11 +136,11 @@ class ActivationNode : public Node<T> {
  private:
   NodeParameter<T> node_param_{};
 
-  MatXXUPtr<T> activation_ptr_{nullptr};
+  MatXXSPtr<T> activation_ptr_{nullptr};
   // Delta vector stores the derivative of loss function of
   // weighted_sum variables
   MatXXUPtr<T> delta_ptr_{nullptr};
-  MatXXUPtr<T> bias_ptr_{nullptr};
+  VecXUPtr<T> bias_ptr_{nullptr};
   // Stores current state of activation vector
   ActStates current_act_state_{kInit};
 

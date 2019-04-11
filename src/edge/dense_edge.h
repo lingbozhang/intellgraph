@@ -20,7 +20,7 @@ Contributor(s):
 #include "glog/logging.h"
 #include "edge/edge.h"
 #include "edge/edge_parameter.h"
-#include "node/node_edge_interface.h"
+#include "node/internal_node.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 #include "utility/random.h"
@@ -51,11 +51,11 @@ class DenseEdge : implements Edge<T> {
 
   void PrintNablaWeight() const final;
 
-  virtual void Forward(REF const NodeEdgeInterface<T>* node_in_ptr, \
-                       MUTE NodeEdgeInterface<T>* node_out_ptr) final;
+  virtual void Forward(REF const IntNode<T>* node_in_ptr, \
+                       MUTE IntNode<T>* node_out_ptr) final;
 
-  virtual void Backward(MUTE NodeEdgeInterface<T>* node_in_ptr, \
-                        MUTE NodeEdgeInterface<T>* node_out_ptr) final;
+  virtual void Backward(MUTE IntNode<T>* node_in_ptr, \
+                        MUTE IntNode<T>* node_out_ptr) final;
 
   void InitializeWeight(REF const std::function<T(T)>& functor) final;
 

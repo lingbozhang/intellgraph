@@ -157,16 +157,16 @@ TEST_F(NodeTest, TestCalcLoss) {
     } else {
       activation = std::exp(value) / (1.0 + std::exp(value));
     }
-    MatXXUPtr<float> data_result_ptr = make_unique<MatXX<float>>(100, 1);
-    data_result_ptr->array() = data_result_ptr->array().unaryExpr( \
+    MatXXUPtr<float> result_data_ptr = make_unique<MatXX<float>>(100, 1);
+    result_data_ptr->array() = result_data_ptr->array().unaryExpr( \
         std::function<float(float)>(NormalFunctor<float>(0.0, 1.0)));
 
     double correct_loss = 0.0;
-    for (size_t i = 0; i < data_result_ptr->array().rows(); ++i) {
-      correct_loss += (activation - data_result_ptr->array()(i)) * \
-                      (activation - data_result_ptr->array()(i));
+    for (size_t i = 0; i < result_data_ptr->array().rows(); ++i) {
+      correct_loss += (activation - result_data_ptr->array()(i)) * \
+                      (activation - result_data_ptr->array()(i));
     }
-    float test_loss = sigmoid_l2_node_ptr_->CalcLoss(data_result_ptr.get());
+    float test_loss = sigmoid_l2_node_ptr_->CalcLoss(result_data_ptr.get());
     EXPECT_NEAR(test_loss, correct_loss, kRelativeError_ * abs(correct_loss))
         << "Activation value: " << activation << std::endl;
   }
@@ -190,15 +190,15 @@ TEST_F(NodeTest, TestCalcDelta) {
       correct_act_ptr->array() = activation;
       correct_prime_ptr->array() = activation * (1.0 - activation);
     }
-    MatXXUPtr<float> data_result_ptr = make_unique<MatXX<float>>(100, 1);
-    data_result_ptr->array() = data_result_ptr->array().unaryExpr( \
+    MatXXUPtr<float> result_data_ptr = make_unique<MatXX<float>>(100, 1);
+    result_data_ptr->array() = result_data_ptr->array().unaryExpr( \
         std::function<float(float)>(NormalFunctor<float>(0.0, 1.0)));
 
     correct_delta_ptr->array() = 2.0 * (correct_act_ptr->array() - \
-                                 data_result_ptr->array()) * \
+                                 result_data_ptr->array()) * \
                                  correct_prime_ptr->array();
 
-    sigmoid_l2_node_ptr_->CalcDelta(data_result_ptr.get());
+    sigmoid_l2_node_ptr_->CalcDelta(result_data_ptr.get());
     for (int i = 0; i < 100; ++i) {
       float test_value = sigmoid_l2_node_ptr_->get_delta_ptr()->array()(i);
       float correct_value = correct_delta_ptr->array()(i);

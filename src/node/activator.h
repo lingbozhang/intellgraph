@@ -1,4 +1,4 @@
-/* Copyright 2019 The Nicole Authors. All Rights Reserved.
+/* Copyright 2019 The IntellGraph Authors. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -12,39 +12,33 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef NICOLE_TUBE_BASE_TUBE_H_
-#define NICOLE_TUBE_BASE_TUBE_H_
+#ifndef INTELLGRAPH_NODE_NODE_ACTIVATOR_H_
+#define INTELLGRAPH_NODE_NODE_ACTIVATOR_H_
 
+#include <memory>
+
+#include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 
-namespace nicole {
-// In Nicole, tube is a basic building block that is used to connect between 
-// two layers. It is an abstract class for all tube classes and has two member 
-// functions:
-// 1. PrintWeight
-// 2. PrintNablaWeight
-class BaseTube {
+namespace intellgraph {
+
+template <class T>
+interface Activator {
  public:
-  virtual void PrintWeight() const = 0;
+  virtual ~Activator() noexcept = default;
+  
+  virtual Activate(MUTE MatXX<T>* activation_ptr) = 0;
 
-  virtual void PrintNablaWeight() const = 0;
+  virtual CalcActPrime(MUTE MatXX<T>* activation_ptr) = 0;
 
- protected:
-  BaseTube() {}
+  virtual Evaluate(REF const MatXX<T>* activation_ptr, \
+                   REF const MatXX<T>* labels_ptr) = 0;
 
-  ~BaseTube() {}
 };
 
-// Alias for unique BaseTube pointer
-using BaseTubeUPtr = std::unique_ptr<BaseTube>;
+template <class T>
+using ActivatorUPtr = std::unique_ptr<Activator<T>>;
 
-}  // namespace nicole
+}  // intellgraph
 
-#endif  // NICOLE_TUBE_BASE_TUBE_H_
-
-
-
-
-
-
-
+#endif  // INTELLGRAPH_NODE_NODE_ACTIVATOR_H_

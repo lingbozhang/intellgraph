@@ -1,4 +1,4 @@
-/* Copyright 2019 The Nicole Authors. All Rights Reserved.
+/* Copyright 2019 The IntellGraph Authors. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -12,22 +12,27 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef NICOLE_TUBE_TUBE_PARAMETER_H_
-#define NICOLE_TUBE_TUBE_PARAMETER_H_
+#ifndef INTELLGRPAH_NODE_EVALUABLE_H_
+#define INTELLGRPAH_NODE_EVALUABLE_H_
 
-#include <vector>
+#include <memory>
 
-#include "layer/activation_base_layer.h"
+#include "utility/auxiliary_cpp.h"
+#include "utility/common.h"
 
-namespace nicole {
-// TubeParamter contains tube information and is used to construct the tube 
-// object
-template <class T, class InType, class OutType>
-struct TubeParameter {
-  size_t id;
-  ActBaseLayerSPtr<T, InType> in_layer;
-  ActBaseLayerSPtr<T, OutType> out_layer;
+namespace intellgraph {
+
+template <class T>
+interface evaluable {
+ public:
+  virtual ~evaluable() noexcept = default;
+
+  COPY virtual T CalcLoss(REF const MatXX<T>* labels_ptr) = 0;
+
+  virtual bool CalcDelta(REF const MatXX<T>* labels_ptr) = 0;
+
 };
 
-}  // namespace nicole
-#endif  // NICOLE_TUBE_TUBE_PARAMETER_H_
+}  // intellgraph
+
+#endif  // INTELLGRPAH_NODE_EVALUABLE_H_

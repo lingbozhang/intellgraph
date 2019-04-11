@@ -14,13 +14,11 @@ Contributor(s):
 ==============================================================================*/
 // Contains node headers
 
-#include "node/input_node.h"
-#include "node/node.h"
-#include "node/node_edge_interface.h"
+#include "node/internal_node.h"
 #include "node/node_factory.h"
 #include "node/node_parameter.h"
 #include "node/node_registry.h"
+#include "node/node.h"
 #include "node/output_node.h"
-#include "node/sigmoid_input_node.h"
 #include "node/sigmoid_l2_node.h"
 #include "node/sigmoid_node.h"

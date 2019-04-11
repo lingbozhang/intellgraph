@@ -46,6 +46,9 @@ namespace intellgraph {
 // Corresponds to interface, the public is replaced with implements
 #define implements public
 
+// In order to differentiate between class and interface, interface is named 
+// with lower case letters
+
 // All interfaces should have virtual destructor in order to allow memory
 // release from interfaces
 
