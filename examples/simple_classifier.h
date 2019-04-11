@@ -33,6 +33,9 @@ using namespace intellgraph;
 class Example1 {
  public:
   static void run() {
+    std::cout << "=================================" << std::endl;
+    std::cout << "A Simple Classifier for 2D points" << std::endl;
+    std::cout << "=================================" << std::endl;
     // Prepares train data
     MatXX<float> training_data(2, 6);
     MatXX<float> training_labels(1, 6);
@@ -62,14 +65,12 @@ class Example1 {
     EdgeRegistry::LoadEdgeRegistry();
 
     // SigmoidNode is an internal node which uses Sigmoid function as activation
-    // function. Note Node has two dimensions, the first dimension indicates
-    // dimension of neural layers  and the second dimension is currently used 
-    // for batch size
-    auto node_param1 = NodeParameter(0, "SigmoidNode", {2, 1});
+    // function. 
+    auto node_param1 = NodeParameter(0, "SigmoidNode", {2});
 
     // SigL2Node uses Sigmoid function as activation function and l2 norm as
     // loss function.
-    auto node_param2 = NodeParameter(1, "SigL2Node", {1, 1});
+    auto node_param2 = NodeParameter(1, "SigL2Node", {1});
 
     // IntellGraph implements Boost Graph library and stores node and edge
     // information in the adjacency list.
@@ -84,6 +85,8 @@ class Example1 {
 
     float eta = 1;
     int loops = 50;
+    std::cout << "Learning rate: " << eta << std::endl;
+    std::cout << "Total epochs: " << loops << std::endl;
     int data_num = 6;
     for (int epoch = 0; epoch < loops; ++epoch) {
       std::cout << "Epoch: " << epoch << "/" << loops << std::endl;

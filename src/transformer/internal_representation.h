@@ -95,21 +95,21 @@ class IntRepr {
     }
   }
 
-  MOVE MatXXSPtr<float> ToMatXXUPtr(COPY size_t row, COPY size_t col) {
+  COPY MatXX<float> ToMatXXUPtr(COPY size_t row, COPY size_t col) {
     if (buffer_ == nullptr || row * col != size_) {
       LOG(WARNING) << "ToMatXXPtr() for IntRepr is failed, an empty "
                    << "nullptr is returned";
-      return nullptr;
+      return {};
     } else {
-      MatXXUPtr<float> rv_ptr = std::make_unique<MatXX<float>>(row, col);
+      MatXX<float> rv(row, col);
       for (size_t r = 0; r < row; ++r) {
         for (size_t c = 0; c < col; ++c) {
-          rv_ptr->array()(r, c) = static_cast<float>(buffer_[r + (c * row)]);
+          rv(r, c) = static_cast<float>(buffer_[r + (c * row)]);
         }
       }
       delete buffer_;
       buffer_ = nullptr;
-      return rv_ptr;
+      return rv;
     }
   }
 
