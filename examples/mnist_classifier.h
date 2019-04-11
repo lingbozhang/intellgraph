@@ -35,8 +35,6 @@ class Example2 {
     std::cout << "=====================================" << std::endl;
     std::cout << "A Simple Classifier for MNIST dataset" << std::endl;
     std::cout << "=====================================" << std::endl;
-    // MNIST_DATA_LOCATION set by MNIST cmake config
-    std::cout << "MNIST data directory: " << MNIST_DATA_LOCATION << std::endl;
     // Loads MNIST data
     mnist::MNIST_dataset<std::vector, std::vector<uint8_t>, uint8_t> dataset =
         mnist::read_dataset<std::vector, std::vector, uint8_t, uint8_t>( \
@@ -111,7 +109,7 @@ class Example2 {
 
     float eta = 3.0;
     int loops = 30;
-    int minbatch_size = 100;
+    int minbatch_size = 10;
     std::cout << "Learning rate: " << eta << std::endl;
     std::cout << "Total epochs: " << loops << std::endl;
     std::cout << "Min-batch size: " << minbatch_size << std::endl;

@@ -98,7 +98,7 @@ class SigmoidNode : public IntNode<T> {
 
   void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels) final;
 
-  bool ResetActState() final {
+  inline bool ResetActState() final {
     return Transition(kInit);
   }
 

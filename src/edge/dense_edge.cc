@@ -68,8 +68,8 @@ void DenseEdge<T>::Backward(IntNode<T>* node_in_ptr, \
   // Calculates delta_ptr_ of input node
   // $\delta^l= \mathcal{D}[f^\prime(z^l)]W^{l+1}\delta^{l+1}$
   CHECK_EQ(weight_ptr_->cols(), node_out_ptr->get_activation_ptr()->rows())
-    << "Backward() in DenseEdge is failed:"
-    << "Dimensions of weight and activation from output node are not equal.";
+      << "Backward() in DenseEdge is failed:"
+      << "Dimensions of weight and activation from output node are not equal.";
 
   node_in_ptr->get_delta_ptr()->noalias() = \
       weight_ptr_->matrix() * node_out_ptr->get_delta_ptr()->matrix();

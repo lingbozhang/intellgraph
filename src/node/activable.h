@@ -46,7 +46,7 @@ interface activable {
 
   virtual void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels) = 0;
 
-  virtual bool ResetActState() = 0;
+  virtual inline bool ResetActState() = 0;
  
  protected:
   // Transitions from kAct state to kPrime state and updates current_act_state_

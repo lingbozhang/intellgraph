@@ -112,8 +112,8 @@ void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
      Instantiate();
   }
   if (*order_.rbegin() != input_node_id_ || *order_.begin() != output_node_id_) {
-      LOG(ERROR) << "Forward() in the Classifier is failed.";
-      exit(1);
+     LOG(ERROR) << "Forward() in the Classifier is failed.";
+     exit(1);
   }
 
   input_node_ptr_->FeedFeature(training_data);

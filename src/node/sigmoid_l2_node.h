@@ -103,7 +103,7 @@ class SigL2Node : public OutputNode<T> {
     sigmoid_node_ptr_->Evaluate(labels);
   }
 
-  bool ResetActState() final {
+  inline bool ResetActState() final {
     return sigmoid_node_ptr_->ResetActState();
   }
 
