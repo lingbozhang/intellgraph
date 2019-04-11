@@ -1,3 +1,3 @@
 # IntellGraph
 
-A deep learning framework based on Graphs
+A deep learning framework in C++
