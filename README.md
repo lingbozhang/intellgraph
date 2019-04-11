@@ -40,12 +40,5 @@ $ cd ../..
 $ bin/IntellGraph
 ```
 
-####  Building Using the Script
-
-There is a handy BASH script (used by the Travis CI) that you can run locally. It builds the project, and runs all the tests
-
-```bash
-./run.sh
-```
 
 
