@@ -47,24 +47,24 @@ interface Graph {
 
   virtual void Reset() = 0;
 
-  virtual void Forward(REF const MatXXSPtr<T>& train_data_ptr, \
-                       REF const MatXXSPtr<T>& train_label_ptr) = 0;
+  virtual void Forward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
+                       REF const Eigen::Ref<const MatXX<T>>& training_labels) = 0;
 
-  virtual void Backward(REF const MatXXSPtr<T>& train_data_ptr, \
-                        REF const MatXXSPtr<T>& train_label_ptr) = 0;
+  virtual void Backward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
+                        REF const Eigen::Ref<const MatXX<T>>& training_labels) = 0;
 
-  virtual void Evaluate(REF const MatXXSPtr<T>& test_data_ptr, \
-                        REF const MatXXSPtr<T>& test_label_ptr) = 0;
+  virtual void Evaluate(REF const Eigen::Ref<const MatXX<T>>& test_data, \
+                        REF const Eigen::Ref<const MatXX<T>>& test_labels) = 0;
 
-  MUTE virtual inline MatXX<T>* get_edge_weight(COPY size_t node_in_id, \
-                                                COPY size_t node_out_id) = 0;
-
-  REF virtual inline const MatXX<T>* get_edge_nabla(COPY size_t node_in_id, \
+  MUTE virtual inline MatXX<T>* get_edge_weight_ptr(COPY size_t node_in_id, \
                                                     COPY size_t node_out_id) = 0;
 
-  MUTE virtual inline VecX<T>* get_node_bias(COPY size_t node_id) = 0;
+  REF virtual inline const MatXX<T>* get_edge_nabla_ptr(COPY size_t node_in_id, \
+                                                        COPY size_t node_out_id) = 0;
 
-  REF virtual inline const MatXX<T>* get_node_delta(COPY size_t node_id) = 0;
+  MUTE virtual inline VecX<T>* get_node_bias_ptr(COPY size_t node_id) = 0;
+
+  REF virtual inline const MatXX<T>* get_node_delta_ptr(COPY size_t node_id) = 0;
 
   virtual inline bool set_output_node_id(COPY size_t id) = 0;
 

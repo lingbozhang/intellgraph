@@ -62,17 +62,17 @@ class Classifier : implements Graph<T> {
     order_.clear();
   }
 
-  void Forward(REF const MatXXSPtr<T>& train_data_ptr, \
-               REF const MatXXSPtr<T>& train_label_ptr) final;
+  void Forward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
+               REF const Eigen::Ref<const MatXX<T>>& training_labels) final;
 
-  void Backward(REF const MatXXSPtr<T>& train_data_ptr, \
-                REF const MatXXSPtr<T>& train_label_ptr) final;
+  void Backward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
+                REF const Eigen::Ref<const MatXX<T>>& training_labels) final;
 
-  void Evaluate(REF const MatXXSPtr<T>& test_data_ptr, \
-                REF const MatXXSPtr<T>& test_label_ptr) final;
+  void Evaluate(REF const Eigen::Ref<const MatXX<T>>& test_data, \
+                REF const Eigen::Ref<const MatXX<T>>& test_label) final;
 
-  MUTE inline MatXX<T>* get_edge_weight(COPY size_t node_in_id, \
-                                        COPY size_t node_out_id) final {
+  MUTE inline MatXX<T>* get_edge_weight_ptr(COPY size_t node_in_id, \
+                                            COPY size_t node_out_id) final {
     auto edge_pair = boost::edge(node_in_id, node_out_id, graph_);
     if (!edge_pair.second) {
       LOG(ERROR) << "Edge connects Nodes: " << node_in_id << " and "
@@ -89,8 +89,8 @@ class Classifier : implements Graph<T> {
     }
   }
 
-  REF inline const MatXX<T>* get_edge_nabla(COPY size_t node_in_id, \
-                                            COPY size_t node_out_id) final {
+  REF inline const MatXX<T>* get_edge_nabla_ptr(COPY size_t node_in_id, \
+                                                COPY size_t node_out_id) final {
     auto edge_pair = boost::edge(node_in_id, node_out_id, graph_);
     if (!edge_pair.second) {
       LOG(ERROR) << "Edge connects Nodes: " << node_in_id << " and "
@@ -107,7 +107,7 @@ class Classifier : implements Graph<T> {
     }
   }
 
-  MUTE inline VecX<T>* get_node_bias(COPY size_t node_id) final {
+  MUTE inline VecX<T>* get_node_bias_ptr(COPY size_t node_id) final {
     if (node_map_.count(node_id) > 0) {
       return node_map_[node_id]->get_bias_ptr();
     } else {
@@ -116,7 +116,7 @@ class Classifier : implements Graph<T> {
     }
   }
 
-  REF inline const MatXX<T>* get_node_delta(COPY size_t node_id) final {
+  REF inline const MatXX<T>* get_node_delta_ptr(COPY size_t node_id) final {
     if (node_map_.count(node_id) > 0) {
       return node_map_[node_id]->get_delta_ptr();
     } else {
@@ -143,19 +143,7 @@ class Classifier : implements Graph<T> {
     return true;
   }
 
-  REF inline const size_t ref_count() {
-    return count_;
-  }
-
-  inline void set_count(COPY size_t count) {
-     count_ = count;
-  }
-
  private:
-  inline void CalcLoss(MUTE MatXXSPtr<T> train_label_ptr) {
-    T loss = output_node_ptr_->CalcLoss(train_label_ptr.get());
-    std::cout << "Loss: " << loss << std::endl;
-  }
 
   IntellGraph graph_{};
 

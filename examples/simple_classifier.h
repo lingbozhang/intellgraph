@@ -34,15 +34,29 @@ class Example1 {
  public:
   static void run() {
     // Prepares train data
-    auto train_d_ptr = std::make_shared<MatXX<float>>(2, 6);
-    auto train_l_ptr = std::make_shared<MatXX<float>>(1, 6);
+    MatXX<float> training_data(2, 6);
+    MatXX<float> training_labels(1, 6);
+    MatXX<float> test_data(2, 4);
+    MatXX<float> test_labels(1, 4);
 
     // In IntellGraph, current version implements Eigen library for matrix
     // abstraction.
-    train_d_ptr->array() << 0.0, 1.0, 0.5,   1,   0, 0.5,
-                            0.0, 1.0,   1, 0.5, 0.5, 0.0;
+    // Training data: * indicates 1, O indicates 0.0;
+    //
+    //                 (0.5, 1.0)(*)   (1.0, 1.0)(*)
+    //  (0.0, 0.5)(O)                  (1.0, 0.5)(*)
+    //  (0.0, 0.0)(O)  (0.5, 0.0)(O)
+    //
+    training_data << 0.0, 1.0, 0.5, 1.0, 0.0, 0.5,
+                     0.0, 1.0, 1.0, 0.5, 0.5, 0.0;
 
-    train_l_ptr->array() << 0.0, 1.0, 1, 1, 0.0, 0.0;
+    training_labels << 0.0, 1.0, 1, 1, 0.0, 0.0;
+
+    test_data << 0.25,  0.0, 0.25, 0.75,
+                  0.0, 0.25, 0.25, 0.75;
+
+    test_labels << 0.0, 0.0, 0.0, 1.0;
+
 
     NodeRegistry::LoadNodeRegistry();
     EdgeRegistry::LoadEdgeRegistry();
@@ -68,26 +82,21 @@ class Example1 {
 
     classifier.Instantiate();
 
-    MatXXSPtr<float> train_data_ptr = std::make_shared<MatXX<float>>(1, 1);
-    MatXXSPtr<float> train_label_ptr = std::make_shared<MatXX<float>>(1, 1);
-
     float eta = 1;
-    int loops = 1000;
+    int loops = 50;
     int data_num = 6;
     for (int epoch = 0; epoch < loops; ++epoch) {
       std::cout << "Epoch: " << epoch << "/" << loops << std::endl;
-      for (int j = 0; j < 6; ++j) {
-        size_t i = rand() % data_num;
-        train_data_ptr->array() = train_d_ptr->col(i);
-        train_label_ptr->array() = train_l_ptr->col(i);
-        classifier.Backward(train_data_ptr, train_label_ptr);
+      for (int i = 0; i < 6; ++i) {
+        int col = rand() % data_num;
+        classifier.Backward(training_data.col(col), training_labels.col(col));
         // Stochastic gradient decent
-        classifier.get_edge_weight(0, 1)->array() -= \
-            eta * classifier.get_edge_nabla(0, 1)->array();
-        classifier.get_node_bias(1)->array() -= eta * \
-            classifier.get_node_delta(1)->array();
+        classifier.get_edge_weight_ptr(0, 1)->array() -= \
+            eta * classifier.get_edge_nabla_ptr(0, 1)->array();
+        classifier.get_node_bias_ptr(1)->array() -= eta * \
+            classifier.get_node_delta_ptr(1)->array();
       }
-      classifier.Evaluate(train_data_ptr, train_label_ptr);
+      classifier.Evaluate(test_data, test_labels);
     }
     std::cout << "Complete" << std::endl;
   }

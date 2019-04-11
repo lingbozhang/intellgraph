@@ -27,9 +27,9 @@ interface evaluable {
  public:
   virtual ~evaluable() noexcept = default;
 
-  COPY virtual T CalcLoss(REF const MatXX<T>* labels_ptr) = 0;
+  COPY virtual T CalcLoss(REF const Eigen::Ref<const MatXX<T>>& labels) = 0;
 
-  virtual bool CalcDelta(REF const MatXX<T>* labels_ptr) = 0;
+  virtual bool CalcDelta(REF const Eigen::Ref<const MatXX<T>>& labels) = 0;
 
 };
 

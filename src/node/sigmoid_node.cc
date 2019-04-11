@@ -23,29 +23,11 @@ SigmoidNode<T>::SigmoidNode(const NodeParameter& node_param) {
   size_t row = node_param.ref_dims()[0];
   size_t col = node_param.ref_dims()[1];
 
-  activation_ptr_ = std::make_shared<MatXX<T>>(row, col);
-  delta_ptr_ = std::make_unique<MatXX<T>>(row, col);
   bias_ptr_ = std::make_unique<VecX<T>>(row);
 
-  activation_ptr_->array() = 0.0;
-  delta_ptr_->array() = 0.0;
   bias_ptr_->array() = 0.0;
 
   current_act_state_ = kInit;
-}
-
-template <class T>
-void SigmoidNode<T>::PrintAct() const {
-  std::cout << "Node: " << node_param_.ref_id() << std::endl
-            << "Activation Vector:" << std::endl << activation_ptr_->array() 
-            << std::endl;
-}
-
-template <class T>
-void SigmoidNode<T>::PrintDelta() const {
-  std::cout << "Node: " << node_param_.ref_id() << std::endl
-            << "Delta Vector:" << std::endl << delta_ptr_->array() 
-            << std::endl;
 }
 
 template <class T>
@@ -53,19 +35,6 @@ void SigmoidNode<T>::PrintBias() const {
   std::cout << "Node: " << node_param_.ref_id() << std::endl 
             << "Bias Vector:" << std::endl << bias_ptr_->array() 
             << std::endl;
-}
-
-template <class T>
-void SigmoidNode<T>::InitializeAct(const std::function<T(T)>& functor) {
-  if (functor == nullptr) {
-    LOG(WARNING) << "InitializeAct() for SigmoidNode is failed: "
-                 << "initializes activation with standard normal distribution";
-    activation_ptr_->array() = activation_ptr_->unaryExpr( \
-        std::function<T(T)>(NormalFunctor<T>(0.0, 1.0)));
-  } else {
-    activation_ptr_->array() = activation_ptr_->unaryExpr(functor);
-  }
-  Transition(kInit);
 }
 
 template <class T>
@@ -88,14 +57,14 @@ template <class T>
 void SigmoidNode<T>::InitToAct() {
   // Sigmoid activation function:
   // f(z)=1.0/(1.0+exp(-z))
-  for (size_t i = 0; i < activation_ptr_->array().rows(); ++i) {
-    for (size_t j = 0; j < activation_ptr_->array().cols(); ++j) {
-      T element_value = activation_ptr_->array()(i, j);
+  for (size_t i = 0; i < activation_.rows(); ++i) {
+    for (size_t j = 0; j < activation_.cols(); ++j) {
+      T element_value = activation_(i, j);
       if (element_value >= 0.0) {
-        activation_ptr_->array()(i, j) = 1.0 / (1.0 + std::exp(-element_value));
+        activation_(i, j) = 1.0 / (1.0 + std::exp(-element_value));
       } else {
-        activation_ptr_->array()(i, j) = std::exp(element_value) / \
-                                         (1.0 + std::exp(element_value));
+        activation_(i, j) = std::exp(element_value) / \
+            (1.0 + std::exp(element_value));
       }
     }
   }
@@ -106,7 +75,7 @@ template <class T>
 void SigmoidNode<T>::ActToPrime() {
   // Derivative equation:
   // $df/dz=f(z)(1-f(z))$
-  activation_ptr_->array() *= (1.0 - activation_ptr_->array());
+  activation_.array() *= (1.0 - activation_.array());
   current_act_state_ = kPrime;
 }
 
@@ -174,31 +143,32 @@ bool SigmoidNode<T>::CalcActPrime() {
 }
 
 template <class T>
-void SigmoidNode<T>::Evaluate(REF const MatXX<T>* labels_ptr) {
+void SigmoidNode<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& labels) {
   if (!Transition(kAct)) {
     LOG(ERROR) << "Evaluate() for SigmoidNode is failed.";
     exit(1);
   }
 
-  CHECK_EQ(activation_ptr_->rows(), labels_ptr->rows()) 
+  CHECK_EQ(activation_.cols(), labels.cols())
       << "CalcLoss() for SigL2Node is failed: "
       << "activation and data matrix dimensions are not equal!";
+
   double accuracy = 0.0;
   size_t correct_guess = 0;
 
-  if (activation_ptr_->rows() == 1) {
-    correct_guess = (activation_ptr_->array().round() == \
-        labels_ptr->array()).count();
+  if (activation_.rows() == 1) {
+    correct_guess = (activation_.array().round() == \
+        labels.array()).count();
   } else {
-    for (size_t i = 0; i < labels_ptr->cols(); ++i) {
+    for (size_t i = 0; i < labels.cols(); ++i) {
       size_t index_guess;
-      activation_ptr_->col(i).maxCoeff(&index_guess);
-      if (index_guess == labels_ptr->array()(0, i)) {
+      activation_.col(i).maxCoeff(&index_guess);
+      if (index_guess == labels(0, i)) {
         correct_guess++;
       }
     }
   }
-  accuracy = correct_guess * 100.0 / labels_ptr->cols();
+  accuracy = correct_guess * 100.0 / labels.cols();
   std::cout << "Accuracy: " << accuracy << "%" << std::endl;
 }
 

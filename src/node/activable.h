@@ -44,7 +44,7 @@ interface activable {
 
   virtual bool CalcActPrime() = 0;
 
-  virtual void Evaluate(REF const MatXX<T>* labels_ptr) = 0;
+  virtual void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels) = 0;
 
   virtual bool ResetActState() = 0;
  

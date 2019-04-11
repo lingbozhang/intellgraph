@@ -28,6 +28,9 @@ int main(int argc, char* argv[]) {
   fLS::FLAGS_log_dir = log_path;
   google::InitGoogleLogging(argv[0]);
 
+  Example1::run();
+  return 0;
+
 /*
   // MNIST_DATA_LOCATION set by MNIST cmake config
   std::cout << "MNIST data directory: " << MNIST_DATA_LOCATION << std::endl;

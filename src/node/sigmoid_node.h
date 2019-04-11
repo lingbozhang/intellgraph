@@ -35,11 +35,11 @@ class SigL2Node;
 // SigmoidNode improves performance of CallActFxn and CalcActPrime with Eigen 
 // library and has better performance than ActivationNode. 
 template <class T>
-class SigmoidNode : implements IntNode<T> {
+class SigmoidNode : public IntNode<T> {
  public:
   friend class SigL2Node<T>;
 
-  SigmoidNode() noexcept = default;
+  SigmoidNode() noexcept = delete;
 
   explicit SigmoidNode(REF const NodeParameter& node_param);
 
@@ -64,55 +64,31 @@ class SigmoidNode : implements IntNode<T> {
   }
 
   // Accessable operations for the activation matrix
-  MUTE inline MatXX<T>* get_activation_ptr() const final {
-    return activation_ptr_.get();
+  MUTE inline MatXX<T>* get_activation_ptr() final {
+    return &activation_;
   }
 
   // Accessable operations for the bias vector
   MUTE inline VecX<T>* get_bias_ptr() const final {
     return bias_ptr_.get();
   }
+
   // Accessable operations for the delta matrix
-  MUTE inline MatXX<T>* get_delta_ptr() const final {
-    return delta_ptr_.get();
+  MUTE inline MatXX<T>* get_delta_ptr() final {
+    return &delta_;
   }
+
   // Accessable operations for the node parameter
   REF inline const NodeParameter& ref_node_param() const final {
     return node_param_;
   }
 
   inline void set_activation(COPY T value) final {
-    activation_ptr_->array() = value;
+    activation_.array() = value;
     Transition(kInit);
-  }
-  
-  inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) final {
-    CHECK_EQ(activation_ptr_->size(), activation_ptr->size()) 
-        << "move_activation_ptr() for SigmoidNode is failed: ";
-    activation_ptr_ = std::move(activation_ptr);
-    Transition(kInit);
-  }
-
-  // Passes a functor and applies it on the activation matrix
-  void InitializeAct(REF const std::function<T(T)>& functor) final;
-
-  inline void move_bias_ptr(MOVE VecXUPtr<T> bias_ptr) final {
-    CHECK_EQ(bias_ptr_->size(), bias_ptr->size())
-        << "move_bias_ptr() for SigmoidNode is failed";
-    bias_ptr_ = std::move(bias_ptr);
   }
 
   void InitializeBias(REF const std::function<T(T)>& functor) final;
-
-  inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) final {
-    CHECK_EQ(delta_ptr_->size(), delta_ptr->size())
-        << "move_delta_ptr() for SigmoidNode is failed";
-    delta_ptr_ = std::move(delta_ptr);
-  }
-
-  void PrintAct() const final;
-
-  void PrintDelta() const final;
 
   void PrintBias() const final;
 
@@ -120,14 +96,14 @@ class SigmoidNode : implements IntNode<T> {
 
   bool CalcActPrime() final;
 
-  void Evaluate(REF const MatXX<T>* labels_ptr) final;
+  void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels) final;
 
   bool ResetActState() final {
     return Transition(kInit);
   }
 
-  void FeedFeature(REF const MatXXSPtr<T>& feature_ptr) final {
-    activation_ptr_ = feature_ptr;
+  void FeedFeature(REF const Eigen::Ref<const MatXX<T>>& feature) final {
+    activation_ = feature;
     Transition(kFeed);
   }
 
@@ -144,11 +120,11 @@ class SigmoidNode : implements IntNode<T> {
  private:
   NodeParameter node_param_{};
 
-  MatXXSPtr<T> activation_ptr_{nullptr};
+  MatXX<T> activation_{};
 
   // Delta vector stores the derivative of loss function of
   // weighted_sum variables
-  MatXXUPtr<T> delta_ptr_{nullptr};
+  MatXX<T> delta_{};
 
   VecXUPtr<T> bias_ptr_{nullptr};
 

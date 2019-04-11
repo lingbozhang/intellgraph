@@ -37,7 +37,7 @@ class Edge {
   // Calculates weighted sum and updates activation_ptr_ of output layer
   // in-place. Function name with a word 'mute' indicates it requires mutable
   // inputs;
-  virtual void Forward(REF const IntNode<T>* node_in_ptr, \
+  virtual void Forward(MUTE IntNode<T>* node_in_ptr, \
                        MUTE IntNode<T>* node_out_ptr) = 0;
 
   // Calculates nabla_weight_ and updates delta_ptr_ of input layer in-place 

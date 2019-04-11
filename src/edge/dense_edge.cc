@@ -43,17 +43,13 @@ void DenseEdge<T>::PrintNablaWeight() const {
 }
 
 template <class T>
-void DenseEdge<T>::Forward(const IntNode<T>* node_in_ptr, \
+void DenseEdge<T>::Forward(IntNode<T>* node_in_ptr, \
     IntNode<T>* node_out_ptr) {
   CHECK_EQ(weight_ptr_->rows(), node_in_ptr->get_activation_ptr()->rows())
       << "Forward() in DenseEdge is failed:"
       << "Dimensions of weight and activation from input node are not equal.";
-  
-  CHECK_EQ(weight_ptr_->cols(), node_out_ptr->get_activation_ptr()->rows())
-      << "Forward() in DenseEdge is failed:"
-      << "Dimensions of weight and activation from output node are not equal.";
 
-  node_out_ptr->get_activation_ptr()->matrix().noalias() = \
+  node_out_ptr->get_activation_ptr()->noalias() = \
       (weight_ptr_->transpose() * \
       node_in_ptr->get_activation_ptr()->matrix()).colwise() + \
       *node_out_ptr->get_bias_ptr();
@@ -71,7 +67,11 @@ void DenseEdge<T>::Backward(IntNode<T>* node_in_ptr, \
       node_out_ptr->get_delta_ptr()->transpose()) / batch_size;
   // Calculates delta_ptr_ of input node
   // $\delta^l= \mathcal{D}[f^\prime(z^l)]W^{l+1}\delta^{l+1}$
-  node_in_ptr->get_delta_ptr()->matrix().noalias() = \
+  CHECK_EQ(weight_ptr_->cols(), node_out_ptr->get_activation_ptr()->rows())
+    << "Backward() in DenseEdge is failed:"
+    << "Dimensions of weight and activation from output node are not equal.";
+
+  node_in_ptr->get_delta_ptr()->noalias() = \
       weight_ptr_->matrix() * node_out_ptr->get_delta_ptr()->matrix();
 
   node_in_ptr->CalcActPrime();

@@ -35,7 +35,7 @@ namespace intellgraph {
 template<class T>
 class SigL2Node : public OutputNode<T> {
  public:
-  SigL2Node() noexcept = default;
+  SigL2Node() noexcept = delete;
 
   explicit SigL2Node(REF const NodeParameter& node_param) {
     sigmoid_node_ptr_ = std::make_unique<SigmoidNode<T>>(node_param);
@@ -54,7 +54,7 @@ class SigL2Node : public OutputNode<T> {
   ~SigL2Node() noexcept final = default;
 
   COPY inline std::vector<size_t> get_dims() const final {
-    return (*sigmoid_node_ptr_.get()).get_dims();
+    return sigmoid_node_ptr_->get_dims();
   }
 
   REF inline const std::vector<size_t>& ref_dims() const final {
@@ -62,7 +62,7 @@ class SigL2Node : public OutputNode<T> {
   }
 
   // Accessable operations for the activation matrix
-  MUTE inline MatXX<T>* get_activation_ptr() const final {
+  MUTE inline MatXX<T>* get_activation_ptr() final {
     return sigmoid_node_ptr_->get_activation_ptr();
   }
 
@@ -71,7 +71,7 @@ class SigL2Node : public OutputNode<T> {
     return sigmoid_node_ptr_->get_bias_ptr();
   }
   // Accessable operations for the delta matrix
-  MUTE inline MatXX<T>* get_delta_ptr() const final {
+  MUTE inline MatXX<T>* get_delta_ptr() final {
     return sigmoid_node_ptr_->get_delta_ptr();
   }
   // Accessable operations for the node parameter
@@ -82,34 +82,9 @@ class SigL2Node : public OutputNode<T> {
   inline void set_activation(COPY T value) final {
     sigmoid_node_ptr_->set_activation(value);
   }
-  
-  inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) final {
-    sigmoid_node_ptr_->move_activation_ptr(std::move(activation_ptr));
-  }
-
-  // Passes a functor and applies it on the activation matrix
-  void InitializeAct(REF const std::function<T(T)>& functor) final {
-    sigmoid_node_ptr_->InitializeAct(functor);
-  }
-
-  inline void move_bias_ptr(MOVE VecXUPtr<T> bias_ptr) final {
-    sigmoid_node_ptr_->move_bias_ptr(std::move(bias_ptr));
-  }
 
   void InitializeBias(REF const std::function<T(T)>& functor) final {
     sigmoid_node_ptr_->InitializeBias(functor);
-  }
-
-  inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) final {
-    sigmoid_node_ptr_->move_delta_ptr(std::move(delta_ptr));
-  }
-
-  void PrintAct() const final {
-    sigmoid_node_ptr_->PrintAct();
-  }
-
-  void PrintDelta() const final {
-    sigmoid_node_ptr_->PrintDelta();
   }
 
   void PrintBias() const final {
@@ -124,21 +99,21 @@ class SigL2Node : public OutputNode<T> {
     return sigmoid_node_ptr_->CalcActPrime();
   }
 
-  void Evaluate(REF const MatXX<T>* labels_ptr) final {
-    sigmoid_node_ptr_->Evaluate(labels_ptr);
+  void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels) {
+    sigmoid_node_ptr_->Evaluate(labels);
   }
 
   bool ResetActState() final {
     return sigmoid_node_ptr_->ResetActState();
   }
 
-  void FeedFeature(REF const MatXXSPtr<T>& feature_ptr) final {
-    sigmoid_node_ptr_->FeedFeature(feature_ptr);
+  void FeedFeature(REF const Eigen::Ref<const MatXX<T>>& feature) final {
+    sigmoid_node_ptr_->FeedFeature(feature);
   }
 
-  COPY T CalcLoss(REF const MatXX<T>* labels_ptr) final;
+  COPY T CalcLoss(REF const Eigen::Ref<const MatXX<T>>& labels) final;
 
-  bool CalcDelta(REF const MatXX<T>* labels_ptr) final;
+  bool CalcDelta(REF const Eigen::Ref<const MatXX<T>>& labels) final;
   
  protected:
   // Transitions from kAct state to kPrime state and updates current_act_state_

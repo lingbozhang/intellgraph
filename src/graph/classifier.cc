@@ -104,8 +104,8 @@ void Classifier<T>::Instantiate() {
 }
 
 template <class T>
-void Classifier<T>::Forward(const MatXXSPtr<T>& train_data_ptr, \
-                            const MatXXSPtr<T>& train_label_ptr) {
+void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
+                            const Eigen::Ref<const MatXX<T>>& training_labels) {
   if (!instantiated_) {
      LOG(WARNING) << "Classifier is not instantiated: "
                   << "Try to instantiate it";
@@ -116,7 +116,7 @@ void Classifier<T>::Forward(const MatXXSPtr<T>& train_data_ptr, \
       exit(1);
   }
 
-  input_node_ptr_->FeedFeature(train_data_ptr);
+  input_node_ptr_->FeedFeature(training_data);
   for (auto it_r = order_.rbegin(); it_r != order_.rend(); ++it_r) {
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t node_in_id = *it_r;
@@ -135,16 +135,13 @@ void Classifier<T>::Forward(const MatXXSPtr<T>& train_data_ptr, \
       edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
     }
   }
- 
-  //CalcLoss(train_label_ptr);
-  //Evaluate(train_label_ptr);
 }
 
 template <class T>
-void Classifier<T>::Backward(const MatXXSPtr<T>& train_data_ptr, \
-                             const MatXXSPtr<T>& train_label_ptr) {
-  Forward(train_data_ptr, train_label_ptr);
-  output_node_ptr_->CalcDelta(train_label_ptr.get());
+void Classifier<T>::Backward(const Eigen::Ref<const MatXX<T>>& training_data, \
+                             const Eigen::Ref<const MatXX<T>>& training_labels) {
+  Forward(training_data, training_labels);
+  output_node_ptr_->CalcDelta(training_labels);
   for (auto it = order_.begin(); it != order_.end(); ++it) {
     IntellGraph::in_edge_iterator ei{}, ei_end{};
     size_t node_out_id = *it;
@@ -166,14 +163,14 @@ void Classifier<T>::Backward(const MatXXSPtr<T>& train_data_ptr, \
 }
 
 template <class T>
-void Classifier<T>::Evaluate(const MatXXSPtr<T>& test_data_ptr, \
-                             const MatXXSPtr<T>& test_label_ptr) {
+void Classifier<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
+                             const Eigen::Ref<const MatXX<T>>& test_labels) {
   if (*order_.rbegin() != input_node_id_ || *order_.begin() != output_node_id_) {
     LOG(ERROR) << "Evaluate() in the Classifier is failed.";
     exit(1);
   }
 
-  input_node_ptr_->FeedFeature(test_data_ptr);
+  input_node_ptr_->FeedFeature(test_data);
   for (auto it_r = order_.rbegin(); it_r != order_.rend(); ++it_r) {
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t node_in_id = *it_r;
@@ -192,7 +189,7 @@ void Classifier<T>::Evaluate(const MatXXSPtr<T>& test_data_ptr, \
       edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
     }
   }
-  output_node_ptr_->Evaluate(test_label_ptr.get());
+  output_node_ptr_->Evaluate(test_labels);
 }
 
 // Instantiate class, otherwise compilation will fail

@@ -43,33 +43,20 @@ class Node {
   REF virtual inline const std::vector<size_t>& ref_dims() const = 0;
 
   // Accessable operations for the activation matrix
-  MUTE virtual inline MatXX<T>* get_activation_ptr() const = 0;
+  MUTE virtual inline MatXX<T>* get_activation_ptr() = 0;
 
   // Accessable operations for the bias vector
   MUTE virtual inline VecX<T>* get_bias_ptr() const = 0;
 
   // Accessable operations for the delta matrix
-  MUTE virtual inline MatXX<T>* get_delta_ptr() const = 0;
+  MUTE virtual inline MatXX<T>* get_delta_ptr() = 0;
 
   // Accessable operations for the node parameter
   REF virtual inline const NodeParameter& ref_node_param() const = 0;
 
   virtual inline void set_activation(COPY T value) = 0;
-  
-  virtual inline void move_activation_ptr(MOVE MatXXUPtr<T> activation_ptr) = 0;
-  
-  // Passes a functor and applies it on the activation matrix
-  virtual void InitializeAct(REF const std::function<T(T)>& functor) = 0;
-
-  virtual inline void move_bias_ptr(MOVE VecXUPtr<T> bias_ptr) = 0;
 
   virtual void InitializeBias(REF const std::function<T(T)>& functor) = 0;
-
-  virtual inline void move_delta_ptr(MOVE MatXXUPtr<T> delta_ptr) = 0;
-
-  virtual void PrintAct() const = 0;
-
-  virtual void PrintDelta() const = 0;
 
   virtual void PrintBias() const = 0;
 

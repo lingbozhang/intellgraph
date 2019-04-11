@@ -51,7 +51,7 @@ class DenseEdge : implements Edge<T> {
 
   void PrintNablaWeight() const final;
 
-  virtual void Forward(REF const IntNode<T>* node_in_ptr, \
+  virtual void Forward(MUTE IntNode<T>* node_in_ptr, \
                        MUTE IntNode<T>* node_out_ptr) final;
 
   virtual void Backward(MUTE IntNode<T>* node_in_ptr, \

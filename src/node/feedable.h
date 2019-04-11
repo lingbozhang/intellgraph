@@ -25,7 +25,7 @@ interface feedable {
  public:
   virtual ~feedable() noexcept = default;
 
-  virtual void FeedFeature(REF const MatXXSPtr<T>& feature_ptr) = 0;
+  virtual void FeedFeature(REF const Eigen::Ref<const MatXX<T>>& feature) = 0;
 
 };
 

@@ -17,35 +17,35 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-T SigL2Node<T>::CalcLoss(const MatXX<T>* labels_ptr) {
+T SigL2Node<T>::CalcLoss(const Eigen::Ref<const MatXX<T>>& labels) {
   T loss = 0;
-  size_t batch_size = labels_ptr->cols();
+  size_t batch_size = labels.cols();
   if (!Transition(kAct)) {
     LOG(ERROR) << "CalcLoss() for SigL2Node is failed.";
     return -1.0;
   }
-  CHECK_EQ(get_activation_ptr()->size(), labels_ptr->size()) 
+  CHECK_EQ(get_activation_ptr()->size(), labels.size())
       << "CalcLoss() for SigL2Node is failed: "
       << "activation and data matrix dimensions are not equal!";
 
-  loss = (get_activation_ptr()->array() - labels_ptr->array()). \
+  loss = (get_activation_ptr()->array() - labels.array()). \
           matrix().squaredNorm();
   return loss / 2.0 / batch_size;
 }
 
 template <class T>
-bool SigL2Node<T>::CalcDelta(const MatXX<T>* labels_ptr) {
+bool SigL2Node<T>::CalcDelta(const Eigen::Ref<const MatXX<T>>& labels) {
   if (!Transition(kAct)) {
     LOG(ERROR) << "CalcDelta() for SigL2Node is failed.";
     return false;
   }
 
-  CHECK_EQ(get_activation_ptr()->size(), labels_ptr->size()) 
+  CHECK_EQ(get_activation_ptr()->size(), labels.size())
       << "CalcDelta() for SigL2Node is failed: "
       << "activation and data matrix dimensions are not equal!";
 
   get_delta_ptr()->array() = (get_activation_ptr()->array() \
-      - labels_ptr->array());
+      - labels.array());
   
   if (!Transition(kPrime)) {
     LOG(ERROR) << "CalcDelta() for SigL2Node is failed.";
