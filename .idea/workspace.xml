@@ -55,16 +55,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d0f2fc6-757e-43ed-9cf2-5d8e7e9230ed" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/examples/mnist_classifier.h" beforeDir="false" afterPath="$PROJECT_DIR$/examples/mnist_classifier.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/edge/dense_edge.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/edge/dense_edge.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/graph/classifier.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/graph/classifier.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/activable.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/activable.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/sigmoid_l2_node.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/sigmoid_l2_node.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/node/sigmoid_node.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/sigmoid_node.h" afterDir="false" />
-    </list>
+    <list default="true" id="3d0f2fc6-757e-43ed-9cf2-5d8e7e9230ed" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -183,7 +174,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/examples/mnist_classifier.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="347">
+            <state relative-caret-position="259">
               <caret line="111" column="26" lean-forward="true" selection-start-line="111" selection-start-column="26" selection-end-line="111" selection-end-column="26" />
             </state>
           </provider>
@@ -796,7 +787,7 @@
       <workItem from="1554839384628" duration="11900000" />
       <workItem from="1554926386545" duration="6430000" />
       <workItem from="1554940039625" duration="2078000" />
-      <workItem from="1554943428777" duration="18335000" />
+      <workItem from="1554943428777" duration="18601000" />
     </task>
     <servers />
   </component>
@@ -812,7 +803,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="255230000" />
+    <option name="totallyTimeSpent" value="255496000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -825,14 +816,13 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1080" extended-state="0" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25559106" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25559106" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32826748" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.52625155" visible="true" weight="0.30192503" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.52625155" visible="true" weight="0.30192503" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.48668796" weight="0.39716312" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -1275,7 +1265,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/examples/mnist_classifier.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="347">
+        <state relative-caret-position="259">
           <caret line="111" column="26" lean-forward="true" selection-start-line="111" selection-start-column="26" selection-end-line="111" selection-end-column="26" />
         </state>
       </provider>

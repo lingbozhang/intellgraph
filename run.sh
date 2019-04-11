@@ -24,7 +24,7 @@ export LibBashRepo="https://github.com/kigster/lib-bash"
 
 # We are using an awesome BASH library `lib-bash` for prettifying the output, and
 # running commands through their LibRun framework.
-divider::lib-bash() {
+IntellGraph::lib-bash() {
   [[ ! -d ${BashLibRoot} ]] && curl -fsSL https://git.io/fxZSi | /usr/bin/env bash
   [[ ! -d ${BashLibRoot} ]] && { 
     printf "Unable to git clone lib-bash repo from ${LibBashRepo}"
@@ -45,8 +45,8 @@ divider::lib-bash() {
   run::set-all show-output-off abort-on-error
 }
 
-divider::header() {
-  h1::purple "Fractional Division With Remainder: A CMake Project Template with Tests"
+IntellGraph::header() {
+  h1::purple "IntellGraph: A Deep Learning Framework in C++"
   local OIFC=${IFC}
   IFS="|" read -r -a gcc_info <<< "$(gcc --version 2>&1 | tr '\n' '|')"
   export IFC=${OIFC}
@@ -55,19 +55,19 @@ divider::header() {
   h1 "${bldylw}CMAKE:  ${bldblu}$(cmake --version | tr '\n' ' ')"
 }
 
-divider::setup() {
+IntellGraph::setup() {
   hl::subtle "Creating Build Folder..."
   run "mkdir -p build/run"
 
   [[ -f .idea/workspace.xml ]] || cp .idea/workspace.xml.example .idea/workspace.xml
 }
 
-divider::clean() {
+IntellGraph::clean() {
   hl::subtle "Cleaning output folders..."
   run 'rm -rf bin/d* include/d* lib/*'
 }
 
-divider::build() {
+IntellGraph::build() {
   run "cd build/run"
   run "cmake ../.. "
   run "make -j 12"
@@ -75,41 +75,41 @@ divider::build() {
   run "cd ${ProjectRoot}"
 }
 
-divider::tests() {
-  if [[ -f bin/divider_tests ]]; then
+IntellGraph::tests() {
+  if [[ -f bin/Intellgraph ]]; then
     run::set-next show-output-on
-    run "echo && bin/divider_tests"
+    run "echo && bin/Intellgraph"
   else
-    printf "${bldred}Can't find installed executable ${bldylw}bin/divider_tests.${clr}\n"
+    printf "${bldred}Can't find installed executable ${bldylw}bin/Intellgraph.${clr}\n"
     exit 2
   fi
 }
 
-divider::examples() {
-  [[ ! -f bin/divider ]] && {
-    error "You don't have the cmpiled binary yet".
-    exit 3
-  }
-
-  run::set-all show-output-on
-
-  hr
-  run "bin/divider 11 7"
-  hr
-  run "bin/divider 1298798375 94759897"
-  hr
-  run "bin/divider 78 17"
-  hr
-
-}
+#IntellGraph::examples() {
+#  [[ ! -f bin/IntellGraph ]] && {
+#    error "You don't have the cmpiled binary yet".
+#    exit 3
+#  }
+#
+#  run::set-all show-output-on
+#
+#  hr
+#  run "bin/IntellGraph 11 7"
+#  hr
+#  run "bin/IntellGraph 1298798375 94759897"
+#  hr
+#  run "bin/IntellGraph 78 17"
+#  hr
+#
+#}
 
 main() {
-  divider::lib-bash
-  divider::header
-  divider::setup
-  divider::build
-  divider::tests
-  divider::examples
+  IntellGraph::lib-bash
+  IntellGraph::header
+  IntellGraph::setup
+  IntellGraph::build
+  IntellGraph::tests
+  IntellGraph::examples
 }
 
 (( $_s_ )) || main

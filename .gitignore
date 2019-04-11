@@ -37,3 +37,4 @@ bin/
 ipch/
 build/
 cmake-build-debug/
+bin/bootstrap

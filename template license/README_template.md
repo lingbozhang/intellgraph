@@ -12,11 +12,11 @@ Do you need some easy-to-use starting point, but one that has the basic moving p
 
 Do you believe in test-driven development, or at the very lest — write your tests *together* with the feature code? If so you'd want to start your project pre-integrated with a good testing framework.
 
-Divider is a minimal project that's kept deliberately very small. When you build it using CMake/make (see below) it generates:
+IntellGraph is a minimal project that's kept deliberately very small. When you build it using CMake/make (see below) it generates:
 
  1. A tiny **static library** `lib/libdivision.a`,
- 2. **A command line binary `bin/divider`**, which links with the library,
- 3. **An executable unit test** `bin/divider_tests`  using [Google Test library](https://github.com/google/googletest).
+ 2. **A command line binary `bin/IntellGraph`**, which links with the library,
+ 3. **An executable unit test** `bin/IntellGraph_tests`  using [Google Test library](https://github.com/google/googletest).
  4. **An optional BASH build script** `./run.sh` that is also used by the Travis CI.
 
 
@@ -63,10 +63,10 @@ $ make && make install
 $ cd ../..
 
 # Run the tests:
-$ bin/divider_tests 
+$ bin/IntellGraph_tests 
 
 # Run the binary:
-$ bin/divider 234 5431
+$ bin/IntellGraph 234 5431
 ```
 
 ####  Building Using the Script
@@ -98,10 +98,10 @@ To make it easy to branch off from this template, the example is minimal, but it
 We build a static library that, given a simple fraction will return the integer result of the division, and the remainder.
 
 ```bash
-$ bin/divider numerator denominator
+$ bin/IntellGraph numerator denominator
 
 # eg:
-$ divider 234 5435
+$ IntellGraph 234 5435
 
 Division : 234 / 5435 = 0
 Remainder: 234 % 5435 = 234
