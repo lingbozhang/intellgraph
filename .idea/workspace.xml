@@ -56,14 +56,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3d0f2fc6-757e-43ed-9cf2-5d8e7e9230ed" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/examples/simple_classifier.h" beforeDir="false" afterPath="$PROJECT_DIR$/examples/simple_classifier.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/edge/dense_edge.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/edge/dense_edge.cc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/edge/dense_edge.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/edge/dense_edge.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/edge/edge.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/edge/edge.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/graph/classifier.cc" beforeDir="false" afterPath="$PROJECT_DIR$/src/graph/classifier.cc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/graph/classifier.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/graph/classifier.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/graph/graph.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/graph/graph.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/node/activable.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/activable.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/node/evaluable.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/evaluable.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/node/feedable.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/node/feedable.h" afterDir="false" />
@@ -811,7 +809,7 @@
       <workItem from="1554839384628" duration="11900000" />
       <workItem from="1554926386545" duration="6430000" />
       <workItem from="1554940039625" duration="2078000" />
-      <workItem from="1554943428777" duration="12874000" />
+      <workItem from="1554943428777" duration="13017000" />
     </task>
     <servers />
   </component>
@@ -827,7 +825,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="249769000" />
+    <option name="totallyTimeSpent" value="249912000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
