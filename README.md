@@ -1,6 +1,6 @@
 # IntellGraph
 
-A deep learning framework in C++
+A Deep Learning Framework in C++
 
 
 # Installation
