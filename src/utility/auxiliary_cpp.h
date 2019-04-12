@@ -43,7 +43,7 @@ namespace intellgraph {
 // it with class, an interface macro is defined and should be used for abstract 
 // class
 #define interface class
-// Corresponds to interface, the public is replaced with implements
+// For interface, the public is replaced with implements
 #define implements public
 
 // In order to differentiate between class and interface, interface is named 
