@@ -17,6 +17,7 @@ Contributor(s):
 
 #include "glog/logging.h"
 #include "node/node_factory.h"
+#include "node/sigmoid_cross_entropy.h"
 #include "node/sigmoid_l2_node.h"
 #include "node/sigmoid_node.h"
 
@@ -35,7 +36,9 @@ class NodeRegistry {
     // Registers SigL2Node
     LOG(INFO) << "Registering SigL2Node";
     DEVIMPL_REGISTERIMPL_NODE(SigL2Node, OutputNode);
-
+    // Registers SigCENode
+    LOG(INFO) << "Registering SigCENode";
+    DEVIMPL_REGISTERIMPL_NODE(SigCENode, OutputNode);
   }
   
 };

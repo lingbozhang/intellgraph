@@ -12,8 +12,8 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_NODE_SIGMOID_L2_NODE_H_
-#define INTELLGRAPH_NODE_SIGMOID_L2_NODE_H_
+#ifndef INTELLGRAPH_NODE_SIGMOID_CROSS_ENTROPY_H_
+#define INTELLGRAPH_NODE_SIGMOID_CROSS_ENTROPY_H_
 
 #include <memory>
 #include <vector>
@@ -26,30 +26,30 @@ Contributor(s):
 #include "utility/common.h"
 
 namespace intellgraph {
-// SigL2Node uses decorator pattern (see https://dzone.com/articles/is-inheritance-dead)
-// SigL2Node improves performance of GetLoss, CalcDelta, GetLoss, and CalcDelta 
-// with Eigen library. In SigL2Node, sigmoid function is used as a activation 
-// function and squared Euclidean norm is used as a loss function.
+// SigCENode uses decorator pattern (see https://dzone.com/articles/is-inheritance-dead)
+// SigCENode improves performance of GetLoss, CalcDelta, GetLoss, and CalcDelta 
+// with Eigen library. In SigCENode, sigmoid function is used as a activation 
+// function and the cross-entropy function is used as a loss function.
 template<class T>
-class SigL2Node : public OutputNode<T> {
+class SigCENode : public OutputNode<T> {
  public:
-  SigL2Node() noexcept = delete;
+  SigCENode() noexcept = delete;
 
-  explicit SigL2Node(REF const NodeParameter& node_param) {
+  explicit SigCENode(REF const NodeParameter& node_param) {
     sigmoid_node_ptr_ = std::make_unique<SigmoidNode<T>>(node_param);
   }
 
   // Move constructor
-  SigL2Node(MOVE SigL2Node<T>&& rhs) noexcept = default;
+  SigCENode(MOVE SigCENode<T>&& rhs) noexcept = default;
 
   // Move operator
-  SigL2Node& operator=(MOVE SigL2Node<T>&& rhs) noexcept = default;
+  SigCENode& operator=(MOVE SigCENode<T>&& rhs) noexcept = default;
 
   // Copy constructor and operator are explicitly deleted
-  SigL2Node(REF const SigL2Node<T>& rhs) = delete;
-  SigL2Node& operator=(REF const SigL2Node<T>& rhs) = delete;
+  SigCENode(REF const SigCENode<T>& rhs) = delete;
+  SigCENode& operator=(REF const SigCENode<T>& rhs) = delete;
 
-  ~SigL2Node() noexcept final = default;
+  ~SigCENode() noexcept final = default;
 
   COPY inline std::vector<size_t> get_dims() const final {
     return sigmoid_node_ptr_->get_dims();
@@ -134,11 +134,11 @@ class SigL2Node : public OutputNode<T> {
 
 };
 
-// Alias for unique SigL2Node pointer
+// Alias for unique SigCENode pointer
 template <class T>
-using SigL2NodeUPtr = std::unique_ptr<SigL2Node<T>>;
+using SigCENodeUPtr = std::unique_ptr<SigCENode<T>>;
  
 }  // namespace intellgraph
  
-# endif  // INTELLGRAPH_NODE_SIGMOID_L2_NODE_H_
+# endif  // INTELLGRAPH_NODE_SIGMOID_CROSS_ENTROPY_H_
  

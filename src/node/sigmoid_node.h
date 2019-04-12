@@ -32,12 +32,17 @@ namespace intellgraph {
 template <class T>
 class SigL2Node;
 
+template <class T>
+class SigCENode;
+
 // SigmoidNode improves performance of CallActFxn and CalcActPrime with Eigen 
 // library and has better performance than ActivationNode. 
 template <class T>
 class SigmoidNode : public IntNode<T> {
  public:
   friend class SigL2Node<T>;
+
+  friend class SigCENode<T>;
 
   SigmoidNode() noexcept = delete;
 
