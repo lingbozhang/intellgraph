@@ -48,6 +48,6 @@ There is a handy BASH script (used by the Travis CI) that you can run locally. I
 ```
 
 ### Acknowledgements
-In this project, we use the cmake-project-template developed by Konstantin Gredeskoul. For more information, please refer to https://github.com/kigster/cmake-project-template
+We use the cmake-project-template developed by Konstantin Gredeskoul. For more information, please refer to https://github.com/kigster/cmake-project-template
 
 
