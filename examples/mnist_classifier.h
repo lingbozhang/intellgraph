@@ -90,7 +90,7 @@ class Example2 {
     auto node_param2 = NodeParameter(1, "SigmoidNode", {30});
     // SigL2Node uses Sigmoid function as activation function and l2 norm as
     // loss function.
-    auto node_param3 = NodeParameter(2, "SigL2Node", {10});
+    auto node_param3 = NodeParameter(4, "SigL2Node", {10});
 
     // IntellGraph implements Boost Graph library and stores node and edge
     // information in the adjacency list.
@@ -100,7 +100,7 @@ class Example2 {
     classifier.AddEdge(node_param2, node_param3, "DenseEdge");
 
     classifier.set_input_node_id(0);
-    classifier.set_output_node_id(2);
+    classifier.set_output_node_id(4);
 
     NodeRegistry::LoadNodeRegistry();
     EdgeRegistry::LoadEdgeRegistry();
@@ -109,7 +109,7 @@ class Example2 {
 
     float eta = 3.0;
     int loops = 30;
-    int minbatch_size = 10;
+    int minbatch_size = 100;
     std::cout << "Learning rate: " << eta << std::endl;
     std::cout << "Total epochs: " << loops << std::endl;
     std::cout << "Min-batch size: " << minbatch_size << std::endl;
@@ -131,12 +131,12 @@ class Example2 {
         classifier.Backward(training_images.block(0, i, 784, minbatch_size), \
                             training_labels.block(0, i, 10, minbatch_size));
         // Stochastic gradient decent
-        classifier.get_edge_weight_ptr(1, 2)->array() -= \
-            eta * classifier.get_edge_nabla_ptr(1, 2)->array();
+        classifier.get_edge_weight_ptr(1, 4)->array() -= \
+            eta * classifier.get_edge_nabla_ptr(1, 4)->array();
         classifier.get_edge_weight_ptr(0, 1)->array() -= \
             eta * classifier.get_edge_nabla_ptr(0, 1)->array();
-        classifier.get_node_bias_ptr(2)->array() -= eta / minbatch_size *\
-            classifier.get_node_delta_ptr(2)->rowwise().sum().array();
+        classifier.get_node_bias_ptr(4)->array() -= eta / minbatch_size *\
+            classifier.get_node_delta_ptr(4)->rowwise().sum().array();
         classifier.get_node_bias_ptr(1)->array() -= eta / minbatch_size *\
             classifier.get_node_delta_ptr(1)->rowwise().sum().array();
       }

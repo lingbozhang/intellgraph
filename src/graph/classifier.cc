@@ -21,18 +21,20 @@ void Classifier<T>::AddEdge(const NodeParameter& node_param_in, \
                             const NodeParameter& node_param_out, \
                             const std::string& edge_name) {
   // Construct node objects and put them in the node_map_
-  size_t vertex_in_id = node_param_in.ref_id();
-  size_t vertex_out_id = node_param_out.ref_id();
+  size_t node_in_id = node_param_in.ref_id();
+  size_t node_out_id = node_param_out.ref_id();
 
   EdgeParameter edge_param{};
   EdgeProperty edge_property{};
 
-  if (node_param_map_.count(vertex_in_id) == 0) {
-    node_param_map_[vertex_in_id].Clone(node_param_in);
+  if (node_param_map_.count(node_in_id) == 0) {
+    index_map_[node_in_id] = node_param_map_.size();
+    node_param_map_[node_in_id].Clone(node_param_in);
   }
 
-  if (node_param_map_.count(vertex_out_id) == 0) {
-    node_param_map_[vertex_out_id].Clone(node_param_out);
+  if (node_param_map_.count(node_out_id) == 0) {
+    index_map_[node_out_id] = node_param_map_.size();
+    node_param_map_[node_out_id].Clone(node_param_out);
   }
   
   edge_property.id = edge_param_map_.size();
@@ -43,7 +45,10 @@ void Classifier<T>::AddEdge(const NodeParameter& node_param_in, \
   edge_param.set_dims_in(node_param_in.ref_dims());
   edge_param.set_dims_out(node_param_out.ref_dims());
 
-  if (!boost::add_edge(vertex_in_id, vertex_out_id, edge_property, graph_). \
+  VertexD vtx_in_id = index_map_[node_in_id];
+  VertexD vtx_out_id = index_map_[node_out_id];
+
+  if (!boost::add_edge(vtx_in_id, vtx_out_id, edge_property, graph_). \
       second) {
     LOG(WARNING) << "Edge has already been added";
     return;
@@ -62,13 +67,13 @@ void Classifier<T>::Instantiate() {
   auto input_node_ptr = std::move(NodeFactory<T, IntNode<T>>::Instantiate( \
       node_param_map_[input_node_id_]));
   input_node_ptr_ = input_node_ptr.get();
-  node_map_[input_node_id_] = std::move(input_node_ptr);
+  node_map_[index_map_[input_node_id_]] = std::move(input_node_ptr);
   
   // Instantiates the output node object
   auto output_node_ptr = std::move(NodeFactory<T, OutputNode<T>>::Instantiate( \
       node_param_map_[output_node_id_]));
   output_node_ptr_ = output_node_ptr.get();
-  node_map_[output_node_id_] = std::move(output_node_ptr);
+  node_map_[index_map_[output_node_id_]] = std::move(output_node_ptr);
 
   LOG(INFO) << "Initializes output node with standard normal distribution";
   output_node_ptr_->InitializeBias(NormalFunctor<T>(0.0, 1.0));
@@ -82,7 +87,7 @@ void Classifier<T>::Instantiate() {
       LOG(INFO) << "Initializes node: " << node_id
                 << ", with standard normal distribution";
       node_ptr->InitializeBias(NormalFunctor<T>(0.0, 1.0));
-      node_map_[node_pair.first] = std::move(node_ptr);
+      node_map_[index_map_[node_id]] = std::move(node_ptr);
     }
   }
   // Instantiates edge objects;
@@ -99,7 +104,6 @@ void Classifier<T>::Instantiate() {
   order_.clear();
   LOG(INFO) << "Determines Forward() orders by topological sorting";
   topological_sort(graph_, std::back_inserter(order_));
-
   instantiated_ = true;
 }
 
@@ -111,7 +115,8 @@ void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
                   << "Try to instantiate it";
      Instantiate();
   }
-  if (*order_.rbegin() != input_node_id_ || *order_.begin() != output_node_id_) {
+  if (*order_.rbegin() != index_map_[input_node_id_ ] || \
+      *order_.begin() != index_map_[output_node_id_]) {
      LOG(ERROR) << "Forward() in the Classifier is failed.";
      exit(1);
   }
@@ -119,18 +124,18 @@ void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
   input_node_ptr_->FeedFeature(training_data);
   for (auto it_r = order_.rbegin(); it_r != order_.rend(); ++it_r) {
     IntellGraph::out_edge_iterator eo{}, eo_end{};
-    size_t node_in_id = *it_r;
-    LOG(INFO) << "Forwarding node: " << node_in_id;
-    if (*it_r != input_node_id_ ) node_map_[*it_r]->CallActFxn();
+    size_t vtx_in_id = *it_r;
+    LOG(INFO) << "Forwarding vertex: " << vtx_in_id;
+    if (*it_r != index_map_[input_node_id_]) node_map_[*it_r]->CallActFxn();
     for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
-      size_t node_out_id = target(*eo, graph_);
+      size_t vtx_out_id = target(*eo, graph_);
       size_t edge_id = graph_[*eo].id;
 
       IntNode<T> *node_in_ptr, *node_out_ptr;
 
-      node_in_ptr = node_map_[node_in_id].get();
+      node_in_ptr = node_map_[vtx_in_id].get();
         
-      node_out_ptr = node_map_[node_out_id].get();
+      node_out_ptr = node_map_[vtx_out_id].get();
  
       edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
     }
@@ -144,17 +149,17 @@ void Classifier<T>::Backward(const Eigen::Ref<const MatXX<T>>& training_data, \
   output_node_ptr_->CalcDelta(training_labels);
   for (auto it = order_.begin(); it != order_.end(); ++it) {
     IntellGraph::in_edge_iterator ei{}, ei_end{};
-    size_t node_out_id = *it;
-    LOG(INFO) << "Backpropagating node: " << node_out_id;
+    size_t vtx_out_id = *it;
+    LOG(INFO) << "Backpropagating vertex: " << vtx_out_id;
     for (std::tie(ei, ei_end) = in_edges(*it, graph_); ei != ei_end; ++ei) {
-      size_t node_in_id = source(*ei, graph_);
+      size_t vtx_in_id = source(*ei, graph_);
       size_t edge_id = graph_[*ei].id;
 
       IntNode<T> *node_in_ptr, *node_out_ptr;
       Edge<T> *edge_ptr;
 
-      node_in_ptr = node_map_[node_in_id].get();
-      node_out_ptr = node_map_[node_out_id].get();
+      node_in_ptr = node_map_[vtx_in_id].get();
+      node_out_ptr = node_map_[vtx_out_id].get();
       edge_ptr = edge_map_[edge_id].get();
 
       edge_ptr->Backward(node_in_ptr, node_out_ptr);
@@ -165,7 +170,8 @@ void Classifier<T>::Backward(const Eigen::Ref<const MatXX<T>>& training_data, \
 template <class T>
 void Classifier<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
                              const Eigen::Ref<const MatXX<T>>& test_labels) {
-  if (*order_.rbegin() != input_node_id_ || *order_.begin() != output_node_id_) {
+  if (*order_.rbegin() != index_map_[input_node_id_] || \
+      *order_.begin() != index_map_[output_node_id_]) {
     LOG(ERROR) << "Evaluate() in the Classifier is failed.";
     exit(1);
   }
@@ -173,18 +179,18 @@ void Classifier<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
   input_node_ptr_->FeedFeature(test_data);
   for (auto it_r = order_.rbegin(); it_r != order_.rend(); ++it_r) {
     IntellGraph::out_edge_iterator eo{}, eo_end{};
-    size_t node_in_id = *it_r;
-    LOG(INFO) << "Forwarding node: " << node_in_id;
-    if (*it_r != input_node_id_ ) node_map_[*it_r]->CallActFxn();
+    size_t vtx_in_id = *it_r;
+    LOG(INFO) << "Forwarding vertex: " << vtx_in_id;
+    if (*it_r != index_map_[input_node_id_] ) node_map_[*it_r]->CallActFxn();
     for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
-      size_t node_out_id = target(*eo, graph_);
+      size_t vtx_out_id = target(*eo, graph_);
       size_t edge_id = graph_[*eo].id;
 
       IntNode<T> *node_in_ptr, *node_out_ptr;
 
-      node_in_ptr = node_map_[node_in_id].get();
+      node_in_ptr = node_map_[vtx_in_id].get();
 
-      node_out_ptr = node_map_[node_out_id].get();
+      node_out_ptr = node_map_[vtx_out_id].get();
 
       edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
     }

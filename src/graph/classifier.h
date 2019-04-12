@@ -50,6 +50,8 @@ class Classifier : implements Graph<T> {
     output_node_id_ = 0;
     input_node_id_ = 0;
 
+    index_map_.clear();
+
     node_param_map_.clear();
     edge_param_map_.clear();
 
@@ -73,7 +75,10 @@ class Classifier : implements Graph<T> {
 
   MUTE inline MatXX<T>* get_edge_weight_ptr(COPY size_t node_in_id, \
                                             COPY size_t node_out_id) final {
-    auto edge_pair = boost::edge(node_in_id, node_out_id, graph_);
+    VertexD vtx_in = index_map_[node_in_id];
+    VertexD vtx_out = index_map_[node_out_id];
+    
+    auto edge_pair = boost::edge(vtx_in, vtx_out, graph_);
     if (!edge_pair.second) {
       LOG(ERROR) << "Edge connects Nodes: " << node_in_id << " and "
                  << node_out_id << "dose not exist";
@@ -91,7 +96,10 @@ class Classifier : implements Graph<T> {
 
   REF inline const MatXX<T>* get_edge_nabla_ptr(COPY size_t node_in_id, \
                                                 COPY size_t node_out_id) final {
-    auto edge_pair = boost::edge(node_in_id, node_out_id, graph_);
+    VertexD vtx_in = index_map_[node_in_id];
+    VertexD vtx_out = index_map_[node_out_id];
+
+    auto edge_pair = boost::edge(vtx_in, vtx_out, graph_);
     if (!edge_pair.second) {
       LOG(ERROR) << "Edge connects Nodes: " << node_in_id << " and "
                  << node_out_id << "dose not exist";
@@ -108,8 +116,9 @@ class Classifier : implements Graph<T> {
   }
 
   MUTE inline VecX<T>* get_node_bias_ptr(COPY size_t node_id) final {
-    if (node_map_.count(node_id) > 0) {
-      return node_map_[node_id]->get_bias_ptr();
+    VertexD vtx_id = index_map_[node_id];
+    if (node_map_.count(vtx_id) > 0) {
+      return node_map_[vtx_id]->get_bias_ptr();
     } else {
       LOG(ERROR) << "node: " << node_id << "does not exist.";
       return nullptr;
@@ -117,8 +126,9 @@ class Classifier : implements Graph<T> {
   }
 
   REF inline const MatXX<T>* get_node_delta_ptr(COPY size_t node_id) final {
-    if (node_map_.count(node_id) > 0) {
-      return node_map_[node_id]->get_delta_ptr();
+    VertexD vtx_id = index_map_[node_id];
+    if (node_map_.count(vtx_id) > 0) {
+      return node_map_[vtx_id]->get_delta_ptr();
     } else {
       LOG(ERROR) << "node: " << node_id << "does not exist."; 
       return nullptr;
@@ -146,6 +156,8 @@ class Classifier : implements Graph<T> {
  private:
 
   IntellGraph graph_{};
+
+  std::unordered_map<size_t, size_t> index_map_{};
 
   bool instantiated_{false};
 
