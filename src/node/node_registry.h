@@ -16,6 +16,8 @@ Contributor(s):
 #define NICOLE_NODE_NODE_REGISTRY_H_
 
 #include "glog/logging.h"
+#include "node/identity_l2_node.h"
+#include "node/identity_node.h"
 #include "node/node_factory.h"
 #include "node/sigmoid_cross_entropy.h"
 #include "node/sigmoid_l2_node.h"
@@ -33,12 +35,18 @@ class NodeRegistry {
     // Registers SigmoidNode
     LOG(INFO) << "Registering SigmoidNode";
     DEVIMPL_REGISTERIMPL_NODE(SigmoidNode, IntNode);
+    // Registers IdentityNode
+    LOG(INFO) << "Registering IdentityNode";
+    DEVIMPL_REGISTERIMPL_NODE(IdentityNode, IntNode);
     // Registers SigL2Node
     LOG(INFO) << "Registering SigL2Node";
     DEVIMPL_REGISTERIMPL_NODE(SigL2Node, OutputNode);
     // Registers SigCENode
     LOG(INFO) << "Registering SigCENode";
     DEVIMPL_REGISTERIMPL_NODE(SigCENode, OutputNode);
+    // Registers IDL2Node
+    LOG(INFO) << "Registering IDL2Node";
+    DEVIMPL_REGISTERIMPL_NODE(IDL2Node, OutputNode);
   }
   
 };

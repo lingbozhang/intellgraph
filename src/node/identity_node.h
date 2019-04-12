@@ -12,8 +12,8 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_NODE_SIGMOID_NODE_H_
-#define INTELLGRAPH_NODE_SIGMOID_NODE_H_
+#ifndef INTELLGRAPH_NODE_IDENTITY_NODE_H_
+#define INTELLGRAPH_NODE_IDENTITY_NODE_H_
 
 #include <functional>
 #include <memory>
@@ -30,35 +30,28 @@ namespace intellgraph {
  
 // Forward declaration
 template <class T>
-class SigL2Node;
+class IDL2Node;
 
 template <class T>
-class SigCENode;
-
-// SigmoidNode improves performance of CallActFxn and CalcActPrime with Eigen 
-// library and has better performance than ActivationNode. 
-template <class T>
-class SigmoidNode : public IntNode<T> {
+class IdentityNode : public IntNode<T> {
  public:
-  friend class SigL2Node<T>;
+  friend class IDL2Node<T>;
 
-  friend class SigCENode<T>;
+  IdentityNode() noexcept = delete;
 
-  SigmoidNode() noexcept = delete;
-
-  explicit SigmoidNode(REF const NodeParameter& node_param);
+  explicit IdentityNode(REF const NodeParameter& node_param);
 
   // Move constructor
-  SigmoidNode(MOVE SigmoidNode<T>&& rhs) noexcept = default;
+  IdentityNode(MOVE IdentityNode<T>&& rhs) noexcept = default;
 
   // Move operator
-  SigmoidNode& operator=(MOVE SigmoidNode<T>&& rhs) noexcept = default;
+  IdentityNode& operator=(MOVE IdentityNode<T>&& rhs) noexcept = default;
   
   // Copy constructor and operator are explicitly deleted
-  SigmoidNode(REF const SigmoidNode<T>& rhs) = delete;
-  SigmoidNode& operator=(REF const SigmoidNode<T>& rhs) = delete;
+  IdentityNode(REF const IdentityNode<T>& rhs) = delete;
+  IdentityNode& operator=(REF const IdentityNode<T>& rhs) = delete;
 
-  virtual ~SigmoidNode() noexcept = default;
+  virtual ~IdentityNode() noexcept = default;
 
   COPY inline std::vector<size_t> get_dims() const final {
     return node_param_.ref_dims();
@@ -138,13 +131,13 @@ class SigmoidNode : public IntNode<T> {
 
 };
 
-// Alias for unqiue SigmoidNode pointer
+// Alias for unqiue IdentityNode pointer
 template <class T>
-using SigNodeUPtr = std::unique_ptr<SigmoidNode<T>>;
+using IDNodeUPtr = std::unique_ptr<IdentityNode<T>>;
 
 }  // namespace intellgraph
 
-#endif  // INTELLGRAPH_NODE_SIGMOID_NODE_H_
+#endif  // INTELLGRAPH_NODE_IDENTITY_NODE_H_
 
 
 

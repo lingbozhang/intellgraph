@@ -12,8 +12,8 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_LAYER_NODE_PARAMETER_H_
-#define INTELLGRAPH_LAYER_NODE_PARAMETER_H_
+#ifndef INTELLGRAPH_NODE_NODE_PARAMETER_H_
+#define INTELLGRAPH_NODE_NODE_PARAMETER_H_
 
 #include <string>
 #include <vector>
@@ -164,4 +164,4 @@ class NodeParameter {
 
 }  // namespace intellgraph
 
-#endif  // INTELLGRAPH_LAYER_NODE_PARAMETER_H_
+#endif  // INTELLGRAPH_NODE_NODE_PARAMETER_H_
