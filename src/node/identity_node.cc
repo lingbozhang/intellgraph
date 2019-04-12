@@ -140,23 +140,10 @@ void IdentityNode<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& labels) {
       << "CalcLoss() for IdentityNode is failed: "
       << "activation and data matrix dimensions are not equal!";
 
-  double accuracy = 0.0;
-  size_t correct_guess = 0;
-
-  if (activation_.rows() == 1) {
-    correct_guess = (activation_.array().round() == \
-        labels.array()).count();
-  } else {
-    for (size_t i = 0; i < labels.cols(); ++i) {
-      size_t index_guess;
-      activation_.col(i).maxCoeff(&index_guess);
-      if (index_guess == labels(0, i)) {
-        correct_guess++;
-      }
-    }
-  }
-  accuracy = correct_guess * 100.0 / labels.cols();
-  std::cout << "Accuracy: " << accuracy << "%" << std::endl;
+  T loss = (get_activation_ptr()->array() - labels.array()). \
+            matrix().norm();
+  T avg_norm = loss / labels.cols();
+  std::cout << "Average l2 norm: " << avg_norm << "%" << std::endl;
 }
 
 // Instantiate class, otherwise compilation will fail
