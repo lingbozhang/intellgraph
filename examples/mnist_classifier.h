@@ -90,7 +90,7 @@ class Example2 {
     auto node_param2 = NodeParameter(1, "SigmoidNode", {100});
     // SigL2Node uses Sigmoid function as activation function and the cross \
     // entropy function as loss function.
-    auto node_param3 = NodeParameter(4, "SoftmaxLogNode", {10});
+    auto node_param3 = NodeParameter(4, "SigCENode", {10});
 
     // IntellGraph implements Boost Graph library and stores node and edge
     // information in the adjacency list.
@@ -107,9 +107,10 @@ class Example2 {
 
     classifier.Instantiate();
 
-    float eta = 3.0;
-    int loops = 30;
-    int minbatch_size = 100;
+    float eta = 0.5;
+    int loops = 100;
+    int minbatch_size = 10;
+    float lambda = 5.0;
     std::cout << "Learning rate: " << eta << std::endl;
     std::cout << "Total epochs: " << loops << std::endl;
     std::cout << "Min-batch size: " << minbatch_size << std::endl;
@@ -130,14 +131,21 @@ class Example2 {
       for (int i = 0; i < nbr_training_data - minbatch_size; i += minbatch_size) {
         classifier.Backward(training_images.block(0, i, 784, minbatch_size), \
                             training_labels.block(0, i, 10, minbatch_size));
-        // Stochastic gradient decent
-        classifier.get_edge_weight_ptr(1, 4)->array() -= \
+        // Stochastic gradient decent + L2 regularization
+        classifier.get_edge_weight_ptr(1, 4)->array() = \
+            (1.0 - eta * lambda / nbr_training_data) * \
+            classifier.get_edge_weight_ptr(1, 4)->array() - \
             eta * classifier.get_edge_nabla_ptr(1, 4)->array();
-        classifier.get_edge_weight_ptr(0, 1)->array() -= \
+        
+        classifier.get_edge_weight_ptr(0, 1)->array() = \
+            (1.0 - eta * lambda / nbr_training_data) * \
+            classifier.get_edge_weight_ptr(0, 1)->array() - \
             eta * classifier.get_edge_nabla_ptr(0, 1)->array();
-        classifier.get_node_bias_ptr(4)->array() -= eta / minbatch_size *\
+        
+        classifier.get_node_bias_ptr(4)->array() -= eta / minbatch_size * \
             classifier.get_node_delta_ptr(4)->rowwise().sum().array();
-        classifier.get_node_bias_ptr(1)->array() -= eta / minbatch_size *\
+        
+        classifier.get_node_bias_ptr(1)->array() -= eta / minbatch_size * \
             classifier.get_node_delta_ptr(1)->rowwise().sum().array();
       }
       classifier.Evaluate(test_images, test_labels);

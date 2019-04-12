@@ -112,12 +112,26 @@ class SigmoidNode : public IntNode<T> {
     Transition(kFeed);
   }
 
- protected:
-  // Transitions from kAct state to kPrime state and updates current_act_state_
-  void ActToPrime() final;
+  inline void TurnDropoutOn(T dropout_p) final {
+    dropout_on_ = true;
+    CHECK_GT(dropout_p, 1.0) << "TurnDropoutOn() for SigmoidNode is failed.";
+    dropout_p_ = dropout_p;
+  }
 
-  // Transitions from kInit state to kAct state and updates current_act_state_
+  inline void TurnDropoutOff() final {
+    dropout_on_ = false;
+    dropout_p_ = 1.0;
+  }
+
+ protected:
+  // Transitions from kInit to kAct and updates current_act_state_
   void InitToAct() final;
+
+  // Transitions from kAct state to kDropout state and updates current_act_state_
+  void ActToDropout() final;
+
+  // Transitions from kDropout state to kPrime and updates current_act_state_
+  void DropoutToPrime() final;
 
   // Transitions from current_act_state_ to state
   bool Transition(ActStates state) final;
@@ -135,6 +149,11 @@ class SigmoidNode : public IntNode<T> {
 
   // Stores current state of activation vector
   ActStates current_act_state_{kInit};
+
+  // A dropout flag
+  bool dropout_on_{false};
+
+  T dropout_p_{1.0};
 
 };
 

@@ -48,19 +48,19 @@ interface Graph {
   virtual void Reset() = 0;
 
   virtual void Forward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
-                       REF const Eigen::Ref<const MatXX<T>>& training_labels) = 0;
+      REF const Eigen::Ref<const MatXX<T>>& training_labels) = 0;
 
   virtual void Backward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
-                        REF const Eigen::Ref<const MatXX<T>>& training_labels) = 0;
+      REF const Eigen::Ref<const MatXX<T>>& training_labels) = 0;
 
   virtual void Evaluate(REF const Eigen::Ref<const MatXX<T>>& test_data, \
-                        REF const Eigen::Ref<const MatXX<T>>& test_labels) = 0;
+      REF const Eigen::Ref<const MatXX<T>>& test_labels) = 0;
 
   MUTE virtual inline MatXX<T>* get_edge_weight_ptr(COPY size_t node_in_id, \
-                                                    COPY size_t node_out_id) = 0;
+      COPY size_t node_out_id) = 0;
 
   REF virtual inline const MatXX<T>* get_edge_nabla_ptr(COPY size_t node_in_id, \
-                                                        COPY size_t node_out_id) = 0;
+      COPY size_t node_out_id) = 0;
 
   MUTE virtual inline VecX<T>* get_node_bias_ptr(COPY size_t node_id) = 0;
 

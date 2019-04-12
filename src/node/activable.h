@@ -20,15 +20,17 @@ Contributor(s):
 
 namespace intellgraph {
 
-// Activation vector has three states and are used to determine behaviors of
+// Activation matrix has three states and are used to determine behaviors of
 // node methods.
 enum ActStates {
-  // Activation vector is initialized or overwritten with weighted_sum
+  // Activation maxtix is initialized or overwritten with weighted_sum
   kInit = 0,
-  // CallActFxn() is invoked and activation vector is overwritten with
+  // CallActFxn() is invoked and activation matrix is overwritten with
   // activation values.
   kAct = 1,
-  // CalcPrime() is invoked and activation vector is overwritten with prime
+  // Dropout is applied on the activation matrix.
+  kDropout = 2,
+  // CalcPrime() is invoked and activation matrix is overwritten with prime
   // values.
   kPrime = 3,
   // Indicates current node is an input node.
@@ -47,12 +49,21 @@ interface activable {
   virtual void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels) = 0;
 
   virtual inline bool ResetActState() = 0;
+
+  virtual inline void TurnDropoutOn(T dropout_p) = 0;
+
+  virtual inline void TurnDropoutOff() = 0;
  
  protected:
-  // Transitions from kAct state to kPrime state and updates current_act_state_
-  virtual void ActToPrime() = 0;
-  // Transitions from kInit state to kAct state and updates current_act_state_
+  // Transitions from kInit to kAct and updates current_act_state_
   virtual void InitToAct() = 0;
+
+  // Transitions from kAct state to kDropout state and updates current_act_state_
+  virtual void ActToDropout() = 0;
+
+  // Transitions from kDropout state to kPrime and updates current_act_state_
+  virtual void DropoutToPrime() = 0;
+  
   // Transitions from current_act_state_ to state
   virtual bool Transition(ActStates state) = 0;
 

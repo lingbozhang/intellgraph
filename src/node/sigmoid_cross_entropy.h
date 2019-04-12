@@ -109,19 +109,32 @@ class SigCENode : public OutputNode<T> {
     sigmoid_node_ptr_->FeedFeature(feature);
   }
 
+  inline void TurnDropoutOn(T dropout_p) final {
+    sigmoid_node_ptr_->TurnDropoutOn(dropout_p);
+  }
+
+  inline void TurnDropoutOff() final {
+    sigmoid_node_ptr_->TurnDropoutOff();
+  }
+
   COPY T CalcLoss(REF const Eigen::Ref<const MatXX<T>>& labels) final;
 
   bool CalcDelta(REF const Eigen::Ref<const MatXX<T>>& labels) final;
   
  protected:
-  // Transitions from kAct state to kPrime state and updates current_act_state_
-  void ActToPrime() final {
-    sigmoid_node_ptr_->ActToPrime();
-  }
-
-  // Transitions from kInit state to kAct state and updates current_act_state_
+  // Transitions from kInit to kAct and updates current_act_state_
   void InitToAct() final {
     sigmoid_node_ptr_->InitToAct();
+  }
+
+  // Transitions from kAct state to kDropout state and updates current_act_state_
+  void ActToDropout() final {
+    sigmoid_node_ptr_->ActToDropout();
+  }
+
+  // Transitions from kDropout state to kPrime and updates current_act_state_
+  void DropoutToPrime() final {
+    sigmoid_node_ptr_->DropoutToPrime();
   }
 
   // Transitions from current_act_state_ to state

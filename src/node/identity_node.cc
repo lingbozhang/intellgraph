@@ -50,9 +50,7 @@ void IdentityNode<T>::InitializeBias(const std::function<T(T)>& functor) {
   Transition(kInit);
 }
 
-// Transitions from kInit state to kAct state. In order to avoid overflow of 
-// exp() function, Identity function is calculated based on the sign of 
-// activation vector entry, as shown in the implementation below.
+// Transitions from kInit state to kAct state.
 template <class T>
 void IdentityNode<T>::InitToAct() {
   // Identity activation function:
@@ -60,10 +58,17 @@ void IdentityNode<T>::InitToAct() {
 }
 
 template <class T>
-void IdentityNode<T>::ActToPrime() {
+void IdentityNode<T>::ActToDropout() {
+  activation_.array().unaryExpr(std::function<T(T)>( \
+      BernoulliFunctor<T>(dropout_p_)));
+  current_act_state_ = kDropout;
+}
+
+template <class T>
+void IdentityNode<T>::DropoutToPrime() {
   // Derivative equation:
   activation_.array() = 1.0;
-  current_act_state_ = kPrime;
+  current_act_state_ = kPrime;;
 }
 
 template <class T>
@@ -93,13 +98,20 @@ bool IdentityNode<T>::Transition(ActStates state) {
   }
 
   while (current_act_state_ < state) {
+    if (!dropout_on_ && current_act_state_ == kAct) {
+      current_act_state_ = kDropout;
+    }
     switch (current_act_state_) {
       case kInit: {
         InitToAct();
         break;
       }
       case kAct: {
-        ActToPrime();
+        ActToDropout();
+        break;
+      }
+      case kDropout: {
+        DropoutToPrime();
         break;
       }
       default: {

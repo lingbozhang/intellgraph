@@ -72,7 +72,14 @@ void SigmoidNode<T>::InitToAct() {
 }
 
 template <class T>
-void SigmoidNode<T>::ActToPrime() {
+void SigmoidNode<T>::ActToDropout() {
+  activation_.array().unaryExpr(std::function<T(T)>( \
+      BernoulliFunctor<T>(dropout_p_)));
+  current_act_state_ = kDropout;
+}
+
+template <class T>
+void SigmoidNode<T>::DropoutToPrime() {
   // Derivative equation:
   // $df/dz=f(z)(1-f(z))$
   activation_.array() *= (1.0 - activation_.array());
@@ -87,8 +94,8 @@ bool SigmoidNode<T>::Transition(ActStates state) {
   }
 
   // Nothing happens if current node is an input node.
-  // Note, an internal node permanently changes to an input node
-  // when Transition(kFeed) is called
+  // Note, an internal node changes to an input node permanently when 
+  // Transition(kFeed) is called
   if (current_act_state_ == kFeed) {
     return true;
   }
@@ -106,13 +113,20 @@ bool SigmoidNode<T>::Transition(ActStates state) {
   }
 
   while (current_act_state_ < state) {
+    if (!dropout_on_ && current_act_state_ == kAct) {
+      current_act_state_ = kDropout;
+    } 
     switch (current_act_state_) {
       case kInit: {
         InitToAct();
         break;
       }
       case kAct: {
-        ActToPrime();
+        ActToDropout();
+        break;
+      }
+      case kDropout: {
+        DropoutToPrime();
         break;
       }
       default: {

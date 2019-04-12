@@ -31,6 +31,7 @@ class NormalFunctor {
     gen = std::mt19937(rd());
     nd_ = std::normal_distribution<T>(mean, standard_deviation);
   }
+
   // Operator takes dummy argument and returns normal distribution result.
   inline T operator()(const T dummy) {
     return nd_(gen);
@@ -50,6 +51,7 @@ class UniformFunctor {
     gen = std::mt19937(rd());
     dis_ = std::uniform_real_distribution<>(a,b);
   }
+
   inline T operator()(const T dummy) {
     return dis_(gen);
   }
@@ -58,6 +60,25 @@ class UniformFunctor {
   T a_{0};
   T b_{0};
   std::uniform_real_distribution<> dis_{};
+
+};
+
+template <class T>
+class BernoulliFunctor {
+ public:
+  explicit BernoulliFunctor(T a) noexcept : a_(a) {
+    gen = std::mt19937(rd());
+    dis_ = std::bernoulli_distribution(a);
+  }
+
+  inline T operator()(const T input) {
+    if (dis_(gen)) return input;
+    return 0.0;
+  }
+
+ private:
+  T a_{0};
+  std::bernoulli_distribution dis_{};
 
 };
 

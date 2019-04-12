@@ -60,8 +60,14 @@ void SoftmaxLogNode<T>::InitToAct() {
 }
 
 template <class T>
-void SoftmaxLogNode<T>::ActToPrime() {
-  LOG(ERROR) << "ActToPrime() for SoftmaxLogNode is node defined";
+void SoftmaxLogNode<T>::ActToDropout() {
+  LOG(ERROR) << "ActToDropout() for SoftmaxLogNode is node defined";
+  exit(1);
+}
+
+template <class T>
+void SoftmaxLogNode<T>::DropoutToPrime() {
+  LOG(ERROR) << "DropoutToPrime() for SoftmaxLogNode is node defined";
   exit(1);
 }
 
@@ -92,13 +98,20 @@ bool SoftmaxLogNode<T>::Transition(ActStates state) {
   }
 
   while (current_act_state_ < state) {
+    if (!dropout_on_ && current_act_state_ == kAct) {
+      current_act_state_ = kDropout;
+    }
     switch (current_act_state_) {
       case kInit: {
         InitToAct();
         break;
       }
       case kAct: {
-        ActToPrime();
+        ActToDropout();
+        break;
+      }
+      case kDropout: {
+        DropoutToPrime();
         break;
       }
       default: {
@@ -143,8 +156,8 @@ void SoftmaxLogNode<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& labels) {
   size_t correct_guess = 0;
 
   if (activation_.rows() == 1) {
-    correct_guess = (activation_.array().round() == \
-        labels.array()).count();
+    LOG(ERROR) << "Evaluate() for SoftmaxLogNode is failed";
+    exit(1);
   } else {
     for (size_t i = 0; i < labels.cols(); ++i) {
       size_t index_guess;
