@@ -14,6 +14,8 @@ Contributor(s):
 ==============================================================================*/
 // Contains node headers
 
+#include "node/identity_l2_node.h"
+#include "node/identity_node.h"
 #include "node/internal_node.h"
 #include "node/node_factory.h"
 #include "node/node_parameter.h"
@@ -23,3 +25,4 @@ Contributor(s):
 #include "node/sigmoid_cross_entropy.h"
 #include "node/sigmoid_l2_node.h"
 #include "node/sigmoid_node.h"
+#include "node/softmax_log_node.h"

@@ -90,7 +90,7 @@ class Example2 {
     auto node_param2 = NodeParameter(1, "SigmoidNode", {100});
     // SigL2Node uses Sigmoid function as activation function and the cross \
     // entropy function as loss function.
-    auto node_param3 = NodeParameter(4, "SigCENode", {10});
+    auto node_param3 = NodeParameter(4, "SoftmaxLogNode", {10});
 
     // IntellGraph implements Boost Graph library and stores node and edge
     // information in the adjacency list.

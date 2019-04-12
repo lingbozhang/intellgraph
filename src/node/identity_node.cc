@@ -143,7 +143,7 @@ void IdentityNode<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& labels) {
   T loss = (get_activation_ptr()->array() - labels.array()). \
             matrix().norm();
   T avg_norm = loss / labels.cols();
-  std::cout << "Average l2 norm: " << avg_norm << "%" << std::endl;
+  std::cout << "Average l2 norm: " << avg_norm << std::endl;
 }
 
 // Instantiate class, otherwise compilation will fail

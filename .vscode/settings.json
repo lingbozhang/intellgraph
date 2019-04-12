@@ -91,7 +91,8 @@
 		"*.ipp": "cpp",
 		"hash_map": "cpp",
 		"hash_set": "cpp",
-		"rope": "cpp"
+		"rope": "cpp",
+		"hashtable": "cpp"
 	},
     "files.exclude": {
         "**/.classpath": true,

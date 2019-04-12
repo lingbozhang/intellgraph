@@ -22,6 +22,7 @@ Contributor(s):
 #include "node/sigmoid_cross_entropy.h"
 #include "node/sigmoid_l2_node.h"
 #include "node/sigmoid_node.h"
+#include "node/softmax_log_node.h"
 
 namespace intellgraph {
 
@@ -47,6 +48,9 @@ class NodeRegistry {
     // Registers IDL2Node
     LOG(INFO) << "Registering IDL2Node";
     DEVIMPL_REGISTERIMPL_NODE(IDL2Node, OutputNode);
+    // Registers SoftmaxLogNode
+    LOG(INFO) << "Registering SoftmaxLogNode";
+    DEVIMPL_REGISTERIMPL_NODE(SoftmaxLogNode, OutputNode);
   }
   
 };
