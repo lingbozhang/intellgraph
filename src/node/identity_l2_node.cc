@@ -20,39 +20,29 @@ template <class T>
 T IDL2Node<T>::CalcLoss(const Eigen::Ref<const MatXX<T>>& labels) {
   T loss = 0;
   size_t batch_size = labels.cols();
-  if (!Transition(kAct)) {
-    LOG(ERROR) << "CalcLoss() for IDL2Node is failed.";
-    return -1.0;
-  }
-  CHECK_EQ(get_activation_ptr()->size(), labels.size())
+
+  CHECK_EQ(this->get_activation_ptr()->size(), labels.size())
       << "CalcLoss() for IDL2Node is failed: "
       << "activation and data matrix dimensions are not equal!";
 
-  loss = (get_activation_ptr()->array() - labels.array()). \
+  loss = (this->get_activation_ptr()->array() - labels.array()). \
           matrix().squaredNorm();
   return loss / 2.0 / batch_size;
 }
 
 template <class T>
 bool IDL2Node<T>::CalcDelta(const Eigen::Ref<const MatXX<T>>& labels) {
-  if (!Transition(kAct)) {
-    LOG(ERROR) << "CalcDelta() for IDL2Node is failed.";
-    return false;
-  }
-
-  CHECK_EQ(get_activation_ptr()->size(), labels.size())
+  LOG(INFO) << "IDL2Node calculates delta";
+  CHECK_EQ(this->get_activation_ptr()->size(), labels.size())
       << "CalcDelta() for IDL2Node is failed: "
       << "activation and data matrix dimensions are not equal!";
 
-  get_delta_ptr()->array() = (get_activation_ptr()->array() \
+  this->get_delta_ptr()->array() = (this->get_activation_ptr()->array() \
       - labels.array());
-  
-  if (!Transition(kPrime)) {
-    LOG(ERROR) << "CalcDelta() for IDL2Node is failed.";
-    return false;
-  }
 
-  get_delta_ptr()->array() *= get_activation_ptr()->array();
+  this->ToPrime();
+
+  this->get_delta_ptr()->array() *= this->get_activation_ptr()->array();
   return true;
 }
 

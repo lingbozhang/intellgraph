@@ -15,10 +15,11 @@ Contributor(s):
 #ifndef INTELLGRAPH_NODE_OUTPUT_NODE_H_
 #define INTELLGRAPH_NODE_OUTPUT_NODE_H_
 
+#include <functional>
 #include <memory>
+#include <vector>
 
-#include "node/evaluable.h"
-#include "node/internal_node.h"
+#include "node/node.h"
 #include "node/node_parameter.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
@@ -26,9 +27,28 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-class OutputNode : public IntNode<T>, implements evaluable<T> {
+class OutputNode : public Node<T> {
  public:
+  OutputNode() noexcept {}
+
+  explicit OutputNode(REF const NodeParameter& node_param)
+      : Node<T>(node_param) {}
+
+  // Move constructor
+  OutputNode(MOVE OutputNode<T>&& rhs) = default;
+
+  // Move operator
+  OutputNode& operator=(MOVE OutputNode<T>&& rhs) = default;
+
+  // Copy constructor and operator are explicitly deleted
+  OutputNode(REF const OutputNode<T>& rhs) = delete;
+  OutputNode& operator=(REF const OutputNode<T>& rhs) = delete;
+
   virtual ~OutputNode() noexcept = default;
+
+  COPY virtual T CalcLoss(REF const Eigen::Ref<const MatXX<T>>& labels) = 0;
+
+  virtual bool CalcDelta(REF const Eigen::Ref<const MatXX<T>>& labels) = 0;
 
 };
 

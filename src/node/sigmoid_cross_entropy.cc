@@ -20,32 +20,25 @@ template <class T>
 T SigCENode<T>::CalcLoss(const Eigen::Ref<const MatXX<T>>& labels) {
   T loss = 0;
   size_t batch_size = labels.cols();
-  if (!Transition(kAct)) {
-    LOG(ERROR) << "CalcLoss() for SigCENode is failed.";
-    return -1.0;
-  }
-  CHECK_EQ(get_activation_ptr()->size(), labels.size())
+
+  CHECK_EQ(this->get_activation_ptr()->size(), labels.size())
       << "CalcLoss() for SigCENode is failed: "
       << "activation and data matrix dimensions are not equal!";
 
-  loss = (labels.array() * get_activation_ptr()->array().log() + \
+  loss = (labels.array() * this->get_activation_ptr()->array().log() + \
          (1.0 - labels.array()) * \
-         (1.0 - get_activation_ptr()->array()).log()).sum();
+         (1.0 - this->get_activation_ptr()->array()).log()).sum();
   return -loss / batch_size;
 }
 
 template <class T>
 bool SigCENode<T>::CalcDelta(const Eigen::Ref<const MatXX<T>>& labels) {
-  if (!Transition(kAct)) {
-    LOG(ERROR) << "CalcDelta() for SigCENode is failed.";
-    return false;
-  }
-
-  CHECK_EQ(get_activation_ptr()->size(), labels.size())
+  LOG(INFO) << "SigCENode calculates delta";
+  CHECK_EQ(this->get_activation_ptr()->size(), labels.size())
       << "CalcDelta() for SigCENode is failed: "
       << "activation and data matrix dimensions are not equal!";
 
-  get_delta_ptr()->array() = (get_activation_ptr()->array() \
+  this->get_delta_ptr()->array() = (this->get_activation_ptr()->array() \
       - labels.array());
   return true;
 }

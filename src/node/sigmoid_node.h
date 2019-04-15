@@ -17,10 +17,9 @@ Contributor(s):
 
 #include <functional>
 #include <memory>
-#include <vector>
 
 #include "glog/logging.h"
-#include "node/internal_node.h"
+#include "node/node.h"
 #include "node/node_parameter.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
@@ -38,122 +37,35 @@ class SigCENode;
 // SigmoidNode improves performance of CallActFxn and CalcActPrime with Eigen 
 // library and has better performance than ActivationNode. 
 template <class T>
-class SigmoidNode : public IntNode<T> {
+class SigmoidNode : public Node<T> {
  public:
   friend class SigL2Node<T>;
 
   friend class SigCENode<T>;
 
-  SigmoidNode() noexcept = delete;
+  SigmoidNode() = delete;
 
-  explicit SigmoidNode(REF const NodeParameter& node_param);
+  explicit SigmoidNode(REF const NodeParameter& node_param)
+      : Node<T>(node_param) {}
 
   // Move constructor
-  SigmoidNode(MOVE SigmoidNode<T>&& rhs) noexcept = default;
+  SigmoidNode(MOVE SigmoidNode<T>&& rhs) = default;
 
   // Move operator
-  SigmoidNode& operator=(MOVE SigmoidNode<T>&& rhs) noexcept = default;
+  SigmoidNode& operator=(MOVE SigmoidNode<T>&& rhs) = default;
   
   // Copy constructor and operator are explicitly deleted
   SigmoidNode(REF const SigmoidNode<T>& rhs) = delete;
   SigmoidNode& operator=(REF const SigmoidNode<T>& rhs) = delete;
 
-  virtual ~SigmoidNode() noexcept = default;
-
-  COPY inline std::vector<size_t> get_dims() const final {
-    return node_param_.ref_dims();
-  }
-
-  REF inline const std::vector<size_t>& ref_dims() const final {
-    return node_param_.ref_dims();
-  }
-
-  // Accessable operations for the activation matrix
-  MUTE inline MatXX<T>* get_activation_ptr() final {
-    return &activation_;
-  }
-
-  // Accessable operations for the bias vector
-  MUTE inline VecX<T>* get_bias_ptr() const final {
-    return bias_ptr_.get();
-  }
-
-  // Accessable operations for the delta matrix
-  MUTE inline MatXX<T>* get_delta_ptr() final {
-    return &delta_;
-  }
-
-  // Accessable operations for the node parameter
-  REF inline const NodeParameter& ref_node_param() const final {
-    return node_param_;
-  }
-
-  inline void set_activation(COPY T value) final {
-    activation_.array() = value;
-    Transition(kInit);
-  }
-
-  void InitializeBias(REF const std::function<T(T)>& functor) final;
-
-  void PrintBias() const final;
-
-  bool CallActFxn() final;
-
-  bool CalcActPrime() final;
+  ~SigmoidNode() noexcept final = default;
 
   void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels) final;
 
-  inline bool ResetActState() final {
-    return Transition(kInit);
-  }
-
-  void FeedFeature(REF const Eigen::Ref<const MatXX<T>>& feature) final {
-    activation_ = feature;
-    Transition(kFeed);
-  }
-
-  inline void TurnDropoutOn(T dropout_p) final {
-    dropout_on_ = true;
-    CHECK_GT(dropout_p, 1.0) << "TurnDropoutOn() for SigmoidNode is failed.";
-    dropout_p_ = dropout_p;
-  }
-
-  inline void TurnDropoutOff() final {
-    dropout_on_ = false;
-    dropout_p_ = 1.0;
-  }
-
  protected:
-  // Transitions from kInit to kAct and updates current_act_state_
-  void InitToAct() final;
+  void Activate() final;
 
-  // Transitions from kAct state to kDropout state and updates current_act_state_
-  void ActToDropout() final;
-
-  // Transitions from kDropout state to kPrime and updates current_act_state_
-  void DropoutToPrime() final;
-
-  // Transitions from current_act_state_ to state
-  bool Transition(ActStates state) final;
-
- private:
-  NodeParameter node_param_{};
-
-  MatXX<T> activation_{};
-
-  // Delta vector stores the derivative of loss function of
-  // weighted_sum variables
-  MatXX<T> delta_{};
-
-  VecXUPtr<T> bias_ptr_{nullptr};
-
-  // Stores current state of activation vector
-  ActStates current_act_state_{kInit};
-
-  // A dropout flag
-  bool dropout_on_{false};
-
-  T dropout_p_{1.0};
+  void Prime() final;
 
 };
 

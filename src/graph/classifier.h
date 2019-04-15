@@ -168,9 +168,9 @@ class Classifier : implements Graph<T> {
   std::unordered_map<size_t, EdgeParameter> edge_param_map_{};
 
   OutputNode<T>* output_node_ptr_{nullptr};
-  IntNode<T>* input_node_ptr_{nullptr};
+  Node<T>* input_node_ptr_{nullptr};
 
-  std::unordered_map<size_t, IntNodeUPtr<T>> node_map_{};
+  std::unordered_map<size_t, NodeUPtr<T>> node_map_{};
   std::unordered_map<size_t, EdgeUPtr<T>> edge_map_{};
 
   // Topological sorting result

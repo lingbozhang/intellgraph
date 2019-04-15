@@ -32,13 +32,14 @@ class SoftmaxLogNode : public OutputNode<T> {
  public:
   SoftmaxLogNode() noexcept = delete;
 
-  explicit SoftmaxLogNode(REF const NodeParameter& node_param);
+  explicit SoftmaxLogNode(REF const NodeParameter& node_param)
+      : OutputNode<T>(node_param) {}
 
   // Move constructor
-  SoftmaxLogNode(MOVE SoftmaxLogNode<T>&& rhs) noexcept = default;
+  SoftmaxLogNode(MOVE SoftmaxLogNode<T>&& rhs) = default;
 
   // Move operator
-  SoftmaxLogNode& operator=(MOVE SoftmaxLogNode<T>&& rhs) noexcept = default;
+  SoftmaxLogNode& operator=(MOVE SoftmaxLogNode<T>&& rhs) = default;
 
   // Copy constructor and operator are explicitly deleted
   SoftmaxLogNode(REF const SoftmaxLogNode<T>& rhs) = delete;
@@ -46,101 +47,16 @@ class SoftmaxLogNode : public OutputNode<T> {
 
   ~SoftmaxLogNode() noexcept final = default;
 
-  COPY inline std::vector<size_t> get_dims() const final {
-    return node_param_.ref_dims();
-  }
-
-  REF inline const std::vector<size_t>& ref_dims() const final {
-    return node_param_.ref_dims();
-  }
-
-  // Accessable operations for the activation matrix
-  MUTE inline MatXX<T>* get_activation_ptr() final {
-    return &activation_;
-  }
-
-  // Accessable operations for the bias vector
-  MUTE inline VecX<T>* get_bias_ptr() const final {
-    return bias_ptr_.get();
-  }
-  // Accessable operations for the delta matrix
-  MUTE inline MatXX<T>* get_delta_ptr() final {
-    return &delta_;
-  }
-  // Accessable operations for the node parameter
-  REF inline const NodeParameter& ref_node_param() const final {
-    return node_param_;
-  }
-
-  inline void set_activation(COPY T value) final {
-    activation_.array() = value;
-  }
-
-  void InitializeBias(REF const std::function<T(T)>& functor) final;
-
-  void PrintBias() const final;
-
-  bool CallActFxn() final;
-
-  bool CalcActPrime() final;
-
-  void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels);
-
-  inline bool ResetActState() final {
-    return Transition(kInit);
-  }
-
-  void FeedFeature(REF const Eigen::Ref<const MatXX<T>>& feature) final {
-    activation_ = feature;
-    Transition(kFeed);
-  }
-
-  inline void TurnDropoutOn(T dropout_p) final {
-    dropout_on_ = true;
-    CHECK_GT(dropout_p, 1.0) << "TurnDropoutOn() for SoftmaxLogNode is failed.";
-    dropout_p_ = dropout_p;
-  }
-
-  inline void TurnDropoutOff() final {
-    dropout_on_ = false;
-    dropout_p_ = 1.0;
-  }
+  void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels) final;
 
   COPY T CalcLoss(REF const Eigen::Ref<const MatXX<T>>& labels) final;
 
   bool CalcDelta(REF const Eigen::Ref<const MatXX<T>>& labels) final;
-  
+
  protected:
-  // Transitions from kInit to kAct and updates current_act_state_
-  void InitToAct() final;
+  void Activate() final;
 
-  // Transitions from kAct state to kDropout state and updates current_act_state_
-  void ActToDropout() final;
-
-  // Transitions from kDropout state to kPrime and updates current_act_state_
-  void DropoutToPrime() final;
-
-  // Transitions from current_act_state_ to state
-  bool Transition(ActStates state) final;
-
- private:
-  NodeParameter node_param_{};
-
-  MatXX<T> activation_{};
-
-  // Delta vector stores the derivative of loss function of
-  // weighted_sum variables
-  MatXX<T> delta_{};
-
-  VecXUPtr<T> bias_ptr_{nullptr};
-
-  // Stores current state of activation vector
-  ActStates current_act_state_{kInit};
-
-  // A dropout flag
-  bool dropout_on_{false};
-
-  T dropout_p_{1.0};
+  void Prime() final;
 
 };
 

@@ -33,14 +33,14 @@ class IDL2Node : public OutputNode<T> {
   IDL2Node() noexcept = delete;
 
   explicit IDL2Node(REF const NodeParameter& node_param) {
-    identity_node_ptr_ = std::make_unique<IdentityNode<T>>(node_param);
+    node_ptr_ = std::make_unique<IdentityNode<T>>(node_param);
   }
 
   // Move constructor
-  IDL2Node(MOVE IDL2Node<T>&& rhs) noexcept = default;
+  IDL2Node(MOVE IDL2Node<T>&& rhs) = default;
 
   // Move operator
-  IDL2Node& operator=(MOVE IDL2Node<T>&& rhs) noexcept = default;
+  IDL2Node& operator=(MOVE IDL2Node<T>&& rhs) = default;
 
   // Copy constructor and operator are explicitly deleted
   IDL2Node(REF const IDL2Node<T>& rhs) = delete;
@@ -48,99 +48,106 @@ class IDL2Node : public OutputNode<T> {
 
   ~IDL2Node() noexcept final = default;
 
+  COPY T CalcLoss(REF const Eigen::Ref<const MatXX<T>>& labels) final;
+
+  bool CalcDelta(REF const Eigen::Ref<const MatXX<T>>& labels) final;
+
+  REF inline const size_t ref_node_id() const final {
+    return node_ptr_->ref_node_id();
+  }
+
   COPY inline std::vector<size_t> get_dims() const final {
-    return identity_node_ptr_->get_dims();
+    return node_ptr_->get_dims();
   }
 
   REF inline const std::vector<size_t>& ref_dims() const final {
-    return identity_node_ptr_->ref_dims();
+    return node_ptr_->ref_dims();
   }
 
   // Accessable operations for the activation matrix
   MUTE inline MatXX<T>* get_activation_ptr() final {
-    return identity_node_ptr_->get_activation_ptr();
+    return node_ptr_->get_activation_ptr();
   }
 
   // Accessable operations for the bias vector
   MUTE inline VecX<T>* get_bias_ptr() const final {
-    return identity_node_ptr_->get_bias_ptr();
+    return node_ptr_->get_bias_ptr();
   }
+
   // Accessable operations for the delta matrix
   MUTE inline MatXX<T>* get_delta_ptr() final {
-    return identity_node_ptr_->get_delta_ptr();
+    return node_ptr_->get_delta_ptr();
   }
+
   // Accessable operations for the node parameter
   REF inline const NodeParameter& ref_node_param() const final {
-    return identity_node_ptr_->ref_node_param();
+    return node_ptr_->ref_node_param();
   }
 
-  inline void set_activation(COPY T value) final {
-    identity_node_ptr_->set_activation(value);
+  COPY inline const bool ref_dropout_on() const final {
+    return node_ptr_->ref_dropout_on();
   }
 
-  void InitializeBias(REF const std::function<T(T)>& functor) final {
-    identity_node_ptr_->InitializeBias(functor);
+  inline void InitializeBias(REF const std::function<T(T)>& functor) final {
+    node_ptr_->InitializeBias(functor);
   }
 
-  void PrintBias() const final {
-    identity_node_ptr_->PrintBias();
-  }
-
-  bool CallActFxn() final {
-    return identity_node_ptr_->CallActFxn();
-  }
-
-  bool CalcActPrime() final {
-    return identity_node_ptr_->CalcActPrime();
-  }
-
-  void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels) {
-    identity_node_ptr_->Evaluate(labels);
-  }
-
-  inline bool ResetActState() final {
-    return identity_node_ptr_->ResetActState();
-  }
-
-  void FeedFeature(REF const Eigen::Ref<const MatXX<T>>& feature) final {
-    identity_node_ptr_->FeedFeature(feature);
+  inline void PrintBias() const final {
+    node_ptr_->PrintBias();
   }
 
   inline void TurnDropoutOn(T dropout_p) final {
-    identity_node_ptr_->TurnDropoutOn(dropout_p);
+    node_ptr_->TurnDropoutOn(dropout_p);
   }
 
   inline void TurnDropoutOff() final {
-    identity_node_ptr_->TurnDropoutOff();
+    node_ptr_->TurnDropoutOff();
   }
 
-  COPY T CalcLoss(REF const Eigen::Ref<const MatXX<T>>& labels) final;
+  inline void ToInit() final {
+    node_ptr_->ToInit();
+  }
 
-  bool CalcDelta(REF const Eigen::Ref<const MatXX<T>>& labels) final;
-  
+  inline void ToFeed() final {
+    node_ptr_->ToFeed();
+  }
+
+  inline void ToAct() final {
+    node_ptr_->ToAct();
+  }
+
+  inline void ToDropout() final {
+    node_ptr_->ToDropout();
+  }
+
+  inline void ToPrime() final {
+    node_ptr_->ToPrime();
+  }
+
+  virtual void Evaluate(REF const Eigen::Ref<const MatXX<T>>& labels) final {
+    node_ptr_->Evaluate(labels);
+  }
+
+  inline void FeedFeature(REF const Eigen::Ref<const MatXX<T>>& feature) final {
+    node_ptr_->FeedFeature(feature);
+    node_ptr_->ToFeed();
+  }
+
+  COPY virtual inline std::string get_node_state() final {
+    return node_ptr_->get_node_state();
+  }
+
  protected:
-  // Transitions from kInit to kAct and updates current_act_state_
-  void InitToAct() final {
-    identity_node_ptr_->InitToAct();
+  void Activate() final {
+    node_ptr_->Activate();
   }
 
-  // Transitions from kAct state to kDropout state and updates current_act_state_
-  void ActToDropout() final {
-    identity_node_ptr_->ActToDropout();
-  }
-
-  // Transitions from kDropout state to kPrime and updates current_act_state_
-  void DropoutToPrime() final {
-    identity_node_ptr_->DropoutToPrime();
-  }
-
-  // Transitions from current_act_state_ to state
-  bool Transition(ActStates state) final {
-    return identity_node_ptr_->Transition(state);
+  void Prime() final {
+    node_ptr_->Prime();
   }
 
  private:
-  IDNodeUPtr<T> identity_node_ptr_{nullptr};
+  IDNodeUPtr<T> node_ptr_{nullptr};
 
 };
 

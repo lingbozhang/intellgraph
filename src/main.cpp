@@ -2,6 +2,7 @@
 #include <algorithm>
 
 #include "glog/logging.h"
+#include "node/node.h"
 #include "mnist_classifier.h"
 #include "simple_classifier.h"
 #include "node/node_headers.h"
@@ -14,7 +15,7 @@ using namespace Eigen;
 
 int main(int argc, char* argv[]) {
   // Initialize Google's logging library.
-  FLAGS_alsologtostderr = false;
+  FLAGS_alsologtostderr = true;
   FLAGS_minloglevel = 2;
   std::string log_path(GetCWD());
   if (log_path.empty()) {
@@ -26,7 +27,9 @@ int main(int argc, char* argv[]) {
 
   fLS::FLAGS_log_dir = log_path;
   google::InitGoogleLogging(argv[0]);
+  Example2::run();
 
+  /*
        std::cout << "=====================================" << std::endl;
        std::cout << "A Simple Classifier for MNIST dataset" << std::endl;
        std::cout << "=====================================" << std::endl;
@@ -152,5 +155,6 @@ int main(int argc, char* argv[]) {
        classifier.Evaluate(test_images, test_labels);
        }
        std::cout << "Complete" << std::endl;
+  */
   return 0;
 }

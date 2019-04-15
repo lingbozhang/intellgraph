@@ -17,6 +17,7 @@ Contributor(s):
 
 #include "glog/logging.h"
 #include "node/identity_l2_node.h"
+#include "node/node.h"
 #include "node/identity_node.h"
 #include "node/node_factory.h"
 #include "node/sigmoid_cross_entropy.h"
@@ -35,10 +36,10 @@ class NodeRegistry {
   static void LoadNodeRegistry() {
     // Registers SigmoidNode
     LOG(INFO) << "Registering SigmoidNode";
-    DEVIMPL_REGISTERIMPL_NODE(SigmoidNode, IntNode);
+    DEVIMPL_REGISTERIMPL_NODE(SigmoidNode, Node);
     // Registers IdentityNode
     LOG(INFO) << "Registering IdentityNode";
-    DEVIMPL_REGISTERIMPL_NODE(IdentityNode, IntNode);
+    DEVIMPL_REGISTERIMPL_NODE(IdentityNode, Node);
     // Registers SigL2Node
     LOG(INFO) << "Registering SigL2Node";
     DEVIMPL_REGISTERIMPL_NODE(SigL2Node, OutputNode);

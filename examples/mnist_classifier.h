@@ -109,7 +109,7 @@ class Example2 {
 
     float eta = 0.5;
     int loops = 100;
-    int minbatch_size = 10;
+    int minbatch_size = 100;
     float lambda = 5.0;
     std::cout << "Learning rate: " << eta << std::endl;
     std::cout << "Total epochs: " << loops << std::endl;

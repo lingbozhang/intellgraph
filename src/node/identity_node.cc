@@ -16,143 +16,25 @@ Contributor(s):
 
 namespace intellgraph {
 
-template <class T>
-IdentityNode<T>::IdentityNode(const NodeParameter& node_param) {
-  node_param_.Clone(node_param);
-
-  size_t row = node_param.ref_dims()[0];
-  size_t col = node_param.ref_dims()[1];
-
-  bias_ptr_ = std::make_unique<VecX<T>>(row);
-
-  bias_ptr_->array() = 0.0;
-
-  current_act_state_ = kInit;
-}
-
-template <class T>
-void IdentityNode<T>::PrintBias() const {
-  std::cout << "Node: " << node_param_.ref_id() << std::endl 
-            << "Bias Vector:" << std::endl << bias_ptr_->array() 
-            << std::endl;
-}
-
-template <class T>
-void IdentityNode<T>::InitializeBias(const std::function<T(T)>& functor) {
-  if (functor == nullptr) {
-    LOG(WARNING) << "InitializeBias() for IdentityNode is failed: " 
-                 << "initializes bias with standard normal distribution";
-    bias_ptr_->array() = bias_ptr_->array().unaryExpr(std::function<T(T)>( \
-        NormalFunctor<T>(0.0, 1.0)));
-  } else {
-    bias_ptr_->array() = bias_ptr_->array().unaryExpr(functor);
-  }
-  Transition(kInit);
-}
-
 // Transitions from kInit state to kAct state.
 template <class T>
-void IdentityNode<T>::InitToAct() {
-  // Identity activation function:
-  current_act_state_ = kAct;  
+void IdentityNode<T>::Activate() {
+  // Identity activation function
 }
 
 template <class T>
-void IdentityNode<T>::ActToDropout() {
-  activation_.array().unaryExpr(std::function<T(T)>( \
-      BernoulliFunctor<T>(dropout_p_)));
-  current_act_state_ = kDropout;
-}
-
-template <class T>
-void IdentityNode<T>::DropoutToPrime() {
-  // Derivative equation:
-  activation_.array() = 1.0;
-  current_act_state_ = kPrime;;
-}
-
-template <class T>
-bool IdentityNode<T>::Transition(ActStates state) {
-  if (state == kFeed) {
-    current_act_state_ = state;
-    return true;
-  }
-
-  // Nothing happens if current node is an input node.
-  // Note, an internal node permanently changes to an input node
-  // when Transition(kFeed) is called
-  if (current_act_state_ == kFeed) {
-    return true;
-  }
-
-  if (state == kInit) {
-    current_act_state_ = state;
-    return true;
-  }
-
-  if (current_act_state_ > state) {
-    LOG(ERROR) << "Transition() for IdentityNode is failed: "
-               << "current state: " << current_act_state_
-               << ", transition state: " << state;
-    return false;
-  }
-
-  while (current_act_state_ < state) {
-    if (!dropout_on_ && current_act_state_ == kAct) {
-      current_act_state_ = kDropout;
-    }
-    switch (current_act_state_) {
-      case kInit: {
-        InitToAct();
-        break;
-      }
-      case kAct: {
-        ActToDropout();
-        break;
-      }
-      case kDropout: {
-        DropoutToPrime();
-        break;
-      }
-      default: {
-        LOG(ERROR) << "Transition() for IdentityNode is failed";
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-template <class T>
-bool IdentityNode<T>::CallActFxn() {
-  if (!Transition(kAct)) {
-    LOG(ERROR) << "CallActFxn() for IdentityNode is failed";
-    return false;
-  }
-  return true;
-}
-
-template <class T>
-bool IdentityNode<T>::CalcActPrime() {
-  if (!Transition(kPrime)) {
-    LOG(ERROR) << "CalcActPrime() for IdentityNode is failed";
-    return false;
-  }
-  return true;
+void IdentityNode<T>::Prime() {
+  // Derivative equation
+  this->get_activation_ptr()->array() = 1.0;
 }
 
 template <class T>
 void IdentityNode<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& labels) {
-  if (!Transition(kAct)) {
-    LOG(ERROR) << "Evaluate() for IdentityNode is failed.";
-    exit(1);
-  }
-
-  CHECK_EQ(activation_.cols(), labels.cols())
+  CHECK_EQ(this->get_activation_ptr()->cols(), labels.cols())
       << "CalcLoss() for IdentityNode is failed: "
       << "activation and data matrix dimensions are not equal!";
 
-  T loss = (get_activation_ptr()->array() - labels.array()). \
+  T loss = (this->get_activation_ptr()->array() - labels.array()). \
             matrix().norm();
   T avg_norm = loss / labels.cols();
   std::cout << "Average l2 norm: " << avg_norm << std::endl;

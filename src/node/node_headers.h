@@ -16,7 +16,6 @@ Contributor(s):
 
 #include "node/identity_l2_node.h"
 #include "node/identity_node.h"
-#include "node/internal_node.h"
 #include "node/node_factory.h"
 #include "node/node_parameter.h"
 #include "node/node_registry.h"

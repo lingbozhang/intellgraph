@@ -16,152 +16,36 @@ Contributor(s):
 
 namespace intellgraph {
 
-template <class T>
-SoftmaxLogNode<T>::SoftmaxLogNode(const NodeParameter& node_param) {
-  node_param_.Clone(node_param);
-
-  size_t row = node_param.ref_dims()[0];
-  size_t col = node_param.ref_dims()[1];
-
-  bias_ptr_ = std::make_unique<VecX<T>>(row);
-
-  bias_ptr_->array() = 0.0;
-
-  current_act_state_ = kInit;
-}
-
-template <class T>
-void SoftmaxLogNode<T>::PrintBias() const {
-  std::cout << "Node: " << node_param_.ref_id() << std::endl 
-            << "Bias Vector:" << std::endl << bias_ptr_->array() 
-            << std::endl;
-}
-
-template <class T>
-void SoftmaxLogNode<T>::InitializeBias(const std::function<T(T)>& functor) {
-  if (functor == nullptr) {
-    LOG(WARNING) << "InitializeBias() for SoftmaxLogNode is failed: " 
-                 << "initializes bias with standard normal distribution";
-    bias_ptr_->array() = bias_ptr_->array().unaryExpr(std::function<T(T)>( \
-        NormalFunctor<T>(0.0, 1.0)));
-  } else {
-    bias_ptr_->array() = bias_ptr_->array().unaryExpr(functor);
-  }
-  Transition(kInit);
-}
-
 // Transitions from kInit state to kAct state. 
 template <class T>
-void SoftmaxLogNode<T>::InitToAct() {
-  activation_.array() = activation_.array().exp();
-  VecX<T> vec = activation_.colwise().sum();
-  activation_.array().rowwise() /= vec.transpose().array();
-  current_act_state_ = kAct;  
+void SoftmaxLogNode<T>::Activate() {
+  this->get_activation_ptr()->array() = this->get_activation_ptr()->array().exp();
+  VecX<T> vec = this->get_activation_ptr()->colwise().sum();
+  this->get_activation_ptr()->array().rowwise() /= vec.transpose().array();
 }
 
 template <class T>
-void SoftmaxLogNode<T>::ActToDropout() {
-  LOG(ERROR) << "ActToDropout() for SoftmaxLogNode is node defined";
+void SoftmaxLogNode<T>::Prime() {
+  LOG(ERROR) << "DropoutToPrime() for SoftmaxLogNode is not defined";
   exit(1);
-}
-
-template <class T>
-void SoftmaxLogNode<T>::DropoutToPrime() {
-  LOG(ERROR) << "DropoutToPrime() for SoftmaxLogNode is node defined";
-  exit(1);
-}
-
-template <class T>
-bool SoftmaxLogNode<T>::Transition(ActStates state) {
-  if (state == kFeed) {
-    current_act_state_ = state;
-    return true;
-  }
-
-  // Nothing happens if current node is an input node.
-  // Note, an internal node permanently changes to an input node
-  // when Transition(kFeed) is called
-  if (current_act_state_ == kFeed) {
-    return true;
-  }
-
-  if (state == kInit) {
-    current_act_state_ = state;
-    return true;
-  }
-
-  if (current_act_state_ > state) {
-    LOG(ERROR) << "Transition() for SoftmaxLogNode is failed: "
-               << "current state: " << current_act_state_
-               << ", transition state: " << state;
-    return false;
-  }
-
-  while (current_act_state_ < state) {
-    if (!dropout_on_ && current_act_state_ == kAct) {
-      current_act_state_ = kDropout;
-    }
-    switch (current_act_state_) {
-      case kInit: {
-        InitToAct();
-        break;
-      }
-      case kAct: {
-        ActToDropout();
-        break;
-      }
-      case kDropout: {
-        DropoutToPrime();
-        break;
-      }
-      default: {
-        LOG(ERROR) << "Transition() for SoftmaxLogNode is failed";
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-template <class T>
-bool SoftmaxLogNode<T>::CallActFxn() {
-  if (!Transition(kAct)) {
-    LOG(ERROR) << "CallActFxn() for SoftmaxLogNode is failed";
-    return false;
-  }
-  return true;
-}
-
-template <class T>
-bool SoftmaxLogNode<T>::CalcActPrime() {
-  if (!Transition(kPrime)) {
-    LOG(ERROR) << "CalcActPrime() for SoftmaxLogNode is failed";
-    return false;
-  }
-  return true;
 }
 
 template <class T>
 void SoftmaxLogNode<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& labels) {
-  if (!Transition(kAct)) {
-    LOG(ERROR) << "Evaluate() for SoftmaxLogNode is failed.";
-    exit(1);
-  }
-
-  CHECK_EQ(activation_.cols(), labels.cols())
+  CHECK_EQ(this->get_activation_ptr()->cols(), labels.cols())
       << "CalcLoss() for SoftmaxLogNode is failed: "
       << "activation and data matrix dimensions are not equal!";
 
   double accuracy = 0.0;
   size_t correct_guess = 0;
 
-  if (activation_.rows() == 1) {
+  if (this->get_activation_ptr()->rows() == 1) {
     LOG(ERROR) << "Evaluate() for SoftmaxLogNode is failed";
     exit(1);
   } else {
     for (size_t i = 0; i < labels.cols(); ++i) {
       size_t index_guess;
-      activation_.col(i).maxCoeff(&index_guess);
+      this->get_activation_ptr()->col(i).maxCoeff(&index_guess);
       if (index_guess == labels(0, i)) {
         correct_guess++;
       }
@@ -175,15 +59,12 @@ template <class T>
 T SoftmaxLogNode<T>::CalcLoss(const Eigen::Ref<const MatXX<T>>& labels) {
   T loss = 0;
   size_t batch_size = labels.cols();
-  if (!Transition(kAct)) {
-    LOG(ERROR) << "CalcLoss() for SoftmaxLogNode is failed.";
-    return -1.0;
-  }
-  CHECK_EQ(get_activation_ptr()->size(), labels.size())
+
+  CHECK_EQ(this->get_activation_ptr()->size(), labels.size())
     << "CalcLoss() for SoftmaxLogNode is failed: "
     << "activation and data matrix dimensions are not equal!";
   // log-like cost function 
-  loss = -((activation_.array() * labels.array()). \
+  loss = -((this->get_activation_ptr()->array() * labels.array()). \
       colwise().maxCoeff().log()).sum();
 
   return loss / labels.rows();
@@ -191,16 +72,12 @@ T SoftmaxLogNode<T>::CalcLoss(const Eigen::Ref<const MatXX<T>>& labels) {
 
 template <class T>
 bool SoftmaxLogNode<T>::CalcDelta(const Eigen::Ref<const MatXX<T>>& labels) {
-  if (!Transition(kAct)) {
-    LOG(ERROR) << "CalcDelta() for SoftmaxLogNode is failed.";
-    return false;
-  }
-
-  CHECK_EQ(get_activation_ptr()->size(), labels.size())
+  LOG(INFO) << "SoftmaxLogNode calculates delta";
+  CHECK_EQ(this->get_activation_ptr()->size(), labels.size())
     << "CalcDelta() for SoftmaxLogNode is failed: "
     << "activation and data matrix dimensions are not equal!";
 
-  get_delta_ptr()->array() = (get_activation_ptr()->array() \
+  this->get_delta_ptr()->array() = (this->get_activation_ptr()->array() \
     - labels.array());
   return true;
 }
