@@ -1,10 +1,24 @@
 # IntellGraph
 
-A Deep Learning Framework in C++
+A Deep Learning Framework developed in C++ and LLVM, based on Directed Graph and Symbolic Computation
 
+## Getting Started
 
-# Installation
-### Building The Project
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+
+### Prerequisites
+
+What things you need to install the software and how to install them
+[Homebrew](https://brew.sh)
+```
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+[CMake](https://cmake.org)
+```
+brew install cmake
+```
+
+### Installation
 
 #### Git Clone
 
@@ -47,8 +61,51 @@ There is a handy BASH script (used by the Travis CI) that you can run locally. I
 ./run.sh
 ```
 
-### Acknowledgements
-We use the cmake-project-template developed by Konstantin Gredeskoul. For more information, please refer to https://github.com/kigster/cmake-project-template
+## Running the tests
+
+Explain how to run the automated tests for this system
+
+### Break down into end to end tests
+
+Explain what these tests test and why
+
+```
+Give an example
+```
+
+### And coding style tests
+
+Explain what these tests test and why
+
+```
+Give an example
+```
+
+## Deployment
+
+Add additional notes about how to deploy this on a live system
+
+## Built With
+
+
+## Contributing
+
+
+
+## Versioning
+
+
+
+## Authors
+
+
+## License
+
+This project is licensed under the Apache License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+* project template is developed by Konstantin Gredeskoul. For more information, please refer to https://github.com/kigster/cmake-project-template 
 
 ### Useful links
 #### AngularJS Git Commit Message Conventions
