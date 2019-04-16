@@ -1,0 +1,99 @@
+/* Copyright 2019 The IntellGraph Authors. All Rights Reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Contributor(s):
+	Lingbo Zhang <lingboz2015@gmail.com>
+==============================================================================*/
+#ifndef INTELLGRAPH_NODE_NODE_FACTORY_H_
+#define INTELLGRAPH_NODE_NODE_FACTORY_H_
+
+#include <functional>
+#include <iostream>
+#include <unordered_map>
+
+#include "glog/logging.h"
+#include "node/node_parameter.h"
+#include "utility/auxiliary_cpp.h"
+
+namespace intellgraph {
+// A Factory design pattern, NodeFactory is used to instantiate corresponding
+// node object.
+template <class T, class Base>
+using NodeFunctor = std::function<MOVE std::unique_ptr<Base>( \
+    REF const NodeParameter&)>;
+
+template <class T, class Base>
+using NodeRegistryMap = std::unordered_map<COPY std::string, \
+                                           COPY NodeFunctor<T, Base>>;
+
+template <class T, class Base>
+class NodeFactory {
+ public:
+  NodeFactory() = delete;
+
+  ~NodeFactory() = delete;
+
+  // use this to instantiate the proper Derived class
+  // static functions have no this parameter. They need no cv-qualifiers.
+  MOVE static std::unique_ptr<Base> Instantiate(REF const NodeParameter& \
+                                                node_param) {
+    std::string name = node_param.ref_node_name();
+    auto it = NodeFactory<T, Base>::Registry().find(name);
+    if (it == NodeFactory<T, Base>::Registry().end()) {
+      LOG(ERROR) << "Instantiate node " << name << " failed";
+      return nullptr;
+    } else {
+      return (it->second)(node_param);
+    }
+  }
+
+  MUTE static NodeRegistryMap<T, Base>& Registry() {
+    static NodeRegistryMap<T, Base> impl;
+    return impl;
+  }
+
+};
+
+template <class T, class Base, class Derived>
+class NodeFactoryRegister {
+ public:
+  explicit NodeFactoryRegister(REF const std::string& name) {
+    NodeFactory<T, Base>::Registry()[name] = \
+        [](const NodeParameter& node_param) -> std::unique_ptr<Base> {
+            // (C++14 feature)
+          std::unique_ptr<Base> rv = std::make_unique<Derived>(node_param);
+          return rv;
+        };
+  }
+};
+
+namespace devimpl {
+// Registers macros are defined here, developers can use them to register their
+// own node classes. Note in order to activate register macros, user defined
+// classes should be added as a dynamic library (see force static variable
+// initialization)
+#define DEVIMPL_REGISTER_NODE(classname, base) \
+  static const NodeFactoryRegister<float, base<float>, classname<float>> \
+      register_f_##classname##_##base; \
+  static const NodeFactoryRegister<double, base<double>, classname<double>> \
+      register_d_##classname##_##base;
+
+#define DEVIMPL_REGISTERIMPL_NODE(classname, base) \
+  static const NodeFactoryRegister<float, base<float>, classname<float>> \
+      register_f_##classname##_##base(#classname); \
+  static const NodeFactoryRegister<double, base<double>, classname<double>> \
+      register_d_##classname##_##base(#classname);
+
+}  // devimpl
+
+}  // intellgraph
+
+#endif  // INTELLGRAPH_NODE_NODE_FACTORY_H_

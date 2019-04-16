@@ -75,7 +75,7 @@ IntellGraph::build() {
   run "cd ${ProjectRoot}"
 }
 
-IntellGraph::tests() {
+IntellGraph::main() {
   if [[ -f bin/Intellgraph ]]; then
     run::set-next show-output-on
     run "echo && bin/Intellgraph"
@@ -108,8 +108,8 @@ main() {
   IntellGraph::header
   IntellGraph::setup
   IntellGraph::build
-  IntellGraph::tests
-  IntellGraph::examples
+  IntellGraph::main
+#  IntellGraph::examples
 }
 
 (( $_s_ )) || main
