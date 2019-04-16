@@ -41,7 +41,7 @@ $ bin/IntellGraph
 ```
 ####  Building Using the Script
 
-There is a handy BASH script (used by the Travis CI) that you can run locally. It builds the project, and runs all the tests
+There is a handy BASH script (used by the Travis CI) that you can run locally. It builds the project, and runs main function. Note run.sh takes 2-5 minutes to setup at first run (please be patient)
 
 ```bash
 ./run.sh
