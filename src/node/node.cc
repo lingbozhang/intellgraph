@@ -90,7 +90,7 @@ template class FeedState<float>;
 template class FeedState<double>;
 
 template <class T>
-void ActivateState<T>::ToInit(Node<T>* node) {
+void State<T>::ToInit(Node<T>* node) {
   this->ChangeState(node, InitialState<T>::get_instance());
 }
 
