@@ -12,7 +12,7 @@ First we need to check out the git repo:
 
 ```bash
 $ cd ${insert your workspace folder here}
-$ git clone https://github.com/kigster/cmake-project-template my-project
+$ git clone https://github.com/lingbozhang/IntellGraph my-project
 $ cd my-project
 $ git submodule init && git submodule update
 ```
@@ -41,7 +41,7 @@ $ bin/IntellGraph
 ```
 ####  Building Using the Script
 
-There is a handy BASH script (used by the Travis CI) that you can run locally. It builds the project, and runs all the tests
+There is a handy BASH script (used by the Travis CI) that you can run locally. It builds the project, and runs main function. Note run.sh takes 2-5 minutes to setup at first run (please be patient)
 
 ```bash
 ./run.sh
