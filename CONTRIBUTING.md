@@ -46,8 +46,8 @@ allow memory release from interfaces
 
 
 #### Git Commit Message Conventions
-Currently, we follow git commit message conventions from [AngularJS Git Commit Message Conventions](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#heading=h.uyo6cb12dt6w) with one modification. In IntellGraph project, the scope is not 
-used.
+Currently, we follow git commit message conventions from [AngularJS Git Commit Message Conventions](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#heading=h.uyo6cb12dt6w) with some modifications. In IntellGraph project, the scope tag is 
+neglected and the body of commit message must written in the [MarkDown format](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
 
 
 
