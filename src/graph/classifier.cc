@@ -12,6 +12,8 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
+#include <math.h>
+
 #include "graph/classifier.h"
 
 namespace intellgraph {
@@ -101,8 +103,9 @@ void Classifier<T>::Instantiate() {
         edge_pair.second));
     // Initializes weight matrix with standard normal distribution
     LOG(INFO) << "Initializes edge: " << edge_pair.first
-              << ", with standard normal distribution";
-    edge_ptr->InitializeWeight(NormalFunctor<T>(0.0, 1.0));
+              << ", with normal distribution";
+    size_t weight_row = edge_ptr->get_weight_ptr()->rows();
+    edge_ptr->InitializeWeight(NormalFunctor<T>(0.0, 1.0 / sqrt(weight_row)));
     edge_map_[edge_pair.first] = std::move(edge_ptr);
   }
 

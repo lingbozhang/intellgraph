@@ -53,7 +53,7 @@ class Example2 {
     // function. 
     auto node_param1 = NodeParameter(0, "SigmoidNode", {784});
     // SigmoidNode uses Sigmoid function as the activation function
-    auto node_param2 = NodeParameter(1, "SigmoidNode", {100});
+    auto node_param2 = NodeParameter(1, "SigmoidNode", {30});
     // SigL2Node uses Sigmoid function as activation function and the cross \
     // entropy function as loss function.
     auto node_param3 = NodeParameter(4, "SigCENode", {10});
@@ -74,7 +74,7 @@ class Example2 {
     //classifier.TurnDropoutOn(0.5);
     classifier.Instantiate();
 
-    float eta = 0.5;
+    float eta = 0.1;
     int loops = 100;
     int minbatch_size = 10;
     float lambda = 5;
