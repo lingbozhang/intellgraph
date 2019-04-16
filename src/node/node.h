@@ -245,15 +245,15 @@ class ActState {
   }
 
   virtual void ToPrime(MUTE Node<T>* node) {
-   LOG(WARNING) << "Node: " << node->ref_node_id()
-                << ", ToPrime() that is not defined in current state: "
-                << node->get_node_state();
+    LOG(WARNING) << "Node: " << node->ref_node_id()
+                 << ", ToPrime() that is not defined in current state: "
+                 << node->get_node_state();
   }
 
   virtual void ToDropout(MUTE Node<T>* node) {
-   LOG(WARNING) << "Node: " << node->ref_node_id()
-                << ", ToDropout() is not defined in current state: "
-                << node->get_node_state();
+    LOG(WARNING) << "Node: " << node->ref_node_id()
+                 << ", ToDropout() is not defined in current state: "
+                 << node->get_node_state();
   }
 
  protected:
@@ -267,7 +267,7 @@ class InitialState : implements ActState<T> {
   InitialState() {};
 
   static ActStateUPtr<T> get_instance() {
-   return std::make_unique<InitialState<T>>();
+    return std::make_unique<InitialState<T>>();
   }
 
   ~InitialState() {};
@@ -290,7 +290,7 @@ class FeedState : implements ActState<T> {
   FeedState() {};
 
   static ActStateUPtr<T> get_instance() {
-   return std::make_unique<FeedState<T>>();
+    return std::make_unique<FeedState<T>>();
   }
 
   ~FeedState() {};
@@ -315,7 +315,7 @@ class ActivateState : implements ActState<T> {
   ActivateState() {};
 
   static ActStateUPtr<T> get_instance() {
-   return std::make_unique<ActivateState<T>>();
+    return std::make_unique<ActivateState<T>>();
   }
 
   ~ActivateState() {};
@@ -338,7 +338,7 @@ class DropoutState : implements ActState<T> {
   DropoutState() {};
 
   static ActStateUPtr<T> get_instance() {
-   return std::make_unique<DropoutState<T>>();
+    return std::make_unique<DropoutState<T>>();
   }
 
   ~DropoutState() {};
@@ -357,7 +357,7 @@ class PrimeState : implements ActState<T> {
   PrimeState() {};
 
   static ActStateUPtr<T> get_instance() {
-   return std::make_unique<PrimeState<T>>();
+    return std::make_unique<PrimeState<T>>();
   }
 
   ~PrimeState() {};
