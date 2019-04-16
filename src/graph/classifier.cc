@@ -91,6 +91,7 @@ void Classifier<T>::Instantiate() {
       LOG(INFO) << "Initializes node: " << node_id
                 << ", with standard normal distribution";
       node_ptr->InitializeBias(NormalFunctor<T>(0.0, 1.0));
+      if (dropout_on_) node_ptr->TurnDropoutOn(dropout_p_);
       node_map_[index_map_[node_id]] = std::move(node_ptr);
     }
   }
@@ -134,7 +135,12 @@ void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t vtx_in_id = *it_r;
     LOG(INFO) << "Forwarding vertex: " << vtx_in_id;
-    if (*it_r != index_map_[input_node_id_]) node_map_[*it_r]->ToAct();
+    if (*it_r != index_map_[input_node_id_]) {
+      node_map_[*it_r]->ToAct();
+      if (node_map_[*it_r]->ref_dropout_on()) {
+        node_map_[*it_r]->ToDropout();
+      }
+    }
     for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
       size_t vtx_out_id = target(*eo, graph_);
       size_t edge_id = graph_[*eo].id;
@@ -188,7 +194,7 @@ void Classifier<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
   }
 
   LOG(INFO) << "======================"
-            << "FORWARDING . . ."
+            << "Evaluating . . ."
             << "======================";
 
   input_node_ptr_->FeedFeature(test_data);
@@ -196,7 +202,13 @@ void Classifier<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t vtx_in_id = *it_r;
     LOG(INFO) << "Forwarding vertex: " << vtx_in_id;
-    if (*it_r != index_map_[input_node_id_] ) node_map_[*it_r]->ToAct();
+    if (*it_r != index_map_[input_node_id_] ) {
+       node_map_[*it_r]->ToAct();
+       if (node_map_[*it_r]->ref_dropout_on()) {
+          node_map_[*it_r]->get_activation_ptr()->array() *= \
+              node_map_[*it_r]->ref_dropout_p();
+       }
+    }
     for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
       size_t vtx_out_id = target(*eo, graph_);
       size_t edge_id = graph_[*eo].id;

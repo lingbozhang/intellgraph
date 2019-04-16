@@ -153,8 +153,18 @@ class Classifier : implements Graph<T> {
     return true;
   }
 
- private:
+  virtual inline void TurnDropoutOn(T dropout_p) {
+    dropout_on_ = true;
+    CHECK_GT(1.0, dropout_p) << "TurnDropoutOn() for Node is failed.";
+    dropout_p_ = dropout_p;
+  }
 
+  virtual inline void TurnDropoutOff() {
+    dropout_on_ = false;
+    dropout_p_ = 1.0;
+  }
+
+ private:
   IntellGraph graph_{};
 
   std::unordered_map<size_t, size_t> index_map_{};
@@ -176,6 +186,11 @@ class Classifier : implements Graph<T> {
   // Topological sorting result
   std::vector<size_t> order_{};
   size_t count_{0};
+
+  // A dropout flag
+  bool dropout_on_{false};
+
+  T dropout_p_{1.0};
 
 };
 

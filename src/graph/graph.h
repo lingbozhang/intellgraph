@@ -70,6 +70,10 @@ interface Graph {
 
   virtual inline bool set_input_node_id(COPY size_t id) = 0;
 
+  virtual inline void TurnDropoutOn(COPY T dropout_p) = 0;
+
+  virtual inline void TurnDropoutOff() = 0;
+
 };
 
 }  // intellgraph

@@ -88,6 +88,14 @@ class IDL2Node : public OutputNode<T> {
     return node_ptr_->ref_dropout_on();
   }
 
+  COPY inline std::string get_node_state() final {
+    return node_ptr_->get_node_state();
+  }
+
+  REF inline const T ref_dropout_p() const final {
+    return node_ptr_->ref_dropout_p();
+  }
+
   inline void InitializeBias(REF const std::function<T(T)>& functor) final {
     node_ptr_->InitializeBias(functor);
   }
@@ -131,10 +139,6 @@ class IDL2Node : public OutputNode<T> {
   inline void FeedFeature(REF const Eigen::Ref<const MatXX<T>>& feature) final {
     node_ptr_->FeedFeature(feature);
     node_ptr_->ToFeed();
-  }
-
-  COPY virtual inline std::string get_node_state() final {
-    return node_ptr_->get_node_state();
   }
 
  protected:
