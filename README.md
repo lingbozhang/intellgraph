@@ -1,7 +1,5 @@
 # IntellGraph [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-[![Gitter chat](https://badges.gitter.im/lingbozhang/gitter.png)](https://gitter.im/intellgraph/community)
-
 A Deep Learning Framework in C++, developed with Just-in-time Compilation and Symbolic Computation.
 
 # Description
@@ -54,7 +52,9 @@ There is a handy BASH script (used by the Travis CI) that you can run locally. I
 ./run.sh
 ```
 ## Contribution guidelines
-If you want to contribute to IntellGraph, be sure to review the [contribution guidelines](CONTRIBUTING.md). By participating, you are expected to uphold this code.
+If you want to contribute to IntellGraph, be sure to review the [contribution guidelines](CONTRIBUTING.md). By participating, you are also expected to join the Gitter community:
+
+[![Gitter chat](https://badges.gitter.im/lingbozhang/gitter.png)](https://gitter.im/intellgraph/community)
 
 ## License
 [Apache License](LICENSE)
