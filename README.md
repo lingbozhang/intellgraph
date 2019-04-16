@@ -1,6 +1,6 @@
 # IntellGraph [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-A Deep Learning Framework developed in C++ and LLVM, focused on Just-in-time Compilation and Symbolic Computation
+A Deep Learning Framework developed in C++ and LLVM, developed with Just-in-time Compilation and Symbolic Computation.
 
 # Description
 IntellGraph is an abbreviation of Intelligent Graph. As the name indicates, the IntellGraph framework is developed for Artifical Intelligence and is abstracted 
