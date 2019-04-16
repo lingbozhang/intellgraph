@@ -25,7 +25,7 @@ There are three empty folders: `lib`, `bin`, and `include`. Those are populated 
 
 `src` is the sources, and `test` is where we put our unit tests.
 
-Now we can build this project, and below we show three separate ways to do so.
+Now we can build this project, and below we show two separate ways to do so.
 
 #### Building Manually
 
