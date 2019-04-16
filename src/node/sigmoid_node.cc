@@ -74,12 +74,3 @@ template class SigmoidNode<float>;
 template class SigmoidNode<double>;
 
 }  // namespace intellgraph
-
-
-
-
-
-
-
-
-
