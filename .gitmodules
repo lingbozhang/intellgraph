@@ -1,7 +1,7 @@
 [submodule "third_party/eigen-git-mirror"]
 	path = third_party/eigen-git-mirror
 	url = https://github.com/eigenteam/eigen-git-mirror
-[submodule "boost"]
+[submodule "third_party/boost"]
 	path = boost
 	url = https://github.com/boostorg/boost
 [submodule "third_party/glog"]
