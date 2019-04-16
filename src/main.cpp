@@ -16,7 +16,7 @@ using namespace Eigen;
 int main(int argc, char* argv[]) {
   // Initialize Google's logging library.
   FLAGS_alsologtostderr = true;
-  FLAGS_minloglevel = 2;
+  FLAGS_minloglevel = 1;
   std::string log_path(GetCWD());
   if (log_path.empty()) {
     // Stores log files in tmp/ if GetCWD() fails
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 
   fLS::FLAGS_log_dir = log_path;
   google::InitGoogleLogging(argv[0]);
-  Example2::run();
+  Example1::run();
 
   /*
        std::cout << "=====================================" << std::endl;
