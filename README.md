@@ -12,7 +12,7 @@ First we need to check out the git repo:
 
 ```bash
 $ cd ${insert your workspace folder here}
-$ git clone https://github.com/kigster/cmake-project-template my-project
+$ git clone https://github.com/lingbozhang/IntellGraph my-project
 $ cd my-project
 $ git submodule init && git submodule update
 ```
