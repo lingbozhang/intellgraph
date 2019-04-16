@@ -50,4 +50,6 @@ There is a handy BASH script (used by the Travis CI) that you can run locally. I
 ### Acknowledgements
 We use the cmake-project-template developed by Konstantin Gredeskoul. For more information, please refer to https://github.com/kigster/cmake-project-template
 
-
+### Useful links
+#### AngularJS Git Commit Message Conventions
+https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#heading=h.uyo6cb12dt6w
