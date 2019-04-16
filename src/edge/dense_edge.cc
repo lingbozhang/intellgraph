@@ -74,7 +74,7 @@ void DenseEdge<T>::Backward(Node<T>* node_in_ptr, \
   node_in_ptr->get_delta_ptr()->noalias() = \
       weight_ptr_->matrix() * node_out_ptr->get_delta_ptr()->matrix();
 
-  if (node_in_ptr->ref_dropout_on()) {
+  if (!node_in_ptr->ref_dropout_on()) {
     node_in_ptr->ToPrime();
   } else {
     node_in_ptr->ToDropout();
