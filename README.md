@@ -1,25 +1,23 @@
-# IntellGraph
+# IntellGraph [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-A Deep Learning Framework developed in C++ and LLVM, based on Directed Graph and Symbolic Computation
+A Deep Learning Framework developed in C++ and LLVM, focused on Just-in-time Compilation and Symbolic Computation
+
+# Description
+IntellGraph is an abbreviation of Intelligent Graph. As the name indicates, the IntellGraph framework is developed for Artifical Intelligence and is abstracted 
+based on Graph Theory. The project is still under development. In current version, users are able to use it for constructing fully connected deep neural networks 
+with different activation and loss functions (e.g. sigmoid activation function, mean square error loss function, cross-entropy loss function, etc). Some examples 
+(in the example/ directory) are prepared to show the capability of the IntellGraph project and you are encouraged to study them before building your own neural 
+networks.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
+* [Homebrew](https://brew.sh)
+* [CMake](https://cmake.org)
 
-What things you need to install the software and how to install them
-
-[Homebrew](https://brew.sh)
-```
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-```
-[CMake](https://cmake.org)
-```
-brew install cmake
-```
-
-### Installation
+### Building
 
 #### Git Clone
 
@@ -33,14 +31,6 @@ $ git submodule init && git submodule update
 ```
 
 Now we should be in the project's top level folder. 
-
-#### Project Structure
-
-There are three empty folders: `lib`, `bin`, and `include`. Those are populated by `make install`.
-
-`src` is the sources, and `test` is where we put our unit tests.
-
-Now we can build this project, and below we show two separate ways to do so.
 
 #### Building Manually
 
@@ -61,52 +51,12 @@ There is a handy BASH script (used by the Travis CI) that you can run locally. I
 ```bash
 ./run.sh
 ```
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-
-## Contributing
-
-
-
-## Versioning
-
-
-
-## Authors
-
+## Contribution guidelines
+If you want to contribute to IntellGraph, be sure to review the [contribution guidelines](CONTRIBUTING.md). By participating, you are expected to uphold this code.
 
 ## License
-
-This project is licensed under the Apache License - see the [LICENSE.md](LICENSE.md) file for details
+[Apache License](LICENSE)
 
 ## Acknowledgments
 
-* project template is developed by Konstantin Gredeskoul. For more information, please refer to https://github.com/kigster/cmake-project-template 
-
-### Useful links
-[AngularJS Git Commit Message Conventions](https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#heading=h.uyo6cb12dt6w)
+- IntellGraph uses and modifies the [cmake-project-template](https://github.com/kigster/cmake-project-template) developed by Konstantin Gredeskoul. 
