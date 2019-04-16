@@ -38,3 +38,7 @@ ipch/
 build/
 cmake-build-debug/
 bin/bootstrap
+
+.DS_Store
+.vscode/
+.idea/
