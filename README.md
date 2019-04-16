@@ -5,7 +5,7 @@ A Deep Learning Framework in C++, developed with Just-in-time Compilation and Sy
 # Description
 IntellGraph is an abbreviation of Intelligent Graph. As the name indicates, the IntellGraph framework is developed for Artifical Intelligence and is abstracted 
 based on Graph Theory. The project is still under development. In current version, users are able to use it for constructing fully connected deep neural networks 
-with different activation and loss functions (e.g. sigmoid activation function, mean square error loss function, cross-entropy loss function, etc). Some examples 
+with different activation and loss functions (e.g. sigmoid activation function, mean square error loss function, cross-entropy loss function, etc). Examples 
 (in the example/ directory) are prepared to show the capability of the IntellGraph project and you are encouraged to study them before building your own neural 
 networks.
 
