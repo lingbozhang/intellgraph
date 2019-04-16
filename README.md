@@ -1,6 +1,6 @@
-# IntellGraph [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)![Gitter](https://img.shields.io/gitter/room/lingbozhang/intellgraph.svg)
+# IntellGraph [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-[![Gitter chat](https://badges.gitter.im/lingbozhang/gitter.png)](https://gitter.im/lingbozhang/gitter)
+[![Gitter chat](https://badges.gitter.im/lingbozhang/gitter.png)](https://gitter.im/intellgraph/community)
 
 A Deep Learning Framework in C++, developed with Just-in-time Compilation and Symbolic Computation.
 
