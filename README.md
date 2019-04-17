@@ -52,7 +52,7 @@ There is a handy BASH script (used by the Travis CI) that you can run locally. I
 ./run.sh
 ```
 ## Contribution guidelines
-If you want to contribute to IntellGraph, be sure to review the [contribution guidelines](CONTRIBUTING.md). By participating, you are also expected to join the Gitter community:
+If you want to contribute to IntellGraph, be sure to review the [contribution guidelines](CONTRIBUTING.md) and [development tutorial](DEVELOPMENT_TUTORIAL.md). By participating, you are also expected to join the Gitter community:
 
 [![Gitter chat](https://badges.gitter.im/lingbozhang/gitter.png)](https://gitter.im/intellgraph/community)
 
