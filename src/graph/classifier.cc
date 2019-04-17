@@ -19,6 +19,21 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
+Graphfxn<T>& Classifier<T>::set_edge(
+    const std::pair<std::string, size_t>& node_pair_in, \
+    const std::pair<std::string, size_t>& node_pair_out, \
+    const std::string& edge_name) {
+  
+  NodeParameter node_param_in = NodeParameter(
+      index_map_.size(), node_pair_in.first, {node_pair_in.second});
+  NodeParameter node_param_out = NodeParameter(
+      index_map_.size() + 1, node_pair_out.first, {node_pair_out.second});
+
+  AddEdge(node_param_in, node_param_out, edge_name);
+  return *this;
+}
+
+template <class T>
 void Classifier<T>::AddEdge(const NodeParameter& node_param_in, \
                             const NodeParameter& node_param_out, \
                             const std::string& edge_name) {
@@ -69,6 +84,9 @@ void Classifier<T>::Instantiate() {
   input_node_ptr_ = nullptr;
   output_node_ptr_ = nullptr;
 
+  if (output_node_id_ == 0 && input_node_id_ == 0) {
+     output_node_id_ = node_param_map_.size() - 1;
+  }
   // Instantiates the input node object
   auto input_node_ptr = std::move(NodeFactory<T, Node<T>>::Instantiate( \
       node_param_map_[input_node_id_]));
@@ -160,8 +178,8 @@ void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
 }
 
 template <class T>
-void Classifier<T>::Backward(const Eigen::Ref<const MatXX<T>>& training_data, \
-                             const Eigen::Ref<const MatXX<T>>& training_labels) {
+void Classifier<T>::Derivative(const Eigen::Ref<const MatXX<T>>& training_data, \
+                               const Eigen::Ref<const MatXX<T>>& training_labels) {
   Forward(training_data, training_labels);
   LOG(INFO) << "======================"
             << "BACKWARDING . . ."

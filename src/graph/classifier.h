@@ -20,7 +20,7 @@ Contributor(s):
 #include <vector>
 
 #include "glog/logging.h"
-#include "graph/graph.h"
+#include "graph/graphfxn.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 #include "utility/random.h"
@@ -28,12 +28,17 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-class Classifier : implements Graph<T> {
+class Classifier : implements Graphfxn<T> {
  public: 
   Classifier() = default;
 
   ~Classifier() noexcept final = default;
 
+  MUTE Graphfxn<T>& set_edge(
+      REF const std::pair<std::string, size_t>& node_param_in, \
+      REF const std::pair<std::string, size_t>& node_param_out, \
+      REF const std::string& edge_name) final;
+  
   // Add an edge in the neural graph. NodeParameters and EdgeParameters are 
   // stored in the hashtables and they will be later used to instantiate a 
   // graph object.
@@ -67,7 +72,7 @@ class Classifier : implements Graph<T> {
   void Forward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
                REF const Eigen::Ref<const MatXX<T>>& training_labels) final;
 
-  void Backward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
+  void Derivative(REF const Eigen::Ref<const MatXX<T>>& training_data, \
                 REF const Eigen::Ref<const MatXX<T>>& training_labels) final;
 
   void Evaluate(REF const Eigen::Ref<const MatXX<T>>& test_data, \

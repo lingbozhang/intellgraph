@@ -20,7 +20,7 @@ Contributor(s):
 #include "edge/edge_headers.h"
 #include "load_mnist_data.h"
 #include "graph/classifier.h"
-#include "graph/graph.h"
+#include "graph/graphfxn.h"
 #include "mnist/mnist_reader.hpp"
 #include "node/node_headers.h"
 #include "transformer/internal_representation.h"
@@ -96,7 +96,7 @@ class Example2 {
       training_images = training_images * perm;
       training_labels = training_labels * perm;
       for (int i = 0; i < nbr_training_data - minbatch_size; i += minbatch_size) {
-        classifier.Backward(training_images.block(0, i, 784, minbatch_size), \
+        classifier.Derivative(training_images.block(0, i, 784, minbatch_size), \
                             training_labels.block(0, i, 10, minbatch_size));
         // Stochastic gradient decent + L2 regularization
         classifier.get_edge_weight_ptr(1, 4)->array() = \
