@@ -28,11 +28,11 @@ Note it is usually not recommended to introduce macros in the header.
 * MOVE:	indicates pass/return by rvalue, or unique_ptr in C++, move ownership is achieved with unique smart pointers.
 
 In order to emphasize on the ownership exchange, in addition to the original accessor and mutator, new accessor and mutator are defined.
-* ref_variable_name: returns variable reference
+* ref_variable_name: returns const variable reference
 * move_variable_name: set variable by move
 
 In C++, abstract class is similar to interface in Java, in order to distinguish it with class, an interface macro is defined and should be used for abstract 
-class. For interface, the public is replaced with implements macros.
+class. For interface, the public is replaced with implements macro.
 
 In order to differentiate between class and interface, interface is named with lower case letters. All interfaces must have virtual destructor in order to 
 allow memory release from interfaces
