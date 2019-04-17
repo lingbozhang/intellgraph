@@ -35,7 +35,7 @@ Now we should be in the project's top level folder.
 #### Building Manually
 
 ```bash
-$ rm -rf build/manual && mkdir build/manual
+$ rm -rf build/manual && mkdir -p build/manual
 $ cd build/manual
 $ cmake ../..
 $ make && make install
