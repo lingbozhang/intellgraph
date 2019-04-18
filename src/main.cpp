@@ -29,5 +29,8 @@ int main(int argc, char* argv[]) {
   fLS::FLAGS_log_dir = log_path;
   google::InitGoogleLogging(argv[0]);
   //Example1::run();
+  int a = 1;
+  int b;
+  int c;
   return 0;
 }
