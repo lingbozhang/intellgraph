@@ -17,6 +17,7 @@ Contributor(s):
 
 namespace intellgraph {
 
+template <class T>
 class SGDSolver {
 
 
@@ -24,6 +25,9 @@ class SGDSolver {
 
 
 
+ private:
+  T learning_rate{0};
+  
 
 };
 

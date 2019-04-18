@@ -20,7 +20,7 @@ Contributor(s):
 #include <vector>
 
 #include "glog/logging.h"
-#include "graph/graph.h"
+#include "graph/graphfxn.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
 #include "utility/random.h"
@@ -28,12 +28,17 @@ Contributor(s):
 namespace intellgraph {
 
 template <class T>
-class Classifier : implements Graph<T> {
+class Classifier : implements Graphfxn<T> {
  public: 
   Classifier() = default;
 
   ~Classifier() noexcept final = default;
 
+  MUTE Graphfxn<T>& set_edge(
+      REF const std::pair<std::string, size_t>& node_param_in, \
+      REF const std::pair<std::string, size_t>& node_param_out, \
+      REF const std::string& edge_name) final;
+  
   // Add an edge in the neural graph. NodeParameters and EdgeParameters are 
   // stored in the hashtables and they will be later used to instantiate a 
   // graph object.
@@ -67,7 +72,7 @@ class Classifier : implements Graph<T> {
   void Forward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
                REF const Eigen::Ref<const MatXX<T>>& training_labels) final;
 
-  void Backward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
+  void Derivative(REF const Eigen::Ref<const MatXX<T>>& training_data, \
                 REF const Eigen::Ref<const MatXX<T>>& training_labels) final;
 
   void Evaluate(REF const Eigen::Ref<const MatXX<T>>& test_data, \
@@ -153,8 +158,18 @@ class Classifier : implements Graph<T> {
     return true;
   }
 
- private:
+  virtual inline void TurnDropoutOn(T dropout_p) {
+    dropout_on_ = true;
+    CHECK_GT(1.0, dropout_p) << "TurnDropoutOn() for Node is failed.";
+    dropout_p_ = dropout_p;
+  }
 
+  virtual inline void TurnDropoutOff() {
+    dropout_on_ = false;
+    dropout_p_ = 1.0;
+  }
+
+ private:
   IntellGraph graph_{};
 
   std::unordered_map<size_t, size_t> index_map_{};
@@ -176,6 +191,11 @@ class Classifier : implements Graph<T> {
   // Topological sorting result
   std::vector<size_t> order_{};
   size_t count_{0};
+
+  // A dropout flag
+  bool dropout_on_{false};
+
+  T dropout_p_{1.0};
 
 };
 

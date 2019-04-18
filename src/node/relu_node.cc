@@ -12,40 +12,41 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#include "node/sigmoid_node.h"
+#include <limits>
+
+#include "node/relu_node.h"
 
 namespace intellgraph {
 
-// Transitions from initial state to activate state. In order to avoid overflow of
-// exp() function, sigmoid function is calculated based on the sign of 
-// activation vector entry, as shown in the implementation below.
+// Transitions from initial state to activate state.
 template <class T>
-void SigmoidNode<T>::Activate() {
-  // Sigmoid activation function:
-  // f(z)=1.0/(1.0+exp(-z))
+void ReLUNode<T>::Activate() {
+  // Rectified linear-unit activation function
   for (size_t i = 0; i < this->get_activation_ptr()->rows(); ++i) {
     for (size_t j = 0; j < this->get_activation_ptr()->cols(); ++j) {
-      T element_value = this->get_activation_ptr()->array()(i, j);
-      if (element_value >= 0.0) {
-        this->get_activation_ptr()->array()(i, j) = 1.0 / (1.0 + \
-            std::exp(-element_value));
-      } else {
-        this->get_activation_ptr()->array()(i, j) = std::exp(element_value) / \
-            (1.0 + std::exp(element_value));
+      if (this->get_activation_ptr()->matrix()(i, j) < 0) {
+        this->get_activation_ptr()->matrix()(i, j) = 0;
+      } else if (this->get_activation_ptr()->matrix()(i, j) == 0) {
+        this->get_activation_ptr()->matrix()(i, j) += \
+            std::numeric_limits<T>::min();
       }
     }
   }
 }
 
 template <class T>
-void SigmoidNode<T>::Prime() {
-  // Derivative equation:
-  // $df/dz=f(z)(1-f(z))$
-  this->get_activation_ptr()->array() *= (1.0 - this->get_activation_ptr()->array());
+void ReLUNode<T>::Prime() { 
+  for (size_t i = 0; i < this->get_activation_ptr()->rows(); ++i) {
+    for (size_t j = 0; j < this->get_activation_ptr()->cols(); ++j) {
+      if (this->get_activation_ptr()->matrix()(i, j) > 0) {
+        this->get_activation_ptr()->matrix()(i, j) = 1;
+      }
+    }
+  }
 }
 
 template <class T>
-void SigmoidNode<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& labels) {
+void ReLUNode<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& labels) {
   CHECK_EQ(this->get_activation_ptr()->cols(), labels.cols())
       << "CalcLoss() for SigL2Node is failed: "
       << "activation and data matrix dimensions are not equal!";
@@ -70,7 +71,7 @@ void SigmoidNode<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& labels) {
 }
 
 // Instantiate class, otherwise compilation will fail
-template class SigmoidNode<float>;
-template class SigmoidNode<double>;
+template class ReLUNode<float>;
+template class ReLUNode<double>;
 
 }  // namespace intellgraph
