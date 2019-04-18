@@ -20,6 +20,7 @@ include_directories(third_party/boost)
 include_directories(third_party/eigen-git-mirror)
 include_directories(third_party/glog/src)
 include_directories(third_party/mnist/include)
+include_directories(third_party/llvm/include)
 
 set(MNIST_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/mnist/include)
 set(MNIST_DATA_DIR ${PROJECT_SOURCE_DIR}/third_party/mnist)
