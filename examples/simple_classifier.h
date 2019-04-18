@@ -20,7 +20,7 @@ Contributor(s):
 
 #include "edge/edge_headers.h"
 #include "graph/classifier.h"
-#include "graph/graphfxn.h"
+#include "graph/graph.h"
 #include "node/node_headers.h"
 #include "utility/common.h"
 
@@ -66,21 +66,20 @@ class Example1 {
 
     // SigmoidNode is an internal node which uses Sigmoid function as activation
     // function. 
-    //auto node_param1 = NodeParameter(0, "SigmoidNode", {2});
+    auto node_param1 = NodeParameter(0, "SigmoidNode", {2});
 
     // SigL2Node uses Sigmoid function as activation function and l2 norm as
     // loss function.
-    //auto node_param2 = NodeParameter(1, "SigL2Node", {1});
+    auto node_param2 = NodeParameter(1, "SigL2Node", {1});
 
     // IntellGraph implements Boost Graph library and stores node and edge
     // information in the adjacency list.
     Classifier<float> classifier;
-    classifier.set_edge({"SigmoidNode", 2}, {"SigL2Node", 1}, "DenseEdge");
     // DenseEdge represents fully connected networks
-    //classifier.AddEdge(node_param1, node_param2, "DenseEdge");
+    classifier.AddEdge(node_param1, node_param2, "DenseEdge");
 
-    //classifier.set_input_node_id(0);
-    //classifier.set_output_node_id(1);
+    classifier.set_input_node_id(0);
+    classifier.set_output_node_id(1);
 
     classifier.Instantiate();
 
@@ -93,7 +92,7 @@ class Example1 {
       std::cout << "Epoch: " << epoch << "/" << loops << std::endl;
       for (int i = 0; i < 6; ++i) {
         int col = rand() % data_num;
-        classifier.Derivative(training_data.col(col), training_labels.col(col));
+        classifier.Backward(training_data.col(col), training_labels.col(col));
         // Stochastic gradient decent
         classifier.get_edge_weight_ptr(0, 1)->array() -= \
             eta * classifier.get_edge_nabla_ptr(0, 1)->array();

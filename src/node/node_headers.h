@@ -21,7 +21,6 @@ Contributor(s):
 #include "node/node_registry.h"
 #include "node/node.h"
 #include "node/output_node.h"
-#include "node/relu_node.h"
 #include "node/sigmoid_cross_entropy.h"
 #include "node/sigmoid_l2_node.h"
 #include "node/sigmoid_node.h"

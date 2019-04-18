@@ -1,23 +1,10 @@
-# IntellGraph [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+# IntellGraph
 
-A Deep Learning Framework in C++, developed with Just-in-time Compilation and Symbolic Computation.
+A Deep Learning Framework in C++
 
-# Description
-IntellGraph is an abbreviation of Intelligent Graph. As the name indicates, the IntellGraph framework is developed for Artifical Intelligence and is abstracted 
-based on Graph Theory. The project is still under development. In current version, users are able to use it for constructing fully connected deep neural networks 
-with different activation and loss functions (e.g. sigmoid activation function, mean square error loss function, cross-entropy loss function, etc). Examples 
-(in the example/ directory) are prepared to show the capability of the IntellGraph project and you are encouraged to study them before building your own neural 
-networks.
 
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-
-### Prerequisites
-* [Homebrew](https://brew.sh)
-* [CMake](https://cmake.org)
-
-### Building
+# Installation
+### Building The Project
 
 #### Git Clone
 
@@ -32,10 +19,18 @@ $ git submodule init && git submodule update
 
 Now we should be in the project's top level folder. 
 
+#### Project Structure
+
+There are three empty folders: `lib`, `bin`, and `include`. Those are populated by `make install`.
+
+`src` is the sources, and `test` is where we put our unit tests.
+
+Now we can build this project, and below we show two separate ways to do so.
+
 #### Building Manually
 
 ```bash
-$ rm -rf build/manual && mkdir -p build/manual
+$ rm -rf build/manual && mkdir build/manual
 $ cd build/manual
 $ cmake ../..
 $ make && make install
@@ -52,16 +47,7 @@ There is a handy BASH script (used by the Travis CI) that you can run locally. I
 ./run.sh
 ```
 
-<!--
-## Contribution guidelines
-If you want to contribute to IntellGraph, be sure to review the [contribution guidelines](CONTRIBUTING.md) and [development tutorial](DEVELOPMENT_TUTORIAL.md). By participating, you are also expected to join the Gitter community:
+### Acknowledgements
+We use the cmake-project-template developed by Konstantin Gredeskoul. For more information, please refer to https://github.com/kigster/cmake-project-template
 
-[![Gitter chat](https://badges.gitter.im/lingbozhang/gitter.png)](https://gitter.im/intellgraph/community)
--->
 
-## License
-[Apache License](LICENSE)
-
-## Acknowledgments
-
-- IntellGraph uses and modifies the [cmake-project-template](https://github.com/kigster/cmake-project-template) developed by Konstantin Gredeskoul. 
