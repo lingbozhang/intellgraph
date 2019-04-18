@@ -75,6 +75,12 @@ void FeedState<T>::ToAct(Node<T>* node) {
 }
 
 template <class T>
+void FeedState<T>::ToDropout(Node<T>* node) {
+  LOG(INFO) << "Node: " << node->ref_node_id()
+            << ", ToDropout() is called, but state remains in FeedState";
+}
+
+template <class T>
 void FeedState<T>::ToPrime(Node<T>* node) {
   LOG(INFO) << "Node: " << node->ref_node_id()
             << ", ToPrime() is called, but state remains in FeedState";

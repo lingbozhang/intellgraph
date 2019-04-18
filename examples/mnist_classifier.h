@@ -18,8 +18,9 @@ Contributor(s):
 #include <iostream>
 
 #include "edge/edge_headers.h"
+#include "load_mnist_data.h"
 #include "graph/classifier.h"
-#include "graph/graph.h"
+#include "graph/graphfxn.h"
 #include "mnist/mnist_reader.hpp"
 #include "node/node_headers.h"
 #include "transformer/internal_representation.h"
@@ -35,59 +36,24 @@ class Example2 {
     std::cout << "=====================================" << std::endl;
     std::cout << "A Simple Classifier for MNIST dataset" << std::endl;
     std::cout << "=====================================" << std::endl;
-    // Loads MNIST data
-    mnist::MNIST_dataset<std::vector, std::vector<uint8_t>, uint8_t> dataset =
-        mnist::read_dataset<std::vector, std::vector, uint8_t, uint8_t>( \
-        MNIST_DATA_LOCATION);
 
-    std::cout << "Nbr of training images = " << dataset.training_images.size() \
-              << std::endl;
-    std::cout << "Nbr of training labels = " << dataset.training_labels.size() \
-              << std::endl;
-    std::cout << "Nbr of test images = " << dataset.test_images.size() \
-              << std::endl;
-    std::cout << "Nbr of test labels = " << dataset.test_labels.size() \
-              << std::endl;
+    size_t nbr_training_data = 50000;
+    size_t nbr_test_data = 10000;
+    MatXX<float> training_images, training_labels;
+    MatXX<float> test_images, test_labels;
 
-    size_t nbr_training_data = dataset.training_images.size();
-    size_t nbr_training_feature = dataset.training_images[0].size();
-    size_t nbr_test_data = dataset.test_images.size();
-    size_t nbr_test_feature = dataset.test_images[0].size();
-    // Converts vector data structure to MatXX data structure
-    std::vector<std::vector<uint8_t>> temp_labels(nbr_training_data, \
-        std::vector<uint8_t>(10, 0));
-    for (size_t i = 0; i < nbr_training_data; ++i) {
-      size_t index = dataset.training_labels[i];
-      temp_labels[i][index] = 1;
-    }
-
-    IntRepr<uint8_t> training_images_int(dataset.training_images);
-    IntRepr<uint8_t> training_labels_int(temp_labels);
-    IntRepr<uint8_t> test_images_int(dataset.test_images);
-    IntRepr<uint8_t> test_labels_int(dataset.test_labels);
-
-    MatXX<float> training_images = training_images_int.ToMatXXUPtr( \
-        nbr_training_data, nbr_training_feature);
-    MatXX<float> training_labels = training_labels_int.ToMatXXUPtr( \
-        nbr_training_data, 10);
-    MatXX<float> test_images = test_images_int.ToMatXXUPtr( \
-        nbr_test_data, nbr_test_feature);
-    MatXX<float> test_labels = test_labels_int.ToMatXXUPtr( \
-        nbr_test_data, 1);
-  
-    // Normalizes features (this is very important !)
-    training_images.array() /= 255.0;
-    test_images.array() /= 255.0;
-    training_images.transposeInPlace();
-    test_images.transposeInPlace();
-    training_labels.transposeInPlace();
-    test_labels.transposeInPlace();
+    LoadMNIST<float>::LoadData(nbr_training_data,
+                               nbr_test_data,
+                               training_images,
+                               training_labels,
+                               test_images,
+                               test_labels);
 
     // SigmoidNode is an input layer which uses Sigmoid function as activation
     // function. 
     auto node_param1 = NodeParameter(0, "SigmoidNode", {784});
     // SigmoidNode uses Sigmoid function as the activation function
-    auto node_param2 = NodeParameter(1, "SigmoidNode", {100});
+    auto node_param2 = NodeParameter(1, "SigmoidNode", {30});
     // SigL2Node uses Sigmoid function as activation function and the cross \
     // entropy function as loss function.
     auto node_param3 = NodeParameter(4, "SigCENode", {10});
@@ -105,12 +71,13 @@ class Example2 {
     NodeRegistry::LoadNodeRegistry();
     EdgeRegistry::LoadEdgeRegistry();
 
+    //classifier.TurnDropoutOn(0.5);
     classifier.Instantiate();
 
-    float eta = 0.5;
+    float eta = 0.1;
     int loops = 100;
-    int minbatch_size = 100;
-    float lambda = 5.0;
+    int minbatch_size = 10;
+    float lambda = 5;
     std::cout << "Learning rate: " << eta << std::endl;
     std::cout << "Total epochs: " << loops << std::endl;
     std::cout << "Min-batch size: " << minbatch_size << std::endl;
@@ -129,7 +96,7 @@ class Example2 {
       training_images = training_images * perm;
       training_labels = training_labels * perm;
       for (int i = 0; i < nbr_training_data - minbatch_size; i += minbatch_size) {
-        classifier.Backward(training_images.block(0, i, 784, minbatch_size), \
+        classifier.Derivative(training_images.block(0, i, 784, minbatch_size), \
                             training_labels.block(0, i, 10, minbatch_size));
         // Stochastic gradient decent + L2 regularization
         classifier.get_edge_weight_ptr(1, 4)->array() = \

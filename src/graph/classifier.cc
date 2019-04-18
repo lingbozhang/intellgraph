@@ -12,9 +12,26 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
+#include <math.h>
+
 #include "graph/classifier.h"
 
 namespace intellgraph {
+
+template <class T>
+Graphfxn<T>& Classifier<T>::set_edge(
+    const std::pair<std::string, size_t>& node_pair_in, \
+    const std::pair<std::string, size_t>& node_pair_out, \
+    const std::string& edge_name) {
+  
+  NodeParameter node_param_in = NodeParameter(
+      index_map_.size(), node_pair_in.first, {node_pair_in.second});
+  NodeParameter node_param_out = NodeParameter(
+      index_map_.size() + 1, node_pair_out.first, {node_pair_out.second});
+
+  AddEdge(node_param_in, node_param_out, edge_name);
+  return *this;
+}
 
 template <class T>
 void Classifier<T>::AddEdge(const NodeParameter& node_param_in, \
@@ -67,6 +84,9 @@ void Classifier<T>::Instantiate() {
   input_node_ptr_ = nullptr;
   output_node_ptr_ = nullptr;
 
+  if (output_node_id_ == 0 && input_node_id_ == 0) {
+     output_node_id_ = node_param_map_.size() - 1;
+  }
   // Instantiates the input node object
   auto input_node_ptr = std::move(NodeFactory<T, Node<T>>::Instantiate( \
       node_param_map_[input_node_id_]));
@@ -91,6 +111,7 @@ void Classifier<T>::Instantiate() {
       LOG(INFO) << "Initializes node: " << node_id
                 << ", with standard normal distribution";
       node_ptr->InitializeBias(NormalFunctor<T>(0.0, 1.0));
+      if (dropout_on_) node_ptr->TurnDropoutOn(dropout_p_);
       node_map_[index_map_[node_id]] = std::move(node_ptr);
     }
   }
@@ -100,8 +121,9 @@ void Classifier<T>::Instantiate() {
         edge_pair.second));
     // Initializes weight matrix with standard normal distribution
     LOG(INFO) << "Initializes edge: " << edge_pair.first
-              << ", with standard normal distribution";
-    edge_ptr->InitializeWeight(NormalFunctor<T>(0.0, 1.0));
+              << ", with normal distribution";
+    size_t weight_row = edge_ptr->get_weight_ptr()->rows();
+    edge_ptr->InitializeWeight(NormalFunctor<T>(0.0, 1.0 / sqrt(weight_row)));
     edge_map_[edge_pair.first] = std::move(edge_ptr);
   }
 
@@ -134,7 +156,12 @@ void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t vtx_in_id = *it_r;
     LOG(INFO) << "Forwarding vertex: " << vtx_in_id;
-    if (*it_r != index_map_[input_node_id_]) node_map_[*it_r]->ToAct();
+    if (*it_r != index_map_[input_node_id_]) {
+      node_map_[*it_r]->ToAct();
+      if (node_map_[*it_r]->ref_dropout_on()) {
+        node_map_[*it_r]->ToDropout();
+      }
+    }
     for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
       size_t vtx_out_id = target(*eo, graph_);
       size_t edge_id = graph_[*eo].id;
@@ -151,8 +178,8 @@ void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
 }
 
 template <class T>
-void Classifier<T>::Backward(const Eigen::Ref<const MatXX<T>>& training_data, \
-                             const Eigen::Ref<const MatXX<T>>& training_labels) {
+void Classifier<T>::Derivative(const Eigen::Ref<const MatXX<T>>& training_data, \
+                               const Eigen::Ref<const MatXX<T>>& training_labels) {
   Forward(training_data, training_labels);
   LOG(INFO) << "======================"
             << "BACKWARDING . . ."
@@ -188,7 +215,7 @@ void Classifier<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
   }
 
   LOG(INFO) << "======================"
-            << "FORWARDING . . ."
+            << "Evaluating . . ."
             << "======================";
 
   input_node_ptr_->FeedFeature(test_data);
@@ -196,7 +223,13 @@ void Classifier<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t vtx_in_id = *it_r;
     LOG(INFO) << "Forwarding vertex: " << vtx_in_id;
-    if (*it_r != index_map_[input_node_id_] ) node_map_[*it_r]->ToAct();
+    if (*it_r != index_map_[input_node_id_] ) {
+       node_map_[*it_r]->ToAct();
+       if (node_map_[*it_r]->ref_dropout_on()) {
+          node_map_[*it_r]->get_activation_ptr()->array() *= \
+              node_map_[*it_r]->ref_dropout_p();
+       }
+    }
     for (std::tie(eo, eo_end) = out_edges(*it_r, graph_); eo != eo_end; ++eo) {
       size_t vtx_out_id = target(*eo, graph_);
       size_t edge_id = graph_[*eo].id;
