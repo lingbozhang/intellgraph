@@ -13,3 +13,6 @@
 [submodule "third_party/llvm"]
 	path = third_party/llvm
 	url = https://github.com/llvm-mirror/llvm
+[submodule "third_party/llvm-project"]
+	path = third_party/llvm-project
+	url = https://github.com/llvm/llvm-project
