@@ -12,8 +12,8 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_GRAPH_GRPAPHFXN_H_
-#define INTELLGRAPH_GRAPH_GRPAPHFXN_H_
+#ifndef INTELLGRAPH_GRAPH_GRPAPH_H_
+#define INTELLGRAPH_GRAPH_GRPAPH_H_
 
 #include "edge/edge_headers.h"
 #include "node/node_headers.h"
@@ -33,16 +33,11 @@ typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, \
 typedef IntellGraph::vertex_descriptor VertexD;
 typedef IntellGraph::edge_descriptor EdgeD;
 
-// An interface for neural graphic function
+// An interface for neural graphs
 template <class T>
-interface Graphfxn {
+interface Graph {
  public:
-  virtual ~Graphfxn() noexcept = default;
-
-  MUTE virtual Graphfxn& set_edge(
-      REF const std::pair<std::string, size_t>& node_param_in, \
-      REF const std::pair<std::string, size_t>& node_param_out, \
-      REF const std::string& edge_name) = 0;
+  virtual ~Graph() noexcept = default;
 
   virtual void AddEdge(REF const NodeParameter& node_param_in, \
                        REF const NodeParameter& node_param_out, \
@@ -55,7 +50,7 @@ interface Graphfxn {
   virtual void Forward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
       REF const Eigen::Ref<const MatXX<T>>& training_labels) = 0;
 
-  virtual void Derivative(REF const Eigen::Ref<const MatXX<T>>& training_data, \
+  virtual void Backward(REF const Eigen::Ref<const MatXX<T>>& training_data, \
       REF const Eigen::Ref<const MatXX<T>>& training_labels) = 0;
 
   virtual void Evaluate(REF const Eigen::Ref<const MatXX<T>>& test_data, \
@@ -75,12 +70,8 @@ interface Graphfxn {
 
   virtual inline bool set_input_node_id(COPY size_t id) = 0;
 
-  virtual inline void TurnDropoutOn(COPY T dropout_p) = 0;
-
-  virtual inline void TurnDropoutOff() = 0;
-
 };
 
 }  // intellgraph
 
-#endif  // INTELLGRAPH_GRAPH_GRPAPHFXN_H_
+#endif  // INTELLGRAPH_GRAPH_GRPAPH_H_

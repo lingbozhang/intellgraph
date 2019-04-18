@@ -112,10 +112,6 @@ class Node {
     return dropout_on_;
   }
 
-  REF virtual inline const T ref_dropout_p() const {
-     return dropout_p_;
-  }
-
   virtual inline void InitializeBias(REF const std::function<T(T)>& functor) {
     if (functor == nullptr) {
       LOG(WARNING) << "InitializeBias() for Node is failed: " 
@@ -186,7 +182,7 @@ class Node {
   virtual void Activate() = 0;
 
   virtual inline void Dropout() {
-    activation_.array() = activation_.array().unaryExpr(std::function<T(T)>( \
+    activation_.array().unaryExpr(std::function<T(T)>( \
         BernoulliFunctor<T>(dropout_p_)));
   }
 
@@ -306,8 +302,6 @@ class FeedState : implements ActState<T> {
   void ToInit(MUTE Node<T>* node) final;
 
   void ToAct(MUTE Node<T>* node) final;
-
-  void ToDropout(MUTE Node<T>* node) final;
 
   void ToPrime(MUTE Node<T>* node) final;
 

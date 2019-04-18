@@ -91,14 +91,6 @@ class SigCENode : public OutputNode<T> {
     return node_ptr_->ref_dropout_on();
   }
 
-  COPY std::string get_node_state() final {
-    return node_ptr_->get_node_state();
-  }
-
-  REF inline const T ref_dropout_p() const final {
-    return node_ptr_->ref_dropout_p();
-  }
-
   inline void InitializeBias(REF const std::function<T(T)>& functor) final {
     node_ptr_->InitializeBias(functor);
   }
@@ -144,6 +136,10 @@ class SigCENode : public OutputNode<T> {
     node_ptr_->ToFeed();
   }
 
+  virtual std::string get_node_state() final {
+    return node_ptr_->get_node_state();
+  }
+  
  protected:
   void Activate() final {
     node_ptr_->Activate();
