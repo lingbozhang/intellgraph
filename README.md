@@ -16,6 +16,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 * [Homebrew](https://brew.sh)
 * [CMake](https://cmake.org)
+* [Conan](https://conan.io)
 
 ### Building
 
@@ -26,8 +27,6 @@ First we need to check out the git repo:
 ```bash
 $ cd ${insert your workspace folder here}
 $ git clone https://github.com/lingbozhang/IntellGraph my-project
-$ cd my-project
-$ git submodule init && git submodule update
 ```
 
 Now we should be in the project's top level folder. 
@@ -37,20 +36,17 @@ Now we should be in the project's top level folder.
 ```bash
 $ rm -rf build/manual && mkdir -p build/manual
 $ cd build/manual
+$ conan install ../..
 $ cmake ../..
 $ make && make install
-$ cd ../..
-
-# Run the binary:
-$ bin/IntellGraph
 ```
-####  Building Using the Script
-
-There is a handy BASH script (used by the Travis CI) that you can run locally. It builds the project, and runs main function. Note run.sh takes 2-5 minutes to setup at first run (please be patient)
-
-```bash
-./run.sh
+## Run examples
+To run examples (codes are located in the examples/ directory), do following:
 ```
+$ cd intellgraph/build/manual/bin
+$ ./examples
+```
+
 ## Contribution guidelines
 If you want to contribute to IntellGraph, be sure to review the [contribution guidelines](CONTRIBUTING.md) and [development tutorial](DEVELOPMENT_TUTORIAL.md). By participating, you are also expected to join the Gitter community:
 
