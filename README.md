@@ -14,7 +14,7 @@ networks.
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
-* [Homebrew](https://brew.sh)
+* [Homebrew](https://brew.sh) (A package manager for MacOS and could be used to install CMake and Conan)
 * [CMake](https://cmake.org)
 * [Conan](https://conan.io)
 
