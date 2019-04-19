@@ -1,0 +1,7 @@
+[requires]
+boost/1.70.0@conan/stable
+glog/20181109@bincrafters/stable
+eigen/3.3.7@conan/stable
+
+[generators]
+cmake

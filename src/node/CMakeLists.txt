@@ -7,5 +7,5 @@ file(GLOB node_header *.h)
 
 add_library(node SHARED STATIC ${node_source})
 
-install(TARGETS node DESTINATION ${INTELLGRAPH_INSTALL_LIB_DIR})
-install(FILES ${node_header} DESTINATION ${INTELLGRAPH_INSTALL_INCLUDE_DIR})
+install(TARGETS node DESTINATION ${INTELLGRAPH_INSTALL_LIB_DIR}/node)
+install(FILES ${node_header} DESTINATION ${INTELLGRAPH_INSTALL_INCLUDE_DIR}/node)

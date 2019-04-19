@@ -15,7 +15,7 @@ Contributor(s):
 #ifndef INTELLGRAPH_EXAMPLE_LOAD_MNIST_DATA_H_
 #define INTELLGRAPH_EXAMPLE_LOAD_MNIST_DATA_H_
 
-#include "mnist/mnist_reader.hpp"
+#include "mnist-master/include/mnist/mnist_reader.hpp"
 #include "transformer/internal_representation.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"

@@ -21,7 +21,6 @@ Contributor(s):
 #include "load_mnist_data.h"
 #include "graph/classifier.h"
 #include "graph/graphfxn.h"
-#include "mnist/mnist_reader.hpp"
 #include "node/node_headers.h"
 #include "transformer/internal_representation.h"
 #include "utility/common.h"
