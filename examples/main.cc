@@ -5,7 +5,6 @@
 #include "simple_classifier.h"
 #include "utility/system.h"
 
-
 int main(int argc, char* argv[]) {
    // Initialize Google's logging library.
    FLAGS_alsologtostderr = true;
