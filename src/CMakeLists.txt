@@ -7,8 +7,9 @@ add_subdirectory(node)
 add_subdirectory(edge)
 add_subdirectory(graph)
 add_subdirectory(solver)
+#add_subdirectory(llvm)
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cc)
 
 add_executable(IntellGraph ${SOURCE_FILES})
 target_link_libraries(IntellGraph graph node edge ${CONAN_LIBS})
