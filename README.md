@@ -48,7 +48,7 @@ $ ./examples
 ```
 
 ## Contribution guidelines
-If you want to contribute to IntellGraph, be sure to review the [contribution guidelines](CONTRIBUTING.md) and [development tutorial](DEVELOPMENT_TUTORIAL.md). By participating, you are also expected to join the Gitter community:
+We welcome every people who interested in the IntellGraph project, if you want to contribute, please do not hesitate to contact me lingboz2015@gmail.com. You are recommended to review the [contribution guidelines](CONTRIBUTING.md) and [development tutorial](DEVELOPMENT_TUTORIAL.md). By participating, you are also expected to join the Gitter community:
 
 [![Gitter chat](https://badges.gitter.im/lingbozhang/gitter.png)](https://gitter.im/intellgraph/community)
 
