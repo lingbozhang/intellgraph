@@ -24,9 +24,8 @@ namespace intellgraph {
 template <class T>
 class GDSolver {
  public:
-  GDSolver(COPY T learning_rate, COPY T momentum_coeff = 0, COPY T lambda = 0) {
+  GDSolver(COPY T learning_rate, COPY T lambda = 0) {
     eta_ = learning_rate;
-    momentum_coeff_ = momentum_coeff;
     lambda_ = lambda;
   }
 
@@ -67,7 +66,6 @@ class GDSolver {
 
  private:
   T eta_{0};
-  T momentum_coeff_{0};
   T lambda_{0};
 
 };
