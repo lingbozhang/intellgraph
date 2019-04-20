@@ -15,6 +15,8 @@ Contributor(s):
 #ifndef INTELLGRAPH_GRAPH_GRPAPHFXN_H_
 #define INTELLGRAPH_GRAPH_GRPAPHFXN_H_
 
+#include <vector>
+
 #include "edge/edge_headers.h"
 #include "node/node_headers.h"
 #include "boost/graph/adjacency_list.hpp"
@@ -73,13 +75,22 @@ interface Graphfxn {
 
   virtual inline bool set_output_node_id(COPY size_t id) = 0;
 
+  virtual inline COPY T get_output_node_id() = 0;
+
   virtual inline bool set_input_node_id(COPY size_t id) = 0;
+
+  virtual inline COPY T get_input_node_id() = 0;
 
   virtual inline void TurnDropoutOn(COPY T dropout_p) = 0;
 
   virtual inline void TurnDropoutOff() = 0;
 
+  COPY virtual inline std::vector<size_t> get_order() = 0;
+
 };
+
+template <class T>
+using GraphfxnUPtr = std::unique_ptr<Graphfxn<T>>;
 
 }  // intellgraph
 

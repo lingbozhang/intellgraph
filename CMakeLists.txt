@@ -12,7 +12,7 @@ set(INTELLGRAPH_INSTALL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set(INTELLGRAPH_INSTALL_BIN_DIR ${PROJECT_SOURCE_DIR}/bin)
 set(INTELLGRAPH_INSTALL_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
 
-include_directories(${INTELLGRAPH_INSTALL_INCLUDE_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/src)
 
 add_subdirectory(src)
 add_subdirectory(examples)

@@ -15,6 +15,7 @@ Contributor(s):
 #ifndef INTELLGRAPH_GRAPH_CLASSIFIER_H_
 #define INTELLGRAPH_GRAPH_CLASSIFIER_H_
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -149,6 +150,10 @@ class Classifier : implements Graphfxn<T> {
     return true;
   }
 
+  COPY inline T get_output_node_id() final {
+    return output_node_id_;
+  }
+
   inline bool set_input_node_id(COPY const size_t id) final {
     if (node_param_map_.count(id) == 0) {
       LOG(ERROR) << "node: " << id << " does not exist in the graph."; 
@@ -158,15 +163,23 @@ class Classifier : implements Graphfxn<T> {
     return true;
   }
 
-  virtual inline void TurnDropoutOn(T dropout_p) {
+  COPY inline T get_input_node_id() final {
+    return input_node_id_;
+  }
+
+  inline void TurnDropoutOn(T dropout_p) final {
     dropout_on_ = true;
     CHECK_GT(1.0, dropout_p) << "TurnDropoutOn() for Node is failed.";
     dropout_p_ = dropout_p;
   }
 
-  virtual inline void TurnDropoutOff() {
+  inline void TurnDropoutOff() final {
     dropout_on_ = false;
     dropout_p_ = 1.0;
+  }
+
+  COPY inline std::vector<size_t> get_order() final {
+    return order_;
   }
 
  private:
@@ -198,6 +211,9 @@ class Classifier : implements Graphfxn<T> {
   T dropout_p_{1.0};
 
 };
+
+template <class T>
+using ClassifierUPtr = std::unique_ptr<Classifier<T>>;
 
 }  // intellgraph
 

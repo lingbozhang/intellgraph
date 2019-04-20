@@ -49,7 +49,12 @@ void DenseEdge<T>::Forward(Node<T>* node_in_ptr, \
       << "Forward() in DenseEdge is failed:"
       << "Dimensions of weight and activation from input node are not equal.";
 
-  node_out_ptr->get_activation_ptr()->noalias() = \
+  CHECK_EQ(weight_ptr_->cols(), node_out_ptr->get_activation_ptr()->rows())
+      << "Forward() in DenseEdge is failed:"
+      << "Dimensions of weight and activation from output node are not equal.";
+
+  // Note activation matrix value is added rather than overwritten
+  node_out_ptr->get_activation_ptr()->noalias() += \
       (weight_ptr_->transpose() * \
       node_in_ptr->get_activation_ptr()->matrix()).colwise() + \
       *node_out_ptr->get_bias_ptr();

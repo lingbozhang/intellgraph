@@ -1,13 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(IntellGraph)
 
-include_directories(${PROJECT_SOURCE_DIR})
-
 add_subdirectory(transformer)
 add_subdirectory(utility)
 add_subdirectory(node)
-add_subdirectory(graph)
 add_subdirectory(edge)
+add_subdirectory(graph)
+add_subdirectory(solver)
 
 set(SOURCE_FILES main.cpp)
 

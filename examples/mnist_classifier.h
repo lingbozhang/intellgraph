@@ -19,9 +19,9 @@ Contributor(s):
 
 #include "edge/edge_headers.h"
 #include "load_mnist_data.h"
-#include "graph/classifier.h"
 #include "graph/graphfxn.h"
 #include "node/node_headers.h"
+#include "solver/gradient_decent.h"
 #include "transformer/internal_representation.h"
 #include "utility/common.h"
 
@@ -36,7 +36,7 @@ class Example2 {
     std::cout << "A Simple Classifier for MNIST dataset" << std::endl;
     std::cout << "=====================================" << std::endl;
 
-    size_t nbr_training_data = 50000;
+    size_t nbr_training_data = 1000;
     size_t nbr_test_data = 10000;
     MatXX<float> training_images, training_labels;
     MatXX<float> test_images, test_labels;
@@ -48,35 +48,28 @@ class Example2 {
                                test_images,
                                test_labels);
 
-    // SigmoidNode is an input layer which uses Sigmoid function as activation
-    // function. 
-    auto node_param1 = NodeParameter(0, "SigmoidNode", {784});
-    // SigmoidNode uses Sigmoid function as the activation function
-    auto node_param2 = NodeParameter(1, "SigmoidNode", {30});
-    // SigL2Node uses Sigmoid function as activation function and the cross \
-    // entropy function as loss function.
-    auto node_param3 = NodeParameter(4, "SigCENode", {10});
-
-    // IntellGraph implements Boost Graph library and stores node and edge
-    // information in the adjacency list.
-    Classifier<float> classifier;
-    // DenseEdge represents fully connected networks
-    classifier.AddEdge(node_param1, node_param2, "DenseEdge");
-    classifier.AddEdge(node_param2, node_param3, "DenseEdge");
-
-    classifier.set_input_node_id(0);
-    classifier.set_output_node_id(4);
-
+    // Registers node and edge classes
     NodeRegistry::LoadNodeRegistry();
     EdgeRegistry::LoadEdgeRegistry();
-
+    // SigmoidNode is an input layer which uses Sigmoid function as activation
+    // function. 
+    // ReLUNode uses rectified linear unit function as the activation function
+    // SigCEode uses Sigmoid function as activation function and the cross \
+    // entropy function as loss function.
+    Graphfxn<float> classifier;
+    // Turns dropout on: dropout probability 0.5
     //classifier.TurnDropoutOn(0.5);
-    classifier.Instantiate();
+    classifier.AddEdge({"SigmoidNode", {0, 784}}, {"SigmoidNode", {1, 400}}, \
+                       "DenseEdge")
+              .AddEdge({"SigmoidNode", {1, 400}}, {"SigCENode", {2, 10}}, \
+                       "DenseEdge")
+              .Create();
 
-    float eta = 0.1;
+    float eta = 1;
+    float lambda = 0.0 / nbr_training_data;
+    GDSolver<float> solver(eta, lambda);
     int loops = 100;
     int minbatch_size = 10;
-    float lambda = 5;
     std::cout << "Learning rate: " << eta << std::endl;
     std::cout << "Total epochs: " << loops << std::endl;
     std::cout << "Min-batch size: " << minbatch_size << std::endl;
@@ -95,24 +88,9 @@ class Example2 {
       training_images = training_images * perm;
       training_labels = training_labels * perm;
       for (int i = 0; i < nbr_training_data - minbatch_size; i += minbatch_size) {
-        classifier.Derivative(training_images.block(0, i, 784, minbatch_size), \
-                            training_labels.block(0, i, 10, minbatch_size));
-        // Stochastic gradient decent + L2 regularization
-        classifier.get_edge_weight_ptr(1, 4)->array() = \
-            (1.0 - eta * lambda / nbr_training_data) * \
-            classifier.get_edge_weight_ptr(1, 4)->array() - \
-            eta * classifier.get_edge_nabla_ptr(1, 4)->array();
-        
-        classifier.get_edge_weight_ptr(0, 1)->array() = \
-            (1.0 - eta * lambda / nbr_training_data) * \
-            classifier.get_edge_weight_ptr(0, 1)->array() - \
-            eta * classifier.get_edge_nabla_ptr(0, 1)->array();
-        
-        classifier.get_node_bias_ptr(4)->array() -= eta / minbatch_size * \
-            classifier.get_node_delta_ptr(4)->rowwise().sum().array();
-        
-        classifier.get_node_bias_ptr(1)->array() -= eta / minbatch_size * \
-            classifier.get_node_delta_ptr(1)->rowwise().sum().array();
+        solver.Train(training_images.block(0, i, 784, minbatch_size), \
+                     training_labels.block(0, i, 10, minbatch_size), \
+                     &classifier);
       }
       classifier.Evaluate(test_images, test_labels);
     }

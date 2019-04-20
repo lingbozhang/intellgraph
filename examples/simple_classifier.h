@@ -19,9 +19,9 @@ Contributor(s):
 #include <memory>
 
 #include "edge/edge_headers.h"
-#include "graph/classifier.h"
 #include "graph/graphfxn.h"
 #include "node/node_headers.h"
+#include "solver/gradient_decent.h"
 #include "utility/common.h"
 
 using namespace std;
@@ -66,39 +66,28 @@ class Example1 {
 
     // SigmoidNode is an internal node which uses Sigmoid function as activation
     // function. 
-    //auto node_param1 = NodeParameter(0, "SigmoidNode", {2});
-
     // SigL2Node uses Sigmoid function as activation function and l2 norm as
     // loss function.
-    //auto node_param2 = NodeParameter(1, "SigL2Node", {1});
-
-    // IntellGraph implements Boost Graph library and stores node and edge
-    // information in the adjacency list.
-    Classifier<float> classifier;
-    classifier.set_edge({"SigmoidNode", 2}, {"SigL2Node", 1}, "DenseEdge");
     // DenseEdge represents fully connected networks
-    //classifier.AddEdge(node_param1, node_param2, "DenseEdge");
+    Graphfxn<float> classifier;
+    // The first number indicates: node_index, 
+    // second number indicates number of neurons in each node.
+    classifier.AddEdge({"SigmoidNode", {0, 2}}, {"SigL2Node", {1, 1}}, "DenseEdge")
+              .Create();
 
-    //classifier.set_input_node_id(0);
-    //classifier.set_output_node_id(1);
+    float eta = 1.0;
+    GDSolver<float> solver(eta);
 
-    classifier.Instantiate();
-
-    float eta = 1;
     int loops = 50;
-    std::cout << "Learning rate: " << eta << std::endl;
+    std::cout << "Learning rate: " << 1 << std::endl;
     std::cout << "Total epochs: " << loops << std::endl;
     int data_num = 6;
     for (int epoch = 0; epoch < loops; ++epoch) {
       std::cout << "Epoch: " << epoch << "/" << loops << std::endl;
       for (int i = 0; i < 6; ++i) {
         int col = rand() % data_num;
-        classifier.Derivative(training_data.col(col), training_labels.col(col));
-        // Stochastic gradient decent
-        classifier.get_edge_weight_ptr(0, 1)->array() -= \
-            eta * classifier.get_edge_nabla_ptr(0, 1)->array();
-        classifier.get_node_bias_ptr(1)->array() -= eta * \
-            classifier.get_node_delta_ptr(1)->array();
+        solver.Train(training_data.col(col), training_labels.col(col), \
+            &classifier);
       }
       classifier.Evaluate(test_data, test_labels);
     }

@@ -12,31 +12,33 @@ limitations under the License.
 Contributor(s):
 	Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#include <math.h>
-
-#include "graph/classifier.h"
+#include "graph/graphfxn.h"
 
 namespace intellgraph {
 
 template <class T>
-Graphfxn<T>& Classifier<T>::set_edge(
-    const std::pair<std::string, size_t>& node_pair_in, \
-    const std::pair<std::string, size_t>& node_pair_out, \
-    const std::string& edge_name) {
-  
-  NodeParameter node_param_in = NodeParameter(
-      index_map_.size(), node_pair_in.first, {node_pair_in.second});
-  NodeParameter node_param_out = NodeParameter(
-      index_map_.size() + 1, node_pair_out.first, {node_pair_out.second});
+Graphfxn<T>& Graphfxn<T>::AddEdge( \
+      REF const std::pair<std::string, std::vector<size_t>>& node_pair_in, \
+      REF const std::pair<std::string, std::vector<size_t>>& node_pair_out, \
+      REF const std::string& edge_name) {
+  NodeParameter node_param_in = NodeParameter( \
+      node_pair_in.second[0], node_pair_in.first, {node_pair_in.second[1]});
+  NodeParameter node_param_out = NodeParameter( \
+      node_pair_out.second[0], node_pair_out.first, {node_pair_out.second[1]});
 
   AddEdge(node_param_in, node_param_out, edge_name);
   return *this;
+
 }
 
 template <class T>
-void Classifier<T>::AddEdge(const NodeParameter& node_param_in, \
-                            const NodeParameter& node_param_out, \
-                            const std::string& edge_name) {
+void Graphfxn<T>::AddEdge(REF const NodeParameter& node_param_in, \
+                          REF const NodeParameter& node_param_out, \
+                          REF const std::string& edge_name) {
+  if (is_created_) {
+    LOG(WARNING) << "Graphfxn has been created and AddEdge() is failed.";
+    return;
+  }
   // Construct node objects and put them in the node_map_
   size_t node_in_id = node_param_in.ref_id();
   size_t node_out_id = node_param_out.ref_id();
@@ -45,12 +47,10 @@ void Classifier<T>::AddEdge(const NodeParameter& node_param_in, \
   EdgeProperty edge_property{};
 
   if (node_param_map_.count(node_in_id) == 0) {
-    index_map_[node_in_id] = node_param_map_.size();
     node_param_map_[node_in_id].Clone(node_param_in);
   }
 
   if (node_param_map_.count(node_out_id) == 0) {
-    index_map_[node_out_id] = node_param_map_.size();
     node_param_map_[node_out_id].Clone(node_param_out);
   }
   
@@ -62,21 +62,21 @@ void Classifier<T>::AddEdge(const NodeParameter& node_param_in, \
   edge_param.set_dims_in(node_param_in.ref_dims());
   edge_param.set_dims_out(node_param_out.ref_dims());
 
-  VertexD vtx_in_id = index_map_[node_in_id];
-  VertexD vtx_out_id = index_map_[node_out_id];
+  VertexD vtx_in_id = node_in_id;
+  VertexD vtx_out_id = node_out_id;
 
-  if (!boost::add_edge(vtx_in_id, vtx_out_id, edge_property, graph_). \
-      second) {
+  if (!boost::add_edge(vtx_in_id, vtx_out_id, edge_property, graph_).second) {
     LOG(WARNING) << "Edge has already been added";
     return;
   }
   edge_param_map_[edge_property.id].Clone(edge_param);
+
 }
 
 template <class T>
-void Classifier<T>::Instantiate() {
+void Graphfxn<T>::Create() {
   LOG(INFO) << "========================="
-            << "INSTANTIATING CLASSIFIER"
+            << "CREATING CLASSIFIER"
             << "=========================";
 
   node_map_.clear();
@@ -84,20 +84,20 @@ void Classifier<T>::Instantiate() {
   input_node_ptr_ = nullptr;
   output_node_ptr_ = nullptr;
 
-  if (output_node_id_ == 0 && input_node_id_ == 0) {
+  if (output_node_id_ == 0 ) {
      output_node_id_ = node_param_map_.size() - 1;
   }
   // Instantiates the input node object
   auto input_node_ptr = std::move(NodeFactory<T, Node<T>>::Instantiate( \
       node_param_map_[input_node_id_]));
   input_node_ptr_ = input_node_ptr.get();
-  node_map_[index_map_[input_node_id_]] = std::move(input_node_ptr);
+  node_map_[input_node_id_] = std::move(input_node_ptr);
   
   // Instantiates the output node object
   auto output_node_ptr = std::move(NodeFactory<T, OutputNode<T>>::Instantiate( \
       node_param_map_[output_node_id_]));
   output_node_ptr_ = output_node_ptr.get();
-  node_map_[index_map_[output_node_id_]] = std::move(output_node_ptr);
+  node_map_[output_node_id_] = std::move(output_node_ptr);
 
   LOG(INFO) << "Initializes output node with standard normal distribution";
   output_node_ptr_->InitializeBias(NormalFunctor<T>(0.0, 1.0));
@@ -112,7 +112,7 @@ void Classifier<T>::Instantiate() {
                 << ", with standard normal distribution";
       node_ptr->InitializeBias(NormalFunctor<T>(0.0, 1.0));
       if (dropout_on_) node_ptr->TurnDropoutOn(dropout_p_);
-      node_map_[index_map_[node_id]] = std::move(node_ptr);
+      node_map_[node_id] = std::move(node_ptr);
     }
   }
   // Instantiates edge objects;
@@ -130,24 +130,82 @@ void Classifier<T>::Instantiate() {
   order_.clear();
   LOG(INFO) << "Determines Forward() orders by topological sorting";
   topological_sort(graph_, std::back_inserter(order_));
-  instantiated_ = true;
+  visited_ = std::vector<bool>(order_.size(), false);
+  is_created_ = true;
+
 }
 
 template <class T>
-void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
-                            const Eigen::Ref<const MatXX<T>>& training_labels) {
+void Graphfxn<T>::RemoveEdge(size_t node_in_id, size_t node_out_id) {
+  if (is_created_) {
+    LOG(WARNING) << "RemoveEdge() for Graphfxn is failed, "
+                 << "Graphfxn has been created";
+    return;
+  }
+  if (node_param_map_.count(node_in_id) == 0) {
+    LOG(WARNING) << "RemoveEdge() for Graphfxn is failed, "
+                 << "Node: " << node_in_id << " does not exist";
+    return;
+  }
+
+  if (node_param_map_.count(node_out_id) == 0) {
+    LOG(WARNING) << "RemoveEdge() for Graphfxn is failed, "
+                 << "Node: " << node_out_id << " does not exist";
+    return;
+  }
+
+  VertexD vtx_in_id = node_in_id;
+  VertexD vtx_out_id = node_out_id;
+
+  auto edge_pair = boost::edge(vtx_in_id, vtx_out_id, graph_);
+  edge_param_map_.erase(graph_[edge_pair.first].id);
+
+  remove_edge(vtx_in_id, vtx_out_id, graph_);
+
+  if (!out_degree(vtx_in_id, graph_) && !in_degree(vtx_in_id, graph_)) {
+    node_param_map_.erase(vtx_in_id);
+    remove_vertex(vtx_in_id, graph_);
+  }
+
+  if (!out_degree(vtx_out_id, graph_) && !in_degree(vtx_out_id, graph_)) {
+    node_param_map_.erase(vtx_out_id);
+    remove_vertex(vtx_out_id, graph_);
+  }
+
+}
+
+template <class T>
+void Graphfxn<T>::ClearGraph() {
+  if (is_created_) {
+    LOG(ERROR) << "ClearGraph() for Graphfxn is failed, "
+               << "Graphfxn has been created.";
+    exit(1);
+  }
+
+  output_node_id_ = 0;
+  input_node_id_ = 0;
+
+  node_param_map_.clear();
+  edge_param_map_.clear();
+
+}
+
+template <class T>
+void Graphfxn<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
+                          const Eigen::Ref<const MatXX<T>>& training_labels) {
   LOG(INFO) << "======================"
             << "FORWARDING . . ."
             << "======================";
 
-  if (!instantiated_) {
-     LOG(WARNING) << "Classifier is not instantiated: "
-                  << "Try to instantiate it";
-     Instantiate();
+  if (!is_created_) {
+     LOG(WARNING) << "Graphfxn is not created: "
+                  << "Try to create it";
+     Create();
   }
-  if (*order_.rbegin() != index_map_[input_node_id_ ] || \
-      *order_.begin() != index_map_[output_node_id_]) {
-     LOG(ERROR) << "Forward() in the Classifier is failed.";
+
+  if (*order_.rbegin() != input_node_id_ || \
+      *order_.begin() != output_node_id_) {
+     LOG(ERROR) << "Forward() in the Graphfxn is failed.";
      exit(1);
   }
 
@@ -156,7 +214,7 @@ void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t vtx_in_id = *it_r;
     LOG(INFO) << "Forwarding vertex: " << vtx_in_id;
-    if (*it_r != index_map_[input_node_id_]) {
+    if (*it_r != input_node_id_) {
       node_map_[*it_r]->ToAct();
       if (node_map_[*it_r]->ref_dropout_on()) {
         node_map_[*it_r]->ToDropout();
@@ -167,19 +225,25 @@ void Classifier<T>::Forward(const Eigen::Ref<const MatXX<T>>& training_data, \
       size_t edge_id = graph_[*eo].id;
 
       Node<T> *node_in_ptr, *node_out_ptr;
-
-      node_in_ptr = node_map_[vtx_in_id].get();
-        
+      node_in_ptr = node_map_[vtx_in_id].get();        
       node_out_ptr = node_map_[vtx_out_id].get();
- 
+
+      if (!visited_[vtx_out_id]) {
+         node_out_ptr->get_activation_ptr()->matrix() = \
+             MatXX<T>::Zero(node_out_ptr->ref_dims()[0], \
+             node_in_ptr->get_activation_ptr()->cols());
+         visited_[vtx_out_id] = true;
+      }
+
       edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
     }
   }
+  visited_.assign(visited_.size(), false);
 }
 
 template <class T>
-void Classifier<T>::Derivative(const Eigen::Ref<const MatXX<T>>& training_data, \
-                               const Eigen::Ref<const MatXX<T>>& training_labels) {
+void Graphfxn<T>::Derivative(const Eigen::Ref<const MatXX<T>>& training_data, \
+                             const Eigen::Ref<const MatXX<T>>& training_labels) {
   Forward(training_data, training_labels);
   LOG(INFO) << "======================"
             << "BACKWARDING . . ."
@@ -206,11 +270,11 @@ void Classifier<T>::Derivative(const Eigen::Ref<const MatXX<T>>& training_data, 
 }
 
 template <class T>
-void Classifier<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
-                             const Eigen::Ref<const MatXX<T>>& test_labels) {
-  if (*order_.rbegin() != index_map_[input_node_id_] || \
-      *order_.begin() != index_map_[output_node_id_]) {
-    LOG(ERROR) << "Evaluate() in the Classifier is failed.";
+void Graphfxn<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
+                           const Eigen::Ref<const MatXX<T>>& test_labels) {
+  if (*order_.rbegin() != input_node_id_ || \
+      *order_.begin() != output_node_id_) {
+    LOG(ERROR) << "Evaluate() in the Graphfxn is failed.";
     exit(1);
   }
 
@@ -223,7 +287,7 @@ void Classifier<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
     IntellGraph::out_edge_iterator eo{}, eo_end{};
     size_t vtx_in_id = *it_r;
     LOG(INFO) << "Forwarding vertex: " << vtx_in_id;
-    if (*it_r != index_map_[input_node_id_] ) {
+    if (*it_r != input_node_id_ ) {
        node_map_[*it_r]->ToAct();
        if (node_map_[*it_r]->ref_dropout_on()) {
           node_map_[*it_r]->get_activation_ptr()->array() *= \
@@ -235,18 +299,25 @@ void Classifier<T>::Evaluate(const Eigen::Ref<const MatXX<T>>& test_data, \
       size_t edge_id = graph_[*eo].id;
 
       Node<T> *node_in_ptr, *node_out_ptr;
-
       node_in_ptr = node_map_[vtx_in_id].get();
-
       node_out_ptr = node_map_[vtx_out_id].get();
+
+      if (!visited_[vtx_out_id]) {
+        node_out_ptr->get_activation_ptr()->matrix() = \
+            MatXX<T>::Zero(node_out_ptr->ref_dims()[0], \
+            node_in_ptr->get_activation_ptr()->cols());
+        visited_[vtx_out_id] = true;
+      }
 
       edge_map_[edge_id]->Forward(node_in_ptr, node_out_ptr);
     }
   }
+  visited_.assign(visited_.size(), false);
   output_node_ptr_->Evaluate(test_labels);
+
 }
 
-// Instantiate class, otherwise compilation will fail
-template class Classifier<float>;
-template class Classifier<double>;
+template class Graphfxn<float>;
+template class Graphfxn<double>;
+
 }  // intellgraph
