@@ -4,7 +4,7 @@ This file explains the IntellGraph architectures and includes development techni
 
 
 ## Node
-In node classes, only one dymaic matrix (activation matrix) is used and it stores data for activation, prime value of activation and input features (if it is an input node). To avoid unexpected data loss and in order to give a clear view of state transitions of the activation matrix, The [State Pattern](https://en.wikipedia.org/wiki/State_pattern) is implemented (see the figure below).
+In node classes, only one dynamic matrix (activation matrix) is used and it stores data for activation, prime value of activation and input features (if it is an input node). To avoid unexpected data loss and in order to give a clear view of state transitions of the activation matrix, The [State Pattern](https://en.wikipedia.org/wiki/State_pattern) is implemented (see the figure below).
 
 
 ![alt text](doc/development_1.png "Logo Title Text 1")
