@@ -42,9 +42,11 @@ class NodeParameter {
   explicit NodeParameter(COPY size_t id, REF const std::string& name, \
                          REF const std::vector<size_t>& dims, \
                          REF const std::string& activator_name = "", \
-                         REF const std::string& estimator_name = "")
+                         REF const std::string& estimator_name = "", \
+                         REF const std::vector<size_t>& node_struct = {})
       : id_(id), node_name_(name), dims_(dims), \
-        activator_name_(activator_name), estimator_name_(estimator_name) {}
+        activator_name_(activator_name), estimator_name_(estimator_name), \
+        node_struct_(node_struct) {}
 
   // Default constructor is equivalent to member-wise move constructor
   NodeParameter(MOVE NodeParameter&& rhs) noexcept = default;
@@ -61,6 +63,7 @@ class NodeParameter {
     node_name_ = rhs.ref_node_name();
     activator_name_ = rhs.ref_activator_name();
     estimator_name_ = rhs.ref_estimator_name();
+    node_struct_ = rhs.ref_node_struct();
   }
 
   ~NodeParameter() noexcept = default;
@@ -150,6 +153,20 @@ class NodeParameter {
     return *this;
   }
 
+  REF inline const std::vector<size_t>& ref_node_struct() const {
+    return node_struct_;
+  }
+
+  inline NodeParameter& set_node_struct(REF const std::vector<size_t>& node_struct) {
+    node_struct_ = node_struct;
+    return *this;
+  }
+
+  inline NodeParameter& move_node_struct(MOVE std::vector<size_t>&& node_struct) {
+    node_struct_ = std::move(node_struct);
+    return *this;
+  }
+
  private:
   // List initialization (since C++11)
   // Note Member will be initialized before the class constructor (C++11)
@@ -159,6 +176,8 @@ class NodeParameter {
 
   std::string activator_name_{""};
   std::string estimator_name_{""};
+
+  std::vector<size_t> node_struct_{};
 
 };
 
