@@ -1,0 +1,10 @@
+# This is the official list of TensorFlow authors for copyright purposes.
+# This file is distinct from the CONTRIBUTORS files.
+# See the latter for an explanation.
+
+# Names should be added to this file as:
+# Name or Organization <email address>
+# The email address is not required for organizations.
+
+Lingbo Zhang <lingboz2015@gmail.com>
+Huicheng Zhang <huichengz0520@gmail.com>
