@@ -2,6 +2,7 @@
 Before sending your pull requests, make sure you followed this list.
 
 - Read [contributing guidelines](CONTRIBUTING.md).
+- Read [Using the Fork-and-Branch Git Workflow](https://blog.scottlowe.org/2015/01/27/using-fork-branch-git-workflow/)
 - Changes are consistent with the [Coding Style](https://github.com/lingbozhang/intellgraph/blob/master//CONTRIBUTING.md#c-coding-style). 
 - Commit messages are consistent with the [Git commit message conventions](https://github.com/lingbozhang/intellgraph/blob/master//CONTRIBUTING.md#c-coding-style).
 
