@@ -2,6 +2,8 @@
 
 A Deep Learning Framework in C++, developed with Just-in-time Compilation and Symbolic Computation.
 
+<p style="text-align:center;"><img src="doc/incubation.png" alt="drawing"  width="200"/>
+
 # Description
 IntellGraph is an abbreviation of Intelligent Graph. As the name indicates, the IntellGraph framework is developed for Artifical Intelligence and is abstracted 
 based on Graph Theory. The project is still under development. In current version, users are able to use it for constructing fully connected deep neural networks 
