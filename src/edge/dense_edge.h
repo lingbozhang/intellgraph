@@ -26,14 +26,15 @@ Contributor(s):
 #include "utility/random.h"
 
 namespace intellgraph {
-// DenseEdge is a edge class that used to build fully connected neural networks.
+// DenseEdge is an edge class that used to build fully connected neural networks.
 // In DenseEdge, weight is updated based on the backpropagation. 
 template <class T>
-class DenseEdge : implements Edge<T> {
+class DenseEdge : public Edge<T> {
  public:
   DenseEdge() noexcept = default;
 
-  explicit DenseEdge(REF const EdgeParameter& edge_param);
+  explicit DenseEdge(REF const EdgeParameter& edge_param)
+      : Edge<T>(edge_param) {}
   
   // Move constructor
   DenseEdge(MOVE DenseEdge<T>&& rhs) noexcept = default;
@@ -47,31 +48,11 @@ class DenseEdge : implements Edge<T> {
 
   ~DenseEdge() noexcept final = default;
 
-  void PrintWeight() const final;
-
-  void PrintNablaWeight() const final;
-
   virtual void Forward(MUTE Node<T>* node_in_ptr, \
                        MUTE Node<T>* node_out_ptr) final;
 
   virtual void Backward(MUTE Node<T>* node_in_ptr, \
                         MUTE Node<T>* node_out_ptr) final;
-
-  void InitializeWeight(REF const std::function<T(T)>& functor) final;
-
-  MUTE inline MatXX<T>* get_weight_ptr() const final {
-    return weight_ptr_.get();
-  }
-
-  REF inline const MatXX<T>* ref_nabla_weight_ptr() const final {
-    return nabla_weight_ptr_.get();
-  }
-
- private:
-  EdgeParameter edge_param_{};
-
-  MatXXUPtr<T> weight_ptr_{nullptr};
-  MatXXUPtr<T> nabla_weight_ptr_{nullptr};
 
 };
 // Alias for unique dense edge pointer

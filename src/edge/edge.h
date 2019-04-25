@@ -17,6 +17,7 @@ Contributor(s):
 
 #include <functional>
 
+#include "edge/edge_parameter.h"
 #include "node/node.h"
 #include "utility/auxiliary_cpp.h"
 #include "utility/common.h"
@@ -28,11 +29,24 @@ namespace intellgraph {
 template <class T>
 class Edge {
  public:
+  Edge() noexcept {}
+
+  explicit Edge(REF const EdgeParameter& edge_param);
+
+  // Move constructor
+  Edge(MOVE Edge<T>&& rhs) = default;
+
+ // Move operator
+  Edge& operator=(MOVE Edge<T>&& rhs) = default;
+
+  // Copy constructor and operator are explicitly deleted
+  Edge(REF const Edge<T>& rhs) = delete;
+  Edge& operator=(REF const Edge<T>& rhs) = delete;
   virtual ~Edge() noexcept = default;
 
-  virtual void PrintWeight() const = 0;
+  void PrintWeight() const;
 
-  virtual void PrintNablaWeight() const = 0;
+  void PrintNablaWeight() const;
 
   // Calculates weighted sum and updates activation_ptr_ of output layer
   // in-place. Function name with a word 'mute' indicates it requires mutable
@@ -46,11 +60,25 @@ class Edge {
                         MUTE Node<T>* node_out_ptr) = 0;
 
   // Passes a unary functor and applies it on the weight matrix
-  virtual void InitializeWeight(REF const std::function<T(T)>& functor) = 0;
+  void InitializeWeight(REF const std::function<T(T)>& functor);
 
-  MUTE virtual inline MatXX<T>* get_weight_ptr() const = 0;
+  MUTE inline MatXX<T>* get_weight_ptr() const {
+    return weight_ptr_.get();
+  }
 
-  REF virtual inline const MatXX<T>* ref_nabla_weight_ptr() const = 0;
+  MUTE inline MatXX<T>* get_nabla_weight_ptr() const {
+    return nabla_weight_ptr_.get();
+  }
+
+  REF inline const MatXX<T>* ref_nabla_weight_ptr() const {
+    return nabla_weight_ptr_.get();
+  }
+
+ private:
+  EdgeParameter edge_param_{};
+
+  MatXXUPtr<T> weight_ptr_{nullptr};
+  MatXXUPtr<T> nabla_weight_ptr_{nullptr};
 
 };
 
