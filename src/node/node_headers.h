@@ -26,3 +26,4 @@ Contributor(s):
 #include "node/sigmoid_l2_node.h"
 #include "node/sigmoid_node.h"
 #include "node/softmax_log_node.h"
+#include "node/tanh_node.h"

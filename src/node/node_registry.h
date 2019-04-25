@@ -25,6 +25,7 @@ Contributor(s):
 #include "node/sigmoid_l2_node.h"
 #include "node/sigmoid_node.h"
 #include "node/softmax_log_node.h"
+#include "node/tanh_node.h"
 
 namespace intellgraph {
 
@@ -38,6 +39,9 @@ class NodeRegistry {
     // Registers SigmoidNode
     LOG(INFO) << "Registering SigmoidNode";
     DEVIMPL_REGISTERIMPL_NODE(SigmoidNode, Node);
+    // Registers TanhNode
+    LOG(INFO) << "Registering TanhNode";
+    DEVIMPL_REGISTERIMPL_NODE(TanhNode, Node)
     // Registers IdentityNode
     LOG(INFO) << "Registering IdentityNode";
     DEVIMPL_REGISTERIMPL_NODE(IdentityNode, Node);

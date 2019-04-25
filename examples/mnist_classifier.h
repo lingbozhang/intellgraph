@@ -59,16 +59,16 @@ class Example2 {
     Graphfxn<float> classifier;
     // Turns dropout on: dropout probability 0.5
     //classifier.TurnDropoutOn(0.5);
-    classifier.AddEdge({"SigmoidNode", {0, 784}}, {"SigmoidNode", {1, 400}}, \
+    classifier.AddEdge({"SigmoidNode", {0, 784}}, {"TanhNode", {1, 30}}, \
                        "DenseEdge")
-              .AddEdge({"SigmoidNode", {1, 400}}, {"SigCENode", {2, 10}}, \
+              .AddEdge({"TanhNode", {1, 30}}, {"SigCENode", {2, 10}}, \
                        "DenseEdge")
               .Create();
 
     float eta = 1;
     float lambda = 0.0 / nbr_training_data;
     GDSolver<float> solver(eta, lambda);
-    int loops = 100;
+    int loops = 40;
     int minbatch_size = 10;
     std::cout << "Learning rate: " << eta << std::endl;
     std::cout << "Total epochs: " << loops << std::endl;
