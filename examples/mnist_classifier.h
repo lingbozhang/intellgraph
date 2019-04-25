@@ -36,7 +36,7 @@ class Example2 {
     std::cout << "A Simple Classifier for MNIST dataset" << std::endl;
     std::cout << "=====================================" << std::endl;
 
-    size_t nbr_training_data = 1000;
+    size_t nbr_training_data = 50000;
     size_t nbr_test_data = 10000;
     MatXX<float> training_images, training_labels;
     MatXX<float> test_images, test_labels;
@@ -59,16 +59,16 @@ class Example2 {
     Graphfxn<float> classifier;
     // Turns dropout on: dropout probability 0.5
     //classifier.TurnDropoutOn(0.5);
-    classifier.AddEdge({"SigmoidNode", {0, 784}}, {"TanhNode", {1, 30}}, \
+    classifier.AddEdge({"SigmoidNode", {0, 784}}, {"ReLUNode", {1, 100}}, \
                        "DenseEdge")
-              .AddEdge({"TanhNode", {1, 30}}, {"SigCENode", {2, 10}}, \
+              .AddEdge({"ReLUNode", {1, 100}}, {"SigCENode", {2, 10}}, \
                        "DenseEdge")
               .Create();
 
-    float eta = 1;
-    float lambda = 0.0 / nbr_training_data;
+    float eta = 0.1;
+    float lambda = 5.0 / nbr_training_data;
     GDSolver<float> solver(eta, lambda);
-    int loops = 40;
+    int loops = 100;
     int minbatch_size = 10;
     std::cout << "Learning rate: " << eta << std::endl;
     std::cout << "Total epochs: " << loops << std::endl;
