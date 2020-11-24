@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package intellgraph;
+
+message VertexParameter {
+  // Required
+  int32 id = 1;
+
+  // Required
+  string type = 2;
+
+  // Required
+  int32 dims = 4;
+}

@@ -1,0 +1,9 @@
+[requires]
+boost/1.70.0
+eigen/3.3.7
+glog/0.4.0
+protobuf/3.6.1@bincrafters/stable
+protoc_installer/3.6.1@bincrafters/stable
+
+[generators]
+cmake

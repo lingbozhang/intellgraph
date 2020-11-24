@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../src/utility/random.h
+functional
+-
+iostream
+-
+random
+-
+
+/Users/lingbozhang/src/intellgraph2/src/utility/random.cc
+src/utility/random.h
+/Users/lingbozhang/src/intellgraph2/src/utility/src/utility/random.h
+

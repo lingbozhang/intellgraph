@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libgraph.a CMakeFiles/graph.dir/graph_builder.cc.o CMakeFiles/graph.dir/graph_impl.cc.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libgraph.a

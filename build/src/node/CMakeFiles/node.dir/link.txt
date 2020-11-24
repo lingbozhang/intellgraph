@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libnode.a CMakeFiles/node.dir/activator_node.cc.o CMakeFiles/node.dir/node_data.cc.o CMakeFiles/node.dir/relu_node.cc.o CMakeFiles/node.dir/sigmoid_node.cc.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libnode.a

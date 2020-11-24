@@ -1,0 +1,5 @@
+if(EXISTS "/Users/lingbozhang/src/intellgraph2/build/src/edge/vertex/vertex_unittests[1]_tests.cmake")
+  include("/Users/lingbozhang/src/intellgraph2/build/src/edge/vertex/vertex_unittests[1]_tests.cmake")
+else()
+  add_test(vertex_unittests_NOT_BUILT vertex_unittests_NOT_BUILT)
+endif()

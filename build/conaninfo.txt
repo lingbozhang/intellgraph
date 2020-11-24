@@ -1,0 +1,115 @@
+[settings]
+    arch=x86_64
+    build_type=Release
+    compiler=apple-clang
+    compiler.libcxx=libc++
+    compiler.version=11.0
+    os=Macos
+
+[requires]
+    boost/1.Y.Z
+    eigen/3.Y.Z
+    glog/0.4.0
+    protobuf/3.Y.Z
+    protoc_installer/3.Y.Z
+
+[options]
+
+
+[full_settings]
+    arch=x86_64
+    arch_build=x86_64
+    build_type=Release
+    compiler=apple-clang
+    compiler.libcxx=libc++
+    compiler.version=11.0
+    os=Macos
+    os_build=Macos
+
+[full_requires]
+    boost/1.70.0:d45e2a7cc75163518ffbbda3fa886038ecaa8f54
+    bzip2/1.0.8:32bef4803d4b079e983ecb27f105881e778bc5a7
+    eigen/3.3.7:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
+    gflags/2.2.2:2ffcb40e4ac22c93d7ea7142dcb7ade34476fea0
+    glog/0.4.0:908bcd6a8ee05696464b1dd91716bdfcacf54301
+    protobuf/3.6.1@bincrafters/stable:eec6acc43f6348a597c20e5bd28d9e0590a02597
+    protoc_installer/3.6.1@bincrafters/stable:2e75a38ab42eff687ae1ee29a83956368f5e97fe
+    zlib/1.2.11:f74366f76f700cc6e991285892ad7a23c30e6d47
+
+[full_options]
+    boost:asio_no_deprecated=False
+    boost:bzip2=True
+    boost:debug_level=0
+    boost:error_code_header_only=False
+    boost:extra_b2_flags=None
+    boost:fPIC=True
+    boost:filesystem_no_deprecated=False
+    boost:header_only=False
+    boost:i18n_backend=iconv
+    boost:layout=system
+    boost:lzma=False
+    boost:magic_autolink=False
+    boost:multithreading=True
+    boost:namespace=boost
+    boost:namespace_alias=False
+    boost:pch=True
+    boost:python_executable=None
+    boost:python_version=None
+    boost:segmented_stacks=False
+    boost:shared=False
+    boost:system_no_deprecated=False
+    boost:without_atomic=False
+    boost:without_chrono=False
+    boost:without_container=False
+    boost:without_context=False
+    boost:without_contract=False
+    boost:without_coroutine=False
+    boost:without_date_time=False
+    boost:without_exception=False
+    boost:without_fiber=False
+    boost:without_filesystem=False
+    boost:without_graph=False
+    boost:without_graph_parallel=False
+    boost:without_iostreams=False
+    boost:without_locale=False
+    boost:without_log=False
+    boost:without_math=False
+    boost:without_mpi=False
+    boost:without_program_options=False
+    boost:without_python=True
+    boost:without_random=False
+    boost:without_regex=False
+    boost:without_serialization=False
+    boost:without_stacktrace=False
+    boost:without_system=False
+    boost:without_test=False
+    boost:without_thread=False
+    boost:without_timer=False
+    boost:without_type_erasure=False
+    boost:without_wave=False
+    boost:zlib=True
+    boost:zstd=False
+    bzip2:build_executable=True
+    bzip2:fPIC=True
+    bzip2:shared=False
+    gflags:fPIC=True
+    gflags:namespace=gflags
+    gflags:nothreads=True
+    gflags:shared=False
+    glog:fPIC=True
+    glog:shared=False
+    glog:with_gflags=True
+    glog:with_threads=True
+    protobuf:fPIC=True
+    protobuf:lite=False
+    protobuf:shared=False
+    protobuf:with_zlib=False
+    zlib:fPIC=True
+    zlib:minizip=False
+    zlib:shared=False
+
+[recipe_hash]
+
+
+[env]
+

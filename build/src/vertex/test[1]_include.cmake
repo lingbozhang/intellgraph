@@ -1,0 +1,5 @@
+if(EXISTS "/Users/lingbozhang/src/intellgraph2/build/src/vertex/test[1]_tests.cmake")
+  include("/Users/lingbozhang/src/intellgraph2/build/src/vertex/test[1]_tests.cmake")
+else()
+  add_test(test_NOT_BUILT test_NOT_BUILT)
+endif()

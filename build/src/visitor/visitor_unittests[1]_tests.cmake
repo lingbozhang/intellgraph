@@ -1,0 +1,7 @@
+add_test( BackwardVisitorTest.VisitSuccess /Users/lingbozhang/src/intellgraph2/build/bin/visitor_unittests [==[--gtest_filter=BackwardVisitorTest.VisitSuccess]==] --gtest_also_run_disabled_tests)
+set_tests_properties( BackwardVisitorTest.VisitSuccess PROPERTIES WORKING_DIRECTORY /Users/lingbozhang/src/intellgraph2/build/src/visitor SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test( ForwardVisitorTest.VisitSuccess /Users/lingbozhang/src/intellgraph2/build/bin/visitor_unittests [==[--gtest_filter=ForwardVisitorTest.VisitSuccess]==] --gtest_also_run_disabled_tests)
+set_tests_properties( ForwardVisitorTest.VisitSuccess PROPERTIES WORKING_DIRECTORY /Users/lingbozhang/src/intellgraph2/build/src/visitor SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test( InitVisitorTest.VisitSuccess /Users/lingbozhang/src/intellgraph2/build/bin/visitor_unittests [==[--gtest_filter=InitVisitorTest.VisitSuccess]==] --gtest_also_run_disabled_tests)
+set_tests_properties( InitVisitorTest.VisitSuccess PROPERTIES WORKING_DIRECTORY /Users/lingbozhang/src/intellgraph2/build/src/visitor SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+set( visitor_unittests_TESTS BackwardVisitorTest.VisitSuccess ForwardVisitorTest.VisitSuccess InitVisitorTest.VisitSuccess)

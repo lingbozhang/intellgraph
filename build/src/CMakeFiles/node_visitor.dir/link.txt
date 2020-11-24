@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc ../lib/libnode_visitor.a CMakeFiles/node_visitor.dir/node1.cc.o CMakeFiles/node_visitor.dir/node_impl.cc.o CMakeFiles/node_visitor.dir/visitor1.cc.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib ../lib/libnode_visitor.a

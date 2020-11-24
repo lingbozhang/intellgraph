@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libop_node.a CMakeFiles/op_node.dir/op_node.cc.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libop_node.a

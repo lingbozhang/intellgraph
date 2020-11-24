@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libintellgraph.a CMakeFiles/intellgraph.dir/graph_builder.cc.o CMakeFiles/intellgraph.dir/graph_impl.cc.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libintellgraph.a

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package intellgraph;
+
+message EdgeParameter {
+  // Required
+  int32 id = 1;
+
+  // Required
+  string type = 2;
+
+  // Required
+  int32 vertex_in_id = 3;
+
+  // Required
+  int32 vertex_out_id = 4;
+}

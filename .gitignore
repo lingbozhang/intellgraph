@@ -1,0 +1,7 @@
+# Destop Service Store from MacOS
+.DS_Store
+# Language Server related directories/files
+.clangd/
+compile_commands.json
+
+

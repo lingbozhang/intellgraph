@@ -1,0 +1,5 @@
+if(EXISTS "/Users/lingbozhang/src/intellgraph2/build/src/visitor/visitor_unittests[1]_tests.cmake")
+  include("/Users/lingbozhang/src/intellgraph2/build/src/visitor/visitor_unittests[1]_tests.cmake")
+else()
+  add_test(visitor_unittests_NOT_BUILT visitor_unittests_NOT_BUILT)
+endif()

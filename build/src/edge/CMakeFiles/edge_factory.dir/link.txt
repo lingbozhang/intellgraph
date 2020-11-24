@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libedge_factory.a CMakeFiles/edge_factory.dir/registry.cc.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libedge_factory.a
