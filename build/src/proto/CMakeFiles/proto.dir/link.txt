@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libproto.a CMakeFiles/proto.dir/vertex_parameter.pb.cc.o CMakeFiles/proto.dir/edge_parameter.pb.cc.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libproto.a

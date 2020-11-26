@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libutility.a CMakeFiles/utility.dir/random.cc.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libutility.a

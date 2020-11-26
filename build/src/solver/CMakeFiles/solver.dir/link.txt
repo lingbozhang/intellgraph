@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libsolver.a CMakeFiles/solver.dir/sgd_solver.cc.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libsolver.a

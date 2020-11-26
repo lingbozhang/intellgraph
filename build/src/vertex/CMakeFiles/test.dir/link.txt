@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libtest.a CMakeFiles/test.dir/sigmoid_test.cc.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libtest.a

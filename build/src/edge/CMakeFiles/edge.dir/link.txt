@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libedge.a CMakeFiles/edge.dir/dense_edge_impl.cc.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libedge.a

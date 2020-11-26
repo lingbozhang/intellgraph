@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc ../lib/libinterface.a CMakeFiles/interface.dir/edge.cc.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib ../lib/libinterface.a

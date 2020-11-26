@@ -78,8 +78,8 @@ GraphImpl<T>::GraphImpl(int batch_size,
 template <typename T> GraphImpl<T>::~GraphImpl() = default;
 
 template <typename T>
-template <class Visitor>
-void GraphImpl<T>::Train(Visitor &solver, const MatrixX<T> &feature,
+template <class Solver>
+void GraphImpl<T>::Train(Solver &solver, const MatrixX<T> &feature,
                          const MatrixX<T> &labels) {
   DCHECK_GT(labels.cols(), 0);
 

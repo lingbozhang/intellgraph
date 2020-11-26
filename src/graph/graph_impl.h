@@ -46,8 +46,8 @@ public:
             const std::set<EdgeParameter> &edge_params);
   ~GraphImpl() override;
 
-  template <class Visitor>
-  void Train(Visitor &solver, const MatrixX<T> &feature,
+  template <class Solver>
+  void Train(Solver &solver, const MatrixX<T> &feature,
              const MatrixX<T> &labels);
   const MatrixX<T> &Infer(const MatrixX<T> &feature);
   T CalculateLoss(const MatrixX<T> &test_feature,

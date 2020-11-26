@@ -15,12 +15,12 @@ Contributor(s):
 #ifndef INTELLGRAPH_SRC_SOLVER_SGD_SOLVER_H_
 #define INTELLGRAPH_SRC_SOLVER_SGD_SOLVER_H_
 
-#include "src/visitor.h"
+#include "src/solver.h"
 
 namespace intellgraph {
 
 // Class that implements the Stochastic Gradient Descent algorithm
-template <typename T> class SgdSolver : public Visitor<T> {
+template <typename T> class SgdSolver : public Solver<T> {
 public:
   explicit SgdSolver(T eta, T lambda);
   ~SgdSolver() override;

@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc ../../lib/libact_visitor.a 
-/Library/Developer/CommandLineTools/usr/bin/ranlib ../../lib/libact_visitor.a
