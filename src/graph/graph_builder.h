@@ -23,6 +23,7 @@ Contributor(s):
 #include "src/graph/classifier_impl.h"
 #include "src/proto/edge_parameter.pb.h"
 #include "src/proto/vertex_parameter.pb.h"
+#include "src/solver.h"
 #include "src/visitor.h"
 
 namespace intellgraph {
@@ -40,6 +41,7 @@ public:
   GraphBuilder &SetBatchSize(int batch_size);
   GraphBuilder &
   SetGraphInitVisitor(std::unique_ptr<Visitor<T>> graph_init_visitor);
+  GraphBuilder &SetSolver(std::unique_ptr<Solver<T>> solver);
   std::unique_ptr<ClassifierImpl<T>> Build();
 
 private:
@@ -48,6 +50,7 @@ private:
   int output_vertex_id_ = -1;
 
   std::unique_ptr<Visitor<T>> graph_init_visitor_;
+  std::unique_ptr<Solver<T>> solver_;
 
   Graph::AdjacencyList adjacency_list_;
   std::set<VertexParameter> vertex_params_;

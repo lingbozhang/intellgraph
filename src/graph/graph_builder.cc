@@ -15,6 +15,7 @@ Contributor(s):
 #include "src/graph/graph_builder.h"
 
 #include "glog/logging.h"
+#include "src/solver/sgd_solver.h"
 #include "src/visitor/normal_init_visitor.h"
 
 namespace intellgraph {
@@ -98,6 +99,14 @@ GraphBuilder<T> &GraphBuilder<T>::SetGraphInitVisitor(
 }
 
 template <typename T>
+GraphBuilder<T> &GraphBuilder<T>::SetSolver(std::unique_ptr<Solver<T>> solver) {
+  DCHECK(solver);
+
+  solver_ = std::move(solver);
+  return *this;
+}
+
+template <typename T>
 std::unique_ptr<ClassifierImpl<T>> GraphBuilder<T>::Build() {
   if (input_vertex_id_ == -1) {
     LOG(ERROR) << "Build graph failed: the input vertex ID must be set!";
@@ -111,14 +120,19 @@ std::unique_ptr<ClassifierImpl<T>> GraphBuilder<T>::Build() {
     LOG(ERROR) << "Build graph failed: the batch size must be set!";
     return nullptr;
   }
+  if (!solver_) {
+    LOG(ERROR) << "Build graph: solver is not set!";
+    return nullptr;
+  }
   if (!graph_init_visitor_) {
     LOG(WARNING) << "Build graph: graph initialization visitor is not set, "
-                    "initialize the graph with normal distribution";
+                    "initialize the graph with normal distribution!";
     graph_init_visitor_ = std::make_unique<NormalInitVisitor<T>>();
   }
   return std::make_unique<ClassifierImpl<T>>(
-      batch_size_, std::move(graph_init_visitor_), adjacency_list_,
-      input_vertex_id_, output_vertex_id_, vertex_params_, edge_params_);
+      batch_size_, std::move(graph_init_visitor_), std::move(solver_),
+      adjacency_list_, input_vertex_id_, output_vertex_id_, vertex_params_,
+      edge_params_);
 }
 
 // Explicit instantiation

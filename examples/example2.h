@@ -72,22 +72,23 @@ public:
     // Builds the graph
     // The Dense edge is added into the graph which represents a fully connected
     // neural network
+    float eta = 0.1;
+    int epochs = 1000;
+
     GraphBuilder<float> graph_builder;
     std::unique_ptr<ClassifierImpl<float>> graph =
         graph_builder.AddEdge("Dense", vtx_param1, vtx_param2)
             .SetInputVertexId(0)
             .SetOutputVertexId(1)
             .SetBatchSize(1)
+            .SetSolver(std::make_unique<SgdSolver<float>>(eta, /*lambda=*/0.0))
             .Build();
-    // Constructs a solver using the Stochastic Gradient Descent algorithm
-    float eta = 0.1;
-    SgdSolver<float> solver(eta, /*lambda=*/0.0);
-    int epochs = 1000;
+
     std::cout << "Total epochs: " << epochs << std::endl;
     int total_size = training_feature.cols();
     for (int epoch = 0; epoch < epochs; ++epoch) {
       for (int i = 0; i < 4; ++i) {
-        graph->Train(solver, training_feature.col(i), training_labels.col(i));
+        graph->Train(training_feature.col(i), training_labels.col(i));
       }
       float loss = graph->CalculateLoss(training_feature, training_labels);
       printf("Epoch %4d/%4d, Loss: %e\n", epoch, epochs, loss);

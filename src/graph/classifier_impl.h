@@ -29,6 +29,7 @@ Contributor(s):
 #include "src/graph.h"
 #include "src/proto/edge_parameter.pb.h"
 #include "src/proto/vertex_parameter.pb.h"
+#include "src/solver.h"
 #include "src/solver/sgd_solver.h"
 #include "src/visitor.h"
 #include "src/visitor/backward_visitor.h"
@@ -41,19 +42,20 @@ namespace intellgraph {
 template <typename T> class ClassifierImpl : public Graph {
 public:
   ClassifierImpl(int batch_size, std::unique_ptr<Visitor<T>> graph_init_visitor,
+                 std::unique_ptr<Solver<T>> solver,
                  const typename Graph::AdjacencyList &adj_list,
                  int input_vertex_id, int output_vertex_id,
                  const std::set<VertexParameter> &vertex_params,
                  const std::set<EdgeParameter> &edge_params);
   ~ClassifierImpl() override;
 
-  template <class Solver>
-  void Train(Solver &solver, const MatrixX<T> &feature,
+  void Train(const MatrixX<T> &feature,
              const Eigen::Ref<const MatrixX<int>> &labels);
   T CalculateLoss(const MatrixX<T> &test_feature,
                   const MatrixX<int> &test_labels);
   const MatrixX<T> &GetProbabilityDist(const MatrixX<T> &feature);
 
+  void SetSolver(std::unique_ptr<Solver<T>> solver);
   // Used for threshold-moving/threshold-tuning
   // In the binary classification, predication that is greater than the
   // threshold will be classified as class 1, and 0 vice versa.
@@ -61,6 +63,7 @@ public:
   // multiplication with the threshold matrix, and the class with a maximum
   // updated predication value is selected as the predicted class.
   void SetThreshold(const MatrixX<T> &threshold);
+
 
   T CalcAccuracy(const MatrixX<T> &test_feature,
                  const Eigen::Ref<const MatrixX<int>> &test_labels);
@@ -78,6 +81,7 @@ private:
 
   int batch_size_ = 0;
   std::unique_ptr<Visitor<T>> graph_init_visitor_;
+  std::unique_ptr<Solver<T>> solver_;
 
   MatrixX<T> threshold_;
 
@@ -101,13 +105,7 @@ private:
 // Tells compiler not to instantiate the template in translation units that
 // include this header file
 extern template class ClassifierImpl<float>;
-extern template void ClassifierImpl<float>::Train<SgdSolver<float>>(
-    SgdSolver<float> &, const MatrixX<float> &,
-    const Eigen::Ref<const MatrixX<int>> &);
 extern template class ClassifierImpl<double>;
-extern template void ClassifierImpl<double>::Train<SgdSolver<double>>(
-    SgdSolver<double> &, const MatrixX<double> &,
-    const Eigen::Ref<const MatrixX<int>> &);
 
 } // namespace intellgraph
 

@@ -22,14 +22,17 @@ namespace intellgraph {
 template <typename T>
 ClassifierImpl<T>::ClassifierImpl(
     int batch_size, std::unique_ptr<Visitor<T>> graph_init_visitor,
+    std::unique_ptr<Solver<T>> solver,
     const typename Graph::AdjacencyList &adjacency_list, int input_vertex_id,
     int output_vertex_id, const std::set<VertexParameter> &vertex_params,
     const std::set<EdgeParameter> &edge_params)
     : batch_size_(batch_size),
       graph_init_visitor_(std::move(graph_init_visitor)),
-      adjacency_list_(adjacency_list), resize_vertex_visitor_(batch_size_) {
+      solver_(std::move(solver)), adjacency_list_(adjacency_list),
+      resize_vertex_visitor_(batch_size_) {
   DCHECK_GT(batch_size_, 0);
   DCHECK(graph_init_visitor_);
+  DCHECK(solver_);
 
   // Instantiates vertices
   for (const auto &vertex_param : vertex_params) {
@@ -81,14 +84,13 @@ ClassifierImpl<T>::ClassifierImpl(
 template <typename T> ClassifierImpl<T>::~ClassifierImpl() = default;
 
 template <typename T>
-template <class Solver>
-void ClassifierImpl<T>::Train(Solver &solver, const MatrixX<T> &feature,
+void ClassifierImpl<T>::Train(const MatrixX<T> &feature,
                               const Eigen::Ref<const MatrixX<int>> &labels) {
   DCHECK_GT(labels.cols(), 0);
 
   this->Forward(feature);
   this->Backward(labels);
-  this->Traverse(solver);
+  this->Traverse(*solver_);
 }
 
 template <typename T>
@@ -106,9 +108,14 @@ ClassifierImpl<T>::GetProbabilityDist(const MatrixX<T> &feature) {
 }
 
 template <typename T>
+void ClassifierImpl<T>::SetSolver(std::unique_ptr<Solver<T>> solver) {
+  DCHECK(solver);
+  solver_ = std::move(solver);
+}
+
+template <typename T>
 void ClassifierImpl<T>::SetThreshold(const MatrixX<T> &threshold) {
   DCHECK_EQ(threshold.rows(), threshold_.rows());
-
   threshold_ = threshold;
 }
 
@@ -216,12 +223,6 @@ void ClassifierImpl<T>::ReverseTraverse(Visitor &visitor) {
 
 // Explicit instantiation
 template class ClassifierImpl<float>;
-template void ClassifierImpl<float>::Train<SgdSolver<float>>(
-    SgdSolver<float> &, const MatrixX<float> &,
-    const Eigen::Ref<const MatrixX<int>> &);
 template class ClassifierImpl<double>;
-template void ClassifierImpl<double>::Train<SgdSolver<double>>(
-    SgdSolver<double> &, const MatrixX<double> &,
-    const Eigen::Ref<const MatrixX<int>> &);
 
 } // namespace intellgraph
