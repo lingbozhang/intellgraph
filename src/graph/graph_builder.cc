@@ -97,7 +97,8 @@ GraphBuilder<T> &GraphBuilder<T>::SetGraphInitVisitor(
   return *this;
 }
 
-template <typename T> std::unique_ptr<GraphImpl<T>> GraphBuilder<T>::Build() {
+template <typename T>
+std::unique_ptr<ClassifierImpl<T>> GraphBuilder<T>::Build() {
   if (input_vertex_id_ == -1) {
     LOG(ERROR) << "Build graph failed: the input vertex ID must be set!";
     return nullptr;
@@ -115,7 +116,7 @@ template <typename T> std::unique_ptr<GraphImpl<T>> GraphBuilder<T>::Build() {
                     "initialize the graph with normal distribution";
     graph_init_visitor_ = std::make_unique<NormalInitVisitor<T>>();
   }
-  return std::make_unique<GraphImpl<T>>(
+  return std::make_unique<ClassifierImpl<T>>(
       batch_size_, std::move(graph_init_visitor_), adjacency_list_,
       input_vertex_id_, output_vertex_id_, vertex_params_, edge_params_);
 }

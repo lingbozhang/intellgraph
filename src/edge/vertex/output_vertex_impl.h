@@ -44,7 +44,6 @@ public:
   VectorX<T> *mutable_bias() override;
 
   T CalcLoss(const Eigen::Ref<const MatrixX<T>> &labels) override;
-  T CalcAccuracy(const Eigen::Ref<const MatrixX<T>> &labels) override;
   void CalcDelta(const Eigen::Ref<const MatrixX<T>> &labels) override;
 
 private:

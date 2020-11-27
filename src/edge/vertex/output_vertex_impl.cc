@@ -108,12 +108,6 @@ T OutputVertexImpl<T, Algorithm>::CalcLoss(
 }
 
 template <typename T, class Algorithm>
-T OutputVertexImpl<T, Algorithm>::CalcAccuracy(
-    const Eigen::Ref<const MatrixX<T>> &labels) {
-  return Algorithm::CalcAccuracy(*this, labels);
-}
-
-template <typename T, class Algorithm>
 void OutputVertexImpl<T, Algorithm>::CalcDelta(
     const Eigen::Ref<const MatrixX<T>> &labels) {
   Algorithm::CalcDelta(*this, labels);

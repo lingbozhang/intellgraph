@@ -56,32 +56,6 @@ public:
   }
 
   template <typename T>
-  static T CalcAccuracy(OutputVertexImpl<T, SigmoidL2> &vertex,
-                        const Eigen::Ref<const MatrixX<T>> &labels) {
-    DCHECK_EQ(vertex.row(), labels.rows());
-
-    LOG(INFO) << "OutputVertex " << vertex.id()
-              << " calculates inference accuracy with the Sigmoid function.";
-
-    T accuracy = 0.0;
-    int correct_guess = 0;
-    MatrixX<T> *activation = vertex.mutable_activation();
-    if (activation->rows() == 1) {
-      correct_guess = (activation->array().round() == labels.array()).count();
-    } else {
-      for (int i = 0; i < activation->cols(); ++i) {
-        int guess_index;
-        activation->col(i).maxCoeff(&guess_index);
-        if (guess_index == labels(0, i)) {
-          correct_guess++;
-        }
-      }
-    }
-    accuracy = correct_guess * 100.0 / labels.cols();
-    return accuracy;
-  }
-
-  template <typename T>
   static T CalcLoss(OutputVertexImpl<T, SigmoidL2> &vertex,
                     const Eigen::Ref<const MatrixX<T>> &labels) {
     DCHECK_EQ(vertex.row(), labels.rows());
@@ -89,7 +63,7 @@ public:
 
     LOG(INFO) << "OutputVertex " << vertex.id() << " calculates L2-NORM loss.";
     const MatrixX<T> &activation = vertex.activation();
-    T loss = (activation.array() - labels.array()).matrix().squaredNorm();
+    T loss = (activation - labels.matrix()).squaredNorm();
     int batch_size = vertex.col();
     return loss / 2.0 / batch_size;
   }
@@ -105,7 +79,7 @@ public:
     MatrixX<T> *delta = vertex.mutable_delta();
     const MatrixX<T> &activation = vertex.activation();
 
-    delta->array() = (activation.array() - labels.array());
+    delta->matrix() = activation - labels.matrix();
     vertex.Derive();
     delta->array() *= activation.array();
   }

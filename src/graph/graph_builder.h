@@ -20,7 +20,7 @@ Contributor(s):
 
 #include "boost/graph/adjacency_list.hpp"
 #include "src/graph.h"
-#include "src/graph/graph_impl.h"
+#include "src/graph/classifier_impl.h"
 #include "src/proto/edge_parameter.pb.h"
 #include "src/proto/vertex_parameter.pb.h"
 #include "src/visitor.h"
@@ -40,7 +40,7 @@ public:
   GraphBuilder &SetBatchSize(int batch_size);
   GraphBuilder &
   SetGraphInitVisitor(std::unique_ptr<Visitor<T>> graph_init_visitor);
-  std::unique_ptr<GraphImpl<T>> Build();
+  std::unique_ptr<ClassifierImpl<T>> Build();
 
 private:
   int batch_size_ = 0;

@@ -12,7 +12,7 @@ limitations under the License.
 Contributor(s):
         Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#include "src/graph/graph_impl.h"
+#include "src/graph/classifier_impl.h"
 
 #include "glog/logging.h"
 #include "src/edge/factory.h"
@@ -20,12 +20,11 @@ Contributor(s):
 namespace intellgraph {
 
 template <typename T>
-GraphImpl<T>::GraphImpl(int batch_size,
-                        std::unique_ptr<Visitor<T>> graph_init_visitor,
-                        const typename Graph::AdjacencyList &adjacency_list,
-                        int input_vertex_id, int output_vertex_id,
-                        const std::set<VertexParameter> &vertex_params,
-                        const std::set<EdgeParameter> &edge_params)
+ClassifierImpl<T>::ClassifierImpl(
+    int batch_size, std::unique_ptr<Visitor<T>> graph_init_visitor,
+    const typename Graph::AdjacencyList &adjacency_list, int input_vertex_id,
+    int output_vertex_id, const std::set<VertexParameter> &vertex_params,
+    const std::set<EdgeParameter> &edge_params)
     : batch_size_(batch_size),
       graph_init_visitor_(std::move(graph_init_visitor)),
       adjacency_list_(adjacency_list), resize_vertex_visitor_(batch_size_) {
@@ -48,6 +47,10 @@ GraphImpl<T>::GraphImpl(int batch_size,
                                                       batch_size_);
       output_vertex_ = output_vertex.get();
       vertex_by_id_.try_emplace(vtx_id, std::move(output_vertex));
+      // Builds the default |threshold_|
+      int dims = vertex_param.dims();
+      threshold_ = MatrixX<T>(dims, 1);
+      threshold_.setConstant(0.5);
     } else {
       // Instantiates output vertices
       std::unique_ptr<OpVertex<T>> vertex =
@@ -75,39 +78,74 @@ GraphImpl<T>::GraphImpl(int batch_size,
   this->Traverse(*graph_init_visitor_);
 }
 
-template <typename T> GraphImpl<T>::~GraphImpl() = default;
+template <typename T> ClassifierImpl<T>::~ClassifierImpl() = default;
 
 template <typename T>
 template <class Solver>
-void GraphImpl<T>::Train(Solver &solver, const MatrixX<T> &feature,
-                         const MatrixX<T> &labels) {
+void ClassifierImpl<T>::Train(Solver &solver, const MatrixX<T> &feature,
+                              const Eigen::Ref<const MatrixX<int>> &labels) {
   DCHECK_GT(labels.cols(), 0);
 
   this->Forward(feature);
   this->Backward(labels);
   this->Traverse(solver);
 }
+
 template <typename T>
-const MatrixX<T> &GraphImpl<T>::Infer(const MatrixX<T> &feature) {
+T ClassifierImpl<T>::CalculateLoss(const MatrixX<T> &test_feature,
+                                   const MatrixX<int> &test_labels) {
+  this->Forward(test_feature);
+  return output_vertex_->CalcLoss(test_labels.cast<T>());
+}
+
+template <typename T>
+const MatrixX<T> &
+ClassifierImpl<T>::GetProbabilityDist(const MatrixX<T> &feature) {
   this->Forward(feature);
   return *output_vertex_->mutable_activation();
 }
 
 template <typename T>
-T GraphImpl<T>::CalculateLoss(const MatrixX<T> &test_feature,
-                              const MatrixX<T> &test_labels) {
-  this->Forward(test_feature);
-  return output_vertex_->CalcLoss(test_labels);
+void ClassifierImpl<T>::SetThreshold(const MatrixX<T> &threshold) {
+  DCHECK_EQ(threshold.rows(), threshold_.rows());
+
+  threshold_ = threshold;
 }
 
 template <typename T>
-T GraphImpl<T>::CalculateAccuracy(const MatrixX<T> &test_feature,
-                                  const MatrixX<T> &test_labels) {
+T ClassifierImpl<T>::CalcAccuracy(
+    const MatrixX<T> &test_feature,
+    const Eigen::Ref<const MatrixX<int>> &test_labels) {
+  DCHECK_EQ(test_labels.rows(), threshold_.rows());
+
   this->Forward(test_feature);
-  return output_vertex_->CalcAccuracy(test_labels);
+
+  T accuracy = 0.0;
+  int correct_guess = 0;
+  MatrixX<T> *activation = output_vertex_->mutable_activation();
+  if (activation->rows() == 1) {
+    correct_guess = ((activation->array() >
+                      threshold_.array().replicate(1, activation->cols())) ==
+                     test_labels.cast<bool>().array())
+                        .count();
+  } else {
+    MatrixX<T> prob =
+        activation->array() *
+        threshold_.array().replicate(activation->rows(), activation->cols());
+    for (int i = 0; i < prob.cols(); ++i) {
+      int guess_index;
+      prob.col(i).maxCoeff(&guess_index);
+      if (guess_index == test_labels(0, i)) {
+        correct_guess++;
+      }
+    }
+  }
+  accuracy = correct_guess * 100.0 / test_labels.cols();
+  return accuracy;
 }
 
-template <typename T> OpVertex<T> *GraphImpl<T>::mutable_vertex(int vertex_id) {
+template <typename T>
+OpVertex<T> *ClassifierImpl<T>::mutable_vertex(int vertex_id) {
   if (vertex_by_id_.find(vertex_id) != vertex_by_id_.end()) {
     return vertex_by_id_.at(vertex_id).get();
   }
@@ -115,7 +153,7 @@ template <typename T> OpVertex<T> *GraphImpl<T>::mutable_vertex(int vertex_id) {
   return nullptr;
 }
 
-template <typename T> Edge<T> *GraphImpl<T>::mutable_edge(int edge_id) {
+template <typename T> Edge<T> *ClassifierImpl<T>::mutable_edge(int edge_id) {
   if (edge_by_id_.find(edge_id) != edge_by_id_.end()) {
     return edge_by_id_.at(edge_id).get();
   }
@@ -123,11 +161,12 @@ template <typename T> Edge<T> *GraphImpl<T>::mutable_edge(int edge_id) {
   return nullptr;
 }
 
-template <typename T> void GraphImpl<T>::ZeroInitializeVertex() {
+template <typename T> void ClassifierImpl<T>::ZeroInitializeVertex() {
   this->Traverse(init_vtx_visitor_);
 }
 
-template <typename T> void GraphImpl<T>::Forward(const MatrixX<T> &feature) {
+template <typename T>
+void ClassifierImpl<T>::Forward(const MatrixX<T> &feature) {
   if (batch_size_ != feature.cols()) {
     batch_size_ = feature.cols();
     resize_vertex_visitor_.set_batch_size(batch_size_);
@@ -140,14 +179,14 @@ template <typename T> void GraphImpl<T>::Forward(const MatrixX<T> &feature) {
 }
 
 template <typename T>
-void GraphImpl<T>::Backward(const Eigen::Ref<const MatrixX<T>> &labels) {
-  output_vertex_->CalcDelta(labels);
+void ClassifierImpl<T>::Backward(const Eigen::Ref<const MatrixX<int>> &labels) {
+  output_vertex_->CalcDelta(labels.cast<T>());
   this->ReverseTraverse(backward_visitor_);
 }
 
 template <typename T>
 template <class Visitor>
-void GraphImpl<T>::Traverse(Visitor &visitor) {
+void ClassifierImpl<T>::Traverse(Visitor &visitor) {
   // Trasverses the graph
   for (auto it = topological_order_.rbegin(); it != topological_order_.rend();
        ++it) {
@@ -163,7 +202,7 @@ void GraphImpl<T>::Traverse(Visitor &visitor) {
 
 template <typename T>
 template <class Visitor>
-void GraphImpl<T>::ReverseTraverse(Visitor &visitor) {
+void ClassifierImpl<T>::ReverseTraverse(Visitor &visitor) {
   // Trasverses the graph reversely
   for (int vtx_id : topological_order_) {
     Graph::AdjacencyList::in_edge_iterator edge_it, edge_it_end;
@@ -176,11 +215,13 @@ void GraphImpl<T>::ReverseTraverse(Visitor &visitor) {
 }
 
 // Explicit instantiation
-template class GraphImpl<float>;
-template void GraphImpl<float>::Train<SgdSolver<float>>(SgdSolver<float> &,
-                                                        const MatrixX<float> &,
-                                                        const MatrixX<float> &);
-template class GraphImpl<double>;
-template void GraphImpl<double>::Train<SgdSolver<double>>(
-    SgdSolver<double> &, const MatrixX<double> &, const MatrixX<double> &);
+template class ClassifierImpl<float>;
+template void ClassifierImpl<float>::Train<SgdSolver<float>>(
+    SgdSolver<float> &, const MatrixX<float> &,
+    const Eigen::Ref<const MatrixX<int>> &);
+template class ClassifierImpl<double>;
+template void ClassifierImpl<double>::Train<SgdSolver<double>>(
+    SgdSolver<double> &, const MatrixX<double> &,
+    const Eigen::Ref<const MatrixX<int>> &);
+
 } // namespace intellgraph

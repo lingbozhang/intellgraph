@@ -20,6 +20,10 @@ Contributor(s):
 
 namespace intellgraph {
 
+// The Edge class is an abstract class that represents an edge data in the
+// IntellGraph. The class is used to store weight and nabla weight matrices from
+// the Neural Network, and it adopts the Visitor Pattern, and accepts various
+// visitors that apply different operations on the edge data members
 template <typename T> class Edge {
 public:
   Edge() = default;

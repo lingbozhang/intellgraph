@@ -20,9 +20,9 @@ Contributor(s):
 #include <iostream>
 #include <memory>
 
+#include "include/intellgraph/classifier_impl.h"
 #include "include/intellgraph/eigen.h"
 #include "include/intellgraph/graph_builder.h"
-#include "include/intellgraph/graph_impl.h"
 #include "include/intellgraph/proto/vertex_parameter.pb.h"
 #include "include/intellgraph/registry.h"
 #include "include/intellgraph/sgd_solver.h"
@@ -52,7 +52,7 @@ public:
               << "====================================================\n";
     // Prepares training data
     MatrixX<float> training_feature(2, 4);
-    MatrixX<float> training_labels(1, 4);
+    MatrixX<int> training_labels(1, 4);
     MatrixX<float> test_feature(2, 1);
     training_feature << -2, 25, 17, -15, -1, 6, 4, -6;
     training_labels << 1, 0, 0, 1;
@@ -73,7 +73,7 @@ public:
     // The Dense edge is added into the graph which represents a fully connected
     // neural network
     GraphBuilder<float> graph_builder;
-    std::unique_ptr<GraphImpl<float>> graph =
+    std::unique_ptr<ClassifierImpl<float>> graph =
         graph_builder.AddEdge("Dense", vtx_param1, vtx_param2)
             .SetInputVertexId(0)
             .SetOutputVertexId(1)
@@ -93,7 +93,8 @@ public:
       printf("Epoch %4d/%4d, Loss: %e\n", epoch, epochs, loss);
     }
     std::cout << "Training complete!!!" << std::endl;
-    float gender = graph->Infer(test_feature).array().round()(0, 0);
+    float gender =
+        graph->GetProbabilityDist(test_feature).array().round()(0, 0);
     printf("Tom's predicted gender: %1.0f (0: male, 1: female)\n", gender);
   }
 };
