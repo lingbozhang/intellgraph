@@ -152,6 +152,55 @@ T ClassifierImpl<T>::CalcAccuracy(
 }
 
 template <typename T>
+const MatrixX<T> ClassifierImpl<T>::CalcConfusionMatrix(
+    const MatrixX<T> &test_feature,
+    const Eigen::Ref<const MatrixX<int>> &test_labels) {
+  DCHECK_EQ(test_feature.cols(), test_labels.cols());
+  DCHECK_EQ(1, test_labels.rows());
+
+  this->Forward(test_feature);
+  MatrixX<T> *activation = output_vertex_->mutable_activation();
+  int class_num = activation->rows() == 1 ? 2 : activation->rows();
+  int batch_size = activation->cols();
+  MatrixX<T> confusion_matrix = MatrixX<T>::Zero(class_num, class_num);
+
+  if (activation->rows() == 1) {
+    // Binary classification
+    int true_positive = 0;
+    int false_negative = 0;
+    int false_positive = 0;
+    int true_negative = 0;
+
+    MatrixX<int> predication = MatrixX<int>::Zero(1, batch_size);
+    predication =
+        (activation->array() > threshold_.array().replicate(1, batch_size))
+            .template cast<int>();
+    int correct_predication =
+        (predication.array() == test_labels.array()).count();
+    true_positive = (predication.array() * test_labels.array()).count();
+    true_negative = correct_predication - true_positive;
+    int positive = test_labels.count();
+    int negative = batch_size - positive;
+    false_negative = positive - true_positive;
+    false_positive = negative - true_negative;
+
+    confusion_matrix << true_negative, false_negative, false_positive,
+        true_positive;
+  } else {
+    // Multi-class classification
+    MatrixX<T> weighted_probability =
+        activation->array() *
+        threshold_.array().replicate(activation->rows(), batch_size);
+    for (int i = 0; i < weighted_probability.cols(); ++i) {
+      int predication_index;
+      weighted_probability.col(i).maxCoeff(&predication_index);
+      confusion_matrix(predication_index, test_labels(0, i))++;
+    }
+  }
+  return confusion_matrix;
+}
+
+template <typename T>
 OpVertex<T> *ClassifierImpl<T>::mutable_vertex(int vertex_id) {
   if (vertex_by_id_.find(vertex_id) != vertex_by_id_.end()) {
     return vertex_by_id_.at(vertex_id).get();

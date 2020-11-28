@@ -48,15 +48,17 @@ public:
               << "Bob     25                6                 0       \n"
               << "Charlie 17                4                 0       \n"
               << "Diana  -15                -6                1       \n"
-              << "Tom     20                5                 ?       \n"
+              << "Tom     20                5                 0       \n"
               << "====================================================\n";
     // Prepares training data
     MatrixX<float> training_feature(2, 4);
     MatrixX<int> training_labels(1, 4);
     MatrixX<float> test_feature(2, 1);
+    MatrixX<int> test_labels(1, 1);
     training_feature << -2, 25, 17, -15, -1, 6, 4, -6;
     training_labels << 1, 0, 0, 1;
     test_feature << 20, 5;
+    test_labels << 0;
     // Registering instances
     Registry::LoadRegistry();
     // Constructs vertices
@@ -97,6 +99,9 @@ public:
     float gender =
         graph->GetProbabilityDist(test_feature).array().round()(0, 0);
     printf("Tom's predicted gender: %1.0f (0: male, 1: female)\n", gender);
+    std::cout << "Confusion Matrix" << std::endl;
+    std::cout << graph->CalcConfusionMatrix(test_feature, test_labels)
+              << std::endl;
   }
 };
 

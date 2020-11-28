@@ -56,6 +56,7 @@ public:
   const MatrixX<T> &GetProbabilityDist(const MatrixX<T> &feature);
 
   void SetSolver(std::unique_ptr<Solver<T>> solver);
+
   // Used for threshold-moving/threshold-tuning
   // In the binary classification, predication that is greater than the
   // threshold will be classified as class 1, and 0 vice versa.
@@ -67,6 +68,21 @@ public:
 
   T CalcAccuracy(const MatrixX<T> &test_feature,
                  const Eigen::Ref<const MatrixX<int>> &test_labels);
+
+  // Calculates and returns the Confusion Matrix based on the input data. In the
+  // matrix, the row index represents a predicted class and the column index
+  // represents an actual class. For example, the Confusion Matrix for the
+  // binary classification is presented in the following format:
+  // --------------------------------------------------------------------------
+  //                       | Negative(0)       | Positive(1)
+  // --------------------------------------------------------------------------
+  // Predicted negative(0) | true negative     | false negative
+  // Predicted positive(1) | false positive    | true positive
+  // --------------------------------------------------------------------------
+  const MatrixX<T>
+  CalcConfusionMatrix(const MatrixX<T> &test_feature,
+                      const Eigen::Ref<const MatrixX<int>> &test_labels);
+
   OpVertex<T> *mutable_vertex(int vertex_id);
   Edge<T> *mutable_edge(int edge_id);
 
