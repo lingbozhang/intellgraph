@@ -21,6 +21,7 @@ Contributor(s):
 #include "src/edge/input_vertex.h"
 #include "src/edge/op_vertex.h"
 #include "src/edge/output_vertex.h"
+#include "src/edge/vertex/cross_entropy.h"
 #include "src/edge/vertex/input_vertex_impl.h"
 #include "src/edge/vertex/op_vertex_impl.h"
 #include "src/edge/vertex/output_vertex_impl.h"
@@ -38,6 +39,8 @@ void Registry::LoadRegistry() {
   REGISTER_VERTEX(OpVertex, OpVertexImpl, Sigmoid);
   LOG(INFO) << "Registering the SigmoidL2 ouput vertex...";
   REGISTER_VERTEX(OutputVertex, OutputVertexImpl, SigmoidL2);
+  LOG(INFO) << "Registering the CrossEntropy ouput vertex...";
+  REGISTER_VERTEX(OutputVertex, OutputVertexImpl, CrossEntropy);
   LOG(INFO) << "Registering the Input vertex...";
   REGISTER_VERTEX(InputVertex, InputVertexImpl, DummyTransformer);
 

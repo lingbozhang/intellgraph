@@ -15,6 +15,7 @@ Contributor(s):
 #include "src/edge/vertex/output_vertex_impl.h"
 
 #include "glog/logging.h"
+#include "src/edge/vertex/cross_entropy.h"
 #include "src/edge/vertex/sigmoid_l2.h"
 
 namespace intellgraph {
@@ -120,6 +121,7 @@ void OutputVertexImpl<T, Algorithm>::CalcDelta(
 // Explicit instantiation
 template class OutputVertexImpl<float, SigmoidL2>;
 template class OutputVertexImpl<double, SigmoidL2>;
+template class OutputVertexImpl<float, CrossEntropy>;
+template class OutputVertexImpl<double, CrossEntropy>;
 
 } // namespace intellgraph
-

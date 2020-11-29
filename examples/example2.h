@@ -69,7 +69,7 @@ public:
         "id: 0 type: 'DummyTransformer' dims: 2", &vtx_param1);
     // Vertex 2
     google::protobuf::TextFormat::ParseFromString(
-        "id: 1 type: 'SigmoidL2' dims: 1", &vtx_param2);
+        "id: 1 type: 'CrossEntropy' dims: 1", &vtx_param2);
     // Builds the graph
     // The Dense edge is added into the graph which represents a fully connected
     // neural network

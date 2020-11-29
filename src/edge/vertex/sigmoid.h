@@ -29,17 +29,7 @@ public:
     // Sigmoid activation function:
     // $\sigma(z)=1.0/(1.0+e^{-z})$
     MatrixX<T> *const activation = vertex.mutable_activation();
-    for (size_t i = 0; i < activation->rows(); ++i) {
-      for (size_t j = 0; j < activation->cols(); ++j) {
-        T element_value = activation->array()(i, j);
-        if (element_value >= 0.0) {
-          activation->array()(i, j) = 1.0 / (1.0 + std::exp(-element_value));
-        } else {
-          activation->array()(i, j) =
-              std::exp(element_value) / (1.0 + std::exp(element_value));
-        }
-      }
-    }
+    activation->array() = 0.5 * (1.0 + Eigen::tanh(0.5 * activation->array()));
   }
 
   template <typename T> static void Derive(OpVertex<T> &vertex) {

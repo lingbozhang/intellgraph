@@ -2,6 +2,7 @@ cc_library(
   STATIC
   NAME "vertex"
   HDRS
+    "cross_entropy.h"
     "input_vertex_impl.h"
     "op_vertex_impl.h"
     "output_vertex_impl.h"
@@ -36,6 +37,7 @@ cc_test(
 # Installs IntellGraph include headers
 install(
   FILES 
+    cross_entropy.h
     input_vertex_impl.h
     op_vertex_impl.h
     output_vertex_impl.h
