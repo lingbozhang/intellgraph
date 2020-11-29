@@ -104,7 +104,7 @@ template <typename T>
 const MatrixX<T> &
 ClassifierImpl<T>::GetProbabilityDist(const MatrixX<T> &feature) {
   this->Forward(feature);
-  return *output_vertex_->mutable_activation();
+  return output_vertex_->activation();
 }
 
 template <typename T>
@@ -120,51 +120,19 @@ void ClassifierImpl<T>::SetThreshold(const MatrixX<T> &threshold) {
 }
 
 template <typename T>
-T ClassifierImpl<T>::CalcAccuracy(
-    const MatrixX<T> &test_feature,
-    const Eigen::Ref<const MatrixX<int>> &test_labels) {
-  DCHECK_EQ(test_labels.rows(), threshold_.rows());
-
-  this->Forward(test_feature);
-
-  T accuracy = 0.0;
-  int correct_guess = 0;
-  MatrixX<T> *activation = output_vertex_->mutable_activation();
-  if (activation->rows() == 1) {
-    correct_guess = ((activation->array() >
-                      threshold_.array().replicate(1, activation->cols())) ==
-                     test_labels.cast<bool>().array())
-                        .count();
-  } else {
-    MatrixX<T> prob =
-        activation->array() *
-        threshold_.array().replicate(activation->rows(), activation->cols());
-    for (int i = 0; i < prob.cols(); ++i) {
-      int guess_index;
-      prob.col(i).maxCoeff(&guess_index);
-      if (guess_index == test_labels(0, i)) {
-        correct_guess++;
-      }
-    }
-  }
-  accuracy = correct_guess * 100.0 / test_labels.cols();
-  return accuracy;
-}
-
-template <typename T>
 const MatrixX<T> ClassifierImpl<T>::CalcConfusionMatrix(
     const MatrixX<T> &test_feature,
     const Eigen::Ref<const MatrixX<int>> &test_labels) {
   DCHECK_EQ(test_feature.cols(), test_labels.cols());
-  DCHECK_EQ(1, test_labels.rows());
+  DCHECK_EQ(output_vertex_->row(), test_labels.rows());
 
   this->Forward(test_feature);
-  MatrixX<T> *activation = output_vertex_->mutable_activation();
-  int class_num = activation->rows() == 1 ? 2 : activation->rows();
-  int batch_size = activation->cols();
+  const MatrixX<T> &activation = output_vertex_->activation();
+  int class_num = activation.rows() == 1 ? 2 : activation.rows();
+  int batch_size = activation.cols();
   MatrixX<T> confusion_matrix = MatrixX<T>::Zero(class_num, class_num);
 
-  if (activation->rows() == 1) {
+  if (activation.rows() == 1) {
     // Binary classification
     int true_positive = 0;
     int false_negative = 0;
@@ -173,7 +141,7 @@ const MatrixX<T> ClassifierImpl<T>::CalcConfusionMatrix(
 
     MatrixX<int> predication = MatrixX<int>::Zero(1, batch_size);
     predication =
-        (activation->array() > threshold_.array().replicate(1, batch_size))
+        (activation.array() > threshold_.array().replicate(1, batch_size))
             .template cast<int>();
     int correct_predication =
         (predication.array() == test_labels.array()).count();
@@ -189,12 +157,13 @@ const MatrixX<T> ClassifierImpl<T>::CalcConfusionMatrix(
   } else {
     // Multi-class classification
     MatrixX<T> weighted_probability =
-        activation->array() *
-        threshold_.array().replicate(activation->rows(), batch_size);
+        activation.array() *
+        threshold_.array().replicate(activation.rows(), batch_size);
     for (int i = 0; i < weighted_probability.cols(); ++i) {
-      int predication_index;
-      weighted_probability.col(i).maxCoeff(&predication_index);
-      confusion_matrix(predication_index, test_labels(0, i))++;
+      int predicted_class, actual_class;
+      weighted_probability.col(i).maxCoeff(&predicted_class);
+      test_labels.col(i).maxCoeff(&actual_class);
+      confusion_matrix(predicted_class, actual_class)++;
     }
   }
   return confusion_matrix;

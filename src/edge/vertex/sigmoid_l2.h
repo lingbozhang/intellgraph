@@ -17,6 +17,7 @@ Contributor(s):
 
 #include "glog/logging.h"
 #include "src/edge/vertex/output_vertex_impl.h"
+#include "src/edge/vertex/sigmoid.h"
 #include "src/eigen.h"
 
 namespace intellgraph {
@@ -29,30 +30,14 @@ public:
   static void Activate(OutputVertexImpl<T, SigmoidL2> &vertex) {
     // Sigmoid activation function:
     // $\sigma(z)=1.0/(1.0+e^{-z})$
-    LOG(INFO) << "OutputVertex " << vertex.id()
-              << " is activated with the Sigmoid function.";
-    MatrixX<T> *activation = vertex.mutable_activation();
-    for (size_t i = 0; i < activation->rows(); ++i) {
-      for (size_t j = 0; j < activation->cols(); ++j) {
-        T element_value = activation->array()(i, j);
-        if (element_value >= 0.0) {
-          activation->array()(i, j) = 1.0 / (1.0 + std::exp(-element_value));
-        } else {
-          activation->array()(i, j) =
-              std::exp(element_value) / (1.0 + std::exp(element_value));
-        }
-      }
-    }
+    Sigmoid::Activate(vertex);
   }
 
   template <typename T>
   static void Derive(OutputVertexImpl<T, SigmoidL2> &vertex) {
     // Derivative equation:
     // $d\sigma/dz=\sigma(z)(1-\sigma(z))$
-    LOG(INFO) << "OutputVertex " << vertex.id()
-              << " is derived with the Sigmoid function.";
-    MatrixX<T> *activation = vertex.mutable_activation();
-    activation->array() *= (1.0 - activation->array());
+    Sigmoid::Derive(vertex);
   }
 
   template <typename T>
@@ -61,7 +46,6 @@ public:
     DCHECK_EQ(vertex.row(), labels.rows());
     DCHECK_EQ(vertex.col(), labels.cols());
 
-    LOG(INFO) << "OutputVertex " << vertex.id() << " calculates L2-NORM loss.";
     const MatrixX<T> &activation = vertex.activation();
     T loss = (activation - labels.matrix()).squaredNorm();
     int batch_size = vertex.col();
@@ -74,8 +58,6 @@ public:
     DCHECK_EQ(vertex.row(), labels.rows());
     DCHECK_EQ(vertex.col(), labels.cols());
 
-    LOG(INFO) << "OutputVertex " << vertex.id()
-              << " calculates delta based on the Sigmoid function";
     MatrixX<T> *delta = vertex.mutable_delta();
     const MatrixX<T> &activation = vertex.activation();
 

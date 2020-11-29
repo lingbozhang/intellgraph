@@ -26,6 +26,7 @@ Contributor(s):
 #include "include/intellgraph/proto/vertex_parameter.pb.h"
 #include "include/intellgraph/registry.h"
 #include "include/intellgraph/sgd_solver.h"
+#include <google/protobuf/text_format.h>
 
 namespace intellgraph {
 
@@ -64,13 +65,11 @@ public:
     // Constructs vertices
     VertexParameter vtx_param1, vtx_param2;
     // Vertex 1
-    vtx_param1.set_id(0);
-    vtx_param1.set_type("DummyTransformer");
-    vtx_param1.set_dims(2);
+    google::protobuf::TextFormat::ParseFromString(
+        "id: 0 type: 'DummyTransformer' dims: 2", &vtx_param1);
     // Vertex 2
-    vtx_param2.set_id(1);
-    vtx_param2.set_type("SigmoidL2");
-    vtx_param2.set_dims(1);
+    google::protobuf::TextFormat::ParseFromString(
+        "id: 1 type: 'SigmoidL2' dims: 1", &vtx_param2);
     // Builds the graph
     // The Dense edge is added into the graph which represents a fully connected
     // neural network
@@ -99,9 +98,6 @@ public:
     float gender =
         graph->GetProbabilityDist(test_feature).array().round()(0, 0);
     printf("Tom's predicted gender: %1.0f (0: male, 1: female)\n", gender);
-    std::cout << "Confusion Matrix" << std::endl;
-    std::cout << graph->CalcConfusionMatrix(test_feature, test_labels)
-              << std::endl;
   }
 };
 

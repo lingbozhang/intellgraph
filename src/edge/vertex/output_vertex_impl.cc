@@ -46,11 +46,13 @@ OutputVertexImpl<T, Algorithm>::~OutputVertexImpl() = default;
 
 template <typename T, class Algorithm>
 void OutputVertexImpl<T, Algorithm>::Activate() {
+  LOG(INFO) << "OutputVertexImpl " << id_ << " is activated.";
   Algorithm::Activate(*this);
 }
 
 template <typename T, class Algorithm>
 void OutputVertexImpl<T, Algorithm>::Derive() {
+  LOG(INFO) << "OutputVertexImpl " << id_ << " is derived.";
   Algorithm::Derive(*this);
 }
 
@@ -58,6 +60,8 @@ template <typename T, class Algorithm>
 void OutputVertexImpl<T, Algorithm>::ResizeVertex(int batch_size) {
   DCHECK(batch_size != col_);
 
+  LOG(INFO) << "OutputVertexImpl " << id_ << " batch size is resized from "
+            << col_ << " to " << batch_size;
   col_ = batch_size;
   activation_ = std::make_unique<MatrixX<T>>(row_, batch_size);
   delta_ = std::make_unique<MatrixX<T>>(row_, batch_size);

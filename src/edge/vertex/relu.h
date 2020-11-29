@@ -26,8 +26,6 @@ public:
   Relu() = default;
 
   template <typename T> static void Activate(OpVertexImpl<T, Relu> &vertex) {
-    LOG(INFO) << "OpVertex " << vertex.id()
-              << " is activated with the Rectified Linear Unit function.";
     MatrixX<T> *const activation = vertex.mutable_activation();
     for (size_t i = 0; i < activation->rows(); ++i) {
       for (size_t j = 0; j < activation->cols(); ++j) {
@@ -39,8 +37,6 @@ public:
   }
 
   template <typename T> static void Derive(OpVertexImpl<T, Relu> &vertex) {
-    LOG(INFO) << "OpVertex " << vertex.id()
-              << " is derived with the Rectified Linear Unit function.";
     MatrixX<T> *const activation = vertex.mutable_activation();
     for (size_t i = 0; i < activation->rows(); ++i) {
       for (size_t j = 0; j < activation->cols(); ++j) {

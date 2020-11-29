@@ -25,11 +25,9 @@ class Sigmoid {
 public:
   Sigmoid() = default;
 
-  template <typename T> static void Activate(OpVertexImpl<T, Sigmoid> &vertex) {
+  template <typename T> static void Activate(OpVertex<T> &vertex) {
     // Sigmoid activation function:
     // $\sigma(z)=1.0/(1.0+e^{-z})$
-    LOG(INFO) << "OpVertex " << vertex.id()
-              << " is activated with the Sigmoid function.";
     MatrixX<T> *const activation = vertex.mutable_activation();
     for (size_t i = 0; i < activation->rows(); ++i) {
       for (size_t j = 0; j < activation->cols(); ++j) {
@@ -44,11 +42,9 @@ public:
     }
   }
 
-  template <typename T> static void Derive(OpVertexImpl<T, Sigmoid> &vertex) {
+  template <typename T> static void Derive(OpVertex<T> &vertex) {
     // Derivative equation:
     // $d\sigma/dz=\sigma(z)(1-\sigma(z))$
-    LOG(INFO) << "OpVertex " << vertex.id()
-              << " is derived with the Sigmoid function.";
     MatrixX<T> *const activation = vertex.mutable_activation();
     activation->array() *= (1.0 - activation->array());
   }

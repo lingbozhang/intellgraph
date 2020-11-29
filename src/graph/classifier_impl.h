@@ -65,10 +65,6 @@ public:
   // updated predication value is selected as the predicted class.
   void SetThreshold(const MatrixX<T> &threshold);
 
-
-  T CalcAccuracy(const MatrixX<T> &test_feature,
-                 const Eigen::Ref<const MatrixX<int>> &test_labels);
-
   // Calculates and returns the Confusion Matrix based on the input data. In the
   // matrix, the row index represents a predicted class and the column index
   // represents an actual class. For example, the Confusion Matrix for the
