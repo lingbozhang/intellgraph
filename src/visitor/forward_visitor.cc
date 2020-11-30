@@ -35,13 +35,15 @@ void ForwardVisitor<T>::Visit(
   MatrixX<T> *const activation_out = vtx_out->mutable_activation();
   const VectorX<T> *const bias_out = vtx_out->mutable_bias();
 
-  const MatrixX<T> *const weight = edge.mutable_weight();
+  const MatrixX<T> &weight = edge.weight();
 
   // Activation matrix data of the outbound vertex is updated rather than
   // overwritten
+  int batch_size = vtx_in->col();
   vtx_in->Activate();
-  activation_out->noalias() +=
-      (weight->transpose() * activation_in.matrix()).colwise() + *bias_out;
+  activation_out->leftCols(batch_size).noalias() +=
+      (weight.transpose() * activation_in.leftCols(batch_size)).colwise() +
+      *bias_out;
 }
 
 // Explicit instantiation

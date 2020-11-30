@@ -61,14 +61,17 @@ template <typename T, class Algorithm>
 void OpVertexImpl<T, Algorithm>::ResizeVertex(int batch_size) {
   DCHECK(batch_size != col_);
 
-  LOG(INFO) << "OpVertexImpl " << id_ << " batch size is resized from " << col_
-            << " to " << batch_size;
   col_ = batch_size;
-  activation_ = std::make_unique<MatrixX<T>>(row_, batch_size);
-  delta_ = std::make_unique<MatrixX<T>>(row_, batch_size);
-  // Zero initialization
-  activation_->setZero();
-  delta_->setZero();
+  if (batch_size > activation_->cols()) {
+    LOG(INFO) << "OpVertexImpl " << id_
+              << " activation column is expanded from " << activation_->cols()
+              << " to " << batch_size;
+    activation_ = std::make_unique<MatrixX<T>>(row_, batch_size);
+    delta_ = std::make_unique<MatrixX<T>>(row_, batch_size);
+    // Zero initialization
+    activation_->setZero();
+    delta_->setZero();
+  }
 }
 
 template <typename T, class Algorithm>

@@ -29,14 +29,18 @@ public:
     // Sigmoid activation function:
     // $\sigma(z)=1.0/(1.0+e^{-z})$
     MatrixX<T> *const activation = vertex.mutable_activation();
-    activation->array() = 0.5 * (1.0 + Eigen::tanh(0.5 * activation->array()));
+    int batch_size = vertex.col();
+    activation->leftCols(batch_size).array() =
+        0.5 * (1.0 + (0.5 * activation->leftCols(batch_size).array()).tanh());
   }
 
   template <typename T> static void Derive(OpVertex<T> &vertex) {
     // Derivative equation:
     // $d\sigma/dz=\sigma(z)(1-\sigma(z))$
     MatrixX<T> *const activation = vertex.mutable_activation();
-    activation->array() *= (1.0 - activation->array());
+    int batch_size = vertex.col();
+    activation->leftCols(batch_size).array() *=
+        (1.0 - activation->leftCols(batch_size).array());
   }
 
 protected:

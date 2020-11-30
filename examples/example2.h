@@ -74,7 +74,7 @@ public:
     // The Dense edge is added into the graph which represents a fully connected
     // neural network
     float eta = 0.1;
-    int epochs = 1000;
+    int epochs = 500;
 
     GraphBuilder<float> graph_builder;
     std::unique_ptr<ClassifierImpl<float>> graph =

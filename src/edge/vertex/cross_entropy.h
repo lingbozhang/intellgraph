@@ -49,13 +49,15 @@ public:
     DCHECK_EQ(vertex.col(), labels.cols());
 
     const MatrixX<T> &activation = vertex.activation();
+    int batch_size = vertex.col();
     // Type epsilon is added inside the log function to avoid overflow
     T epsilon = std::numeric_limits<T>::epsilon();
     T loss =
-        (labels.array() * (epsilon + activation.array()).log() +
-         (1.0 - labels.array()) * (1.0 - activation.array() + epsilon).log())
+        (labels.array() *
+             (epsilon + activation.leftCols(batch_size).array()).log() +
+         (1.0 - labels.array()) *
+             (1.0 - activation.leftCols(batch_size).array() + epsilon).log())
             .sum();
-    int batch_size = vertex.col();
     return -loss / batch_size;
   }
 
@@ -68,7 +70,9 @@ public:
     MatrixX<T> *delta = vertex.mutable_delta();
     const MatrixX<T> &activation = vertex.activation();
 
-    delta->matrix() = activation - labels.matrix();
+    int batch_size = vertex.col();
+    delta->leftCols(batch_size) =
+        activation.leftCols(batch_size) - labels.matrix();
   }
 
 protected:

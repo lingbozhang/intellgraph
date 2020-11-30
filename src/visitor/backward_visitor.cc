@@ -35,22 +35,24 @@ void BackwardVisitor<T>::Visit(
   MatrixX<T> *const delta_in = vtx_in->mutable_delta();
   MatrixX<T> *const delta_out = vtx_out->mutable_delta();
 
-  const MatrixX<T> *const weight = edge.mutable_weight();
+  const MatrixX<T> &weight = edge.weight();
   MatrixX<T> *const nabla_weight = edge.mutable_nabla_weight();
 
   // Calculates |nabla_weight|:
   // $\frac{\partial loss}{\partial W^l}=a^{l-1}(\delta^{l})^T$
-  int batch_size = activation_in.cols();
-  nabla_weight->noalias() =
-      (activation_in.matrix() * delta_out->transpose()) / batch_size;
+  int batch_size = vtx_in->col();
+  nabla_weight->matrix() = (activation_in.leftCols(batch_size) *
+                            delta_out->leftCols(batch_size).transpose()) /
+                           batch_size;
 
   // Calculates |delta_in|:
   // $\delta^l= \mathcal{D}[f^\prime(z^l)]W^{l+1}\delta^{l+1}$
   if (delta_in) {
     // Delta matrix data are updated rather than overwritten
     vtx_in->Derive();
-    delta_in->array() += (weight->matrix() * delta_out->matrix()).array() *
-                         activation_in.array();
+    delta_in->leftCols(batch_size).array() +=
+        (weight * delta_out->leftCols(batch_size)).array() *
+        activation_in.leftCols(batch_size).array();
   }
 }
 

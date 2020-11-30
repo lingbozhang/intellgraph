@@ -53,7 +53,7 @@ public:
              const Eigen::Ref<const MatrixX<int>> &labels);
   T CalculateLoss(const MatrixX<T> &test_feature,
                   const MatrixX<int> &test_labels);
-  const MatrixX<T> &GetProbabilityDist(const MatrixX<T> &feature);
+  const MatrixX<T> GetProbabilityDist(const MatrixX<T> &feature);
 
   void SetSolver(std::unique_ptr<Solver<T>> solver);
 

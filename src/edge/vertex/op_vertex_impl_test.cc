@@ -31,7 +31,9 @@ TEST(OpVertexImplTest, ResizeVertexSuccess) {
   op_vertex_double.ResizeVertex(2);
 
   EXPECT_FLOAT_EQ(op_vertex_float.col(), 2);
+  EXPECT_FLOAT_EQ(op_vertex_float.activation().cols(), 2);
   EXPECT_DOUBLE_EQ(op_vertex_double.col(), 2);
+  EXPECT_DOUBLE_EQ(op_vertex_double.activation().cols(), 2);
 }
 
 TEST(OpVertexImplTest, GetIdSuccess) {

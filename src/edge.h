@@ -32,6 +32,7 @@ public:
   virtual void Accept(Visitor<T> &visitor) = 0;
 
   virtual int id() const = 0;
+  virtual const MatrixX<T> &weight() = 0;
   virtual MatrixX<T> *mutable_weight() = 0;
   virtual MatrixX<T> *mutable_nabla_weight() = 0;
 };

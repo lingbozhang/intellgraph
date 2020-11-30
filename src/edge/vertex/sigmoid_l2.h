@@ -47,8 +47,8 @@ public:
     DCHECK_EQ(vertex.col(), labels.cols());
 
     const MatrixX<T> &activation = vertex.activation();
-    T loss = (activation - labels.matrix()).squaredNorm();
     int batch_size = vertex.col();
+    T loss = (activation.leftCols(batch_size) - labels.matrix()).squaredNorm();
     return loss / 2.0 / batch_size;
   }
 
@@ -61,9 +61,12 @@ public:
     MatrixX<T> *delta = vertex.mutable_delta();
     const MatrixX<T> &activation = vertex.activation();
 
-    delta->matrix() = activation - labels.matrix();
+    int batch_size = vertex.col();
+    delta->leftCols(batch_size) =
+        activation.leftCols(batch_size) - labels.matrix();
     vertex.Derive();
-    delta->array() *= activation.array();
+    delta->leftCols(batch_size).array() *=
+        activation.leftCols(batch_size).array();
   }
 
 protected:

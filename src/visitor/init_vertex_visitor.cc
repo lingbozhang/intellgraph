@@ -31,8 +31,9 @@ void InitVertexVisitor<T>::Visit(
             << " is zero initialized.";
 
   OpVertex<T> *const vtx_out = edge.vertex_out();
-  vtx_out->mutable_activation()->setZero();
-  vtx_out->mutable_delta()->setZero();
+  int batch_size = vtx_out->col();
+  vtx_out->mutable_activation()->leftCols(batch_size).setZero();
+  vtx_out->mutable_delta()->leftCols(batch_size).setZero();
 }
 
 // Explicit instantiation

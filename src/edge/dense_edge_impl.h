@@ -33,6 +33,7 @@ public:
   void Accept(Visitor<T> &visitor) override { visitor.Visit(*this); }
 
   int id() const override;
+  const MatrixX<T> &weight() override;
   MatrixX<T> *mutable_weight() override;
   MatrixX<T> *mutable_nabla_weight() override;
 

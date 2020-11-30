@@ -101,10 +101,10 @@ T ClassifierImpl<T>::CalculateLoss(const MatrixX<T> &test_feature,
 }
 
 template <typename T>
-const MatrixX<T> &
+const MatrixX<T>
 ClassifierImpl<T>::GetProbabilityDist(const MatrixX<T> &feature) {
   this->Forward(feature);
-  return output_vertex_->activation();
+  return output_vertex_->activation().leftCols(batch_size_);
 }
 
 template <typename T>
@@ -129,7 +129,7 @@ const MatrixX<T> ClassifierImpl<T>::CalcConfusionMatrix(
   this->Forward(test_feature);
   const MatrixX<T> &activation = output_vertex_->activation();
   int class_num = activation.rows() == 1 ? 2 : activation.rows();
-  int batch_size = activation.cols();
+  int batch_size = output_vertex_->col();
   MatrixX<T> confusion_matrix = MatrixX<T>::Zero(class_num, class_num);
 
   if (activation.rows() == 1) {
@@ -140,11 +140,12 @@ const MatrixX<T> ClassifierImpl<T>::CalcConfusionMatrix(
     int true_negative = 0;
 
     MatrixX<int> predication = MatrixX<int>::Zero(1, batch_size);
-    predication =
-        (activation.array() > threshold_.array().replicate(1, batch_size))
-            .template cast<int>();
+    predication = (activation.leftCols(batch_size).array() >
+                   threshold_.array().replicate(1, batch_size))
+                      .template cast<int>();
     int correct_predication =
-        (predication.array() == test_labels.array()).count();
+        (predication.leftCols(batch_size).array() == test_labels.array())
+            .count();
     true_positive = (predication.array() * test_labels.array()).count();
     true_negative = correct_predication - true_positive;
     int positive = test_labels.count();
@@ -157,9 +158,9 @@ const MatrixX<T> ClassifierImpl<T>::CalcConfusionMatrix(
   } else {
     // Multi-class classification
     MatrixX<T> weighted_probability =
-        activation.array() *
+        activation.leftCols(batch_size).array() *
         threshold_.array().replicate(activation.rows(), batch_size);
-    for (int i = 0; i < weighted_probability.cols(); ++i) {
+    for (int i = 0; i < batch_size; ++i) {
       int predicted_class, actual_class;
       weighted_probability.col(i).maxCoeff(&predicted_class);
       test_labels.col(i).maxCoeff(&actual_class);

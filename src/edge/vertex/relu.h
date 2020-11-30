@@ -28,7 +28,7 @@ public:
   template <typename T> static void Activate(OpVertexImpl<T, Relu> &vertex) {
     MatrixX<T> *const activation = vertex.mutable_activation();
     for (size_t i = 0; i < activation->rows(); ++i) {
-      for (size_t j = 0; j < activation->cols(); ++j) {
+      for (size_t j = 0; j < vertex.col(); ++j) {
         if (activation->matrix()(i, j) < 0) {
           activation->matrix()(i, j) = 0;
         }
@@ -39,7 +39,7 @@ public:
   template <typename T> static void Derive(OpVertexImpl<T, Relu> &vertex) {
     MatrixX<T> *const activation = vertex.mutable_activation();
     for (size_t i = 0; i < activation->rows(); ++i) {
-      for (size_t j = 0; j < activation->cols(); ++j) {
+      for (size_t j = 0; j < vertex.col(); ++j) {
         DCHECK_GE(activation->matrix()(i, j), 0);
         if (activation->matrix()(i, j) > 0) {
           activation->matrix()(i, j) = 1;

@@ -49,6 +49,11 @@ int DenseEdgeImpl<T, VertexIn, VertexOut>::id() const {
 }
 
 template <typename T, class VertexIn, class VertexOut>
+const MatrixX<T> &DenseEdgeImpl<T, VertexIn, VertexOut>::weight() {
+  return *weight_;
+};
+
+template <typename T, class VertexIn, class VertexOut>
 MatrixX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_weight() {
   return weight_.get();
 };
