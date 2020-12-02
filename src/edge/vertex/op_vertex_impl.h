@@ -36,7 +36,7 @@ public:
 
   void Activate() override;
   void Derive() override;
-  void ResizeVertex(int batch_size) override;
+  void ResizeVertex(int length) override;
 
   int id() const override;
   int row() const override;

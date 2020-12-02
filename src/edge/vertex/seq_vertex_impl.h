@@ -1,0 +1,58 @@
+/* Copyright 2020 The IntellGraph Authors. All Rights Reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Contributor(s):
+        Lingbo Zhang <lingboz2015@gmail.com>
+==============================================================================*/
+#ifndef INTELLGRAPH_SRC_EDGE_VERTEX_SEQ_VERTEX_IMPL_H_
+#define INTELLGRAPH_SRC_EDGE_VERTEX_SEQ_VERTEX_IMPL_H_
+
+#include "src/edge/seq_vertex.h"
+#include "src/edge/vertex/op_vertex_impl.h"
+#include "src/proto/vertex_parameter.pb.h"
+
+namespace intellgraph {
+
+template <typename T, class Algorithm>
+class SeqVertexImpl : public Algorithm, public SeqVertex<T> {
+public:
+  SeqVertexImpl(int id, int row, int col);
+  SeqVertexImpl(const VertexParameter &vtx_param, int time_length);
+  ~SeqVertexImpl() override;
+
+  void Activate() override { op_vertex_.Activate(); }
+  void Derive() override { op_vertex_.Derive(); }
+  void ResizeVertex(int length) override { op_vertex_.ResizeVertex(length); }
+
+  int id() const override { return op_vertex_.id(); }
+  int row() const override { return op_vertex_.row(); }
+  int col() const override { return op_vertex_.col(); }
+
+  const MatrixX<T> &activation() const override {
+    return op_vertex_.activation();
+  }
+  MatrixX<T> *mutable_activation() override {
+    return op_vertex_.mutable_activation();
+  }
+  MatrixX<T> *mutable_delta() override { return op_vertex_.mutable_delta(); }
+  VectorX<T> *mutable_bias() override { return op_vertex_.mutable_bias(); }
+
+  void ForwardTimeByOneStep() override;
+  int GetCurrentTimeStep() const override;
+
+private:
+  OpVertexImpl<T, Algorithm> op_vertex_;
+  int timestamp_ = 0;
+};
+
+} // namespace intellgraph
+
+#endif // INTELLGRAPH_SRC_EDGE_VERTEX_SEQ_VERTEX_IMPL_H_

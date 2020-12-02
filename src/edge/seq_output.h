@@ -12,21 +12,20 @@ limitations under the License.
 Contributor(s):
         Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_SRC_EDGE_OUTPUT_VERTEX_H_
-#define INTELLGRAPH_SRC_EDGE_OUTPUT_VERTEX_H_
+#ifndef INTELLGRAPH_SRC_EDGE_SEQ_OUTPUT_H_
+#define INTELLGRAPH_SRC_EDGE_SEQ_OUTPUT_H_
 
-#include "src/edge/op_vertex.h"
+#include "src/edge/seq_vertex.h"
 #include "src/eigen.h"
 
 namespace intellgraph {
 
-template <typename T>
-class OutputVertex : public OpVertex<T> {
+template <typename T> class SeqOutput : public SeqVertex<T> {
 public:
   typedef T value_type;
 
-  OutputVertex() = default;
-  ~OutputVertex() override = default;
+  SeqOutput() = default;
+  ~SeqOutput() override = default;
 
   virtual T CalcLoss(const Eigen::Ref<const MatrixX<T>> &labels) = 0;
   virtual void CalcDelta(const Eigen::Ref<const MatrixX<T>> &labels) = 0;
@@ -34,4 +33,4 @@ public:
 
 } // namespace intellgraph
 
-#endif // INTELLGRAPH_SRC_EDGE_OUTPUT_VERTEX_H_
+#endif // INTELLGRAPH_SRC_EDGE_SEQ_OUTPUT_H_

@@ -2,7 +2,7 @@
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-1.0
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,26 +12,26 @@ limitations under the License.
 Contributor(s):
         Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_SRC_EDGE_OUTPUT_VERTEX_H_
-#define INTELLGRAPH_SRC_EDGE_OUTPUT_VERTEX_H_
+#ifndef INTELLGRAPH_SRC_GRAPH_RNN_IMPL_H_
+#define INTELLGRAPH_SRC_GRAPH_RNN_IMPL_H_
 
-#include "src/edge/op_vertex.h"
-#include "src/eigen.h"
+#include "src/graph.h"
 
 namespace intellgraph {
 
-template <typename T>
-class OutputVertex : public OpVertex<T> {
+template <typename T> class RnnImpl : public Graph {
 public:
-  typedef T value_type;
+  RnnImpl() = default;
+  ~RnnImpl() = default;
 
-  OutputVertex() = default;
-  ~OutputVertex() override = default;
+  void Train();
 
-  virtual T CalcLoss(const Eigen::Ref<const MatrixX<T>> &labels) = 0;
-  virtual void CalcDelta(const Eigen::Ref<const MatrixX<T>> &labels) = 0;
+private:
+  // Graph topology
+  const typename Graph::AdjacencyList adjacency_list_;
+  std::vector<int> topological_order_;
 };
 
 } // namespace intellgraph
 
-#endif // INTELLGRAPH_SRC_EDGE_OUTPUT_VERTEX_H_
+#endif // INTELLGRAPH_SRC_GRAPH_RNN_IMPL_H_

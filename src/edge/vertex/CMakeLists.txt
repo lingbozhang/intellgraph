@@ -6,13 +6,14 @@ cc_library(
     "input_vertex_impl.h"
     "op_vertex_impl.h"
     "output_vertex_impl.h"
-    "relu.h"
-    "sigmoid.h"
-    "sigmoid_l2.h"
+    "seq_vertex_impl.h"
+    "seq_output_impl.h"
   SRCS
     "input_vertex_impl.cc"
     "op_vertex_impl.cc"
     "output_vertex_impl.cc"
+    "seq_vertex_impl.cc"
+    "seq_output_impl.cc"
   DEPS
     "CONAN_PKG::eigen"
     "CONAN_PKG::glog"
@@ -42,6 +43,7 @@ install(
     op_vertex_impl.h
     output_vertex_impl.h
     relu.h
+    seq_vertex_impl.h
     sigmoid.h
     sigmoid_l2.h
   DESTINATION 

@@ -32,7 +32,7 @@ public:
   virtual void Activate() = 0;
   virtual void Derive() = 0;
   // Resizes activation and delta matrices
-  virtual void ResizeVertex(int batch_size) = 0;
+  virtual void ResizeVertex(int length) = 0;
 
   virtual int id() const = 0;
   virtual int row() const = 0;

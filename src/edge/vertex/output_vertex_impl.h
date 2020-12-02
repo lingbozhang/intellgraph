@@ -15,7 +15,6 @@ Contributor(s):
 #ifndef INTELLGRAPH_SRC_EDGE_VERTEX_OUTPUT_VERTEX_IMPL_H_
 #define INTELLGRAPH_SRC_EDGE_VERTEX_OUTPUT_VERTEX_IMPL_H_
 
-#include "glog/logging.h"
 #include "src/edge/output_vertex.h"
 #include "src/proto/vertex_parameter.pb.h"
 
@@ -32,7 +31,7 @@ public:
 
   void Activate() override;
   void Derive() override;
-  void ResizeVertex(int batch_size) override;
+  void ResizeVertex(int length) override;
 
   int id() const override;
   int row() const override;

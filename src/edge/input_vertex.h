@@ -33,7 +33,7 @@ public:
   // Dummy implementations:
   void Activate() override {}
   void Derive() override {}
-  void ResizeVertex(int batch_size) override {}
+  void ResizeVertex(int length) override {}
   MatrixX<T> *mutable_activation() override { return nullptr; }
   VectorX<T> *mutable_bias() override { return nullptr; }
   MatrixX<T> *mutable_delta() override { return nullptr; }
