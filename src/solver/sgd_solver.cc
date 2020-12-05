@@ -26,6 +26,13 @@ SgdSolver<T>::SgdSolver(T eta, T lambda) : eta_(eta), lambda_(lambda) {
   DCHECK_GE(lambda, 0.0);
 }
 
+template <typename T>
+SgdSolver<T>::SgdSolver(const SolverConfig &config)
+    : eta_(config.eta()), lambda_(config.lambda()) {
+  DCHECK_GT(eta_, 0.0);
+  DCHECK_GE(lambda_, 0.0);
+}
+
 template <typename T> SgdSolver<T>::~SgdSolver() = default;
 
 template <typename T>

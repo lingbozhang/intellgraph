@@ -16,7 +16,7 @@ cc_library(
   PUBLIC_DEPS
     "CONAN_PKG::eigen"
     "edge"
-    "edge_factory"
+    "factory"
     "proto"
     "solver"
     "vertex"

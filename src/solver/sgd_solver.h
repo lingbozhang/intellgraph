@@ -15,6 +15,7 @@ Contributor(s):
 #ifndef INTELLGRAPH_SRC_SOLVER_SGD_SOLVER_H_
 #define INTELLGRAPH_SRC_SOLVER_SGD_SOLVER_H_
 
+#include "src/proto/graph_parameter.pb.h"
 #include "src/solver.h"
 
 namespace intellgraph {
@@ -23,6 +24,7 @@ namespace intellgraph {
 template <typename T> class SgdSolver : public Solver<T> {
 public:
   explicit SgdSolver(T eta, T lambda);
+  explicit SgdSolver(const SolverConfig &config);
   ~SgdSolver() override;
 
   void Visit(DenseEdgeImpl<T, OpVertex<T>, OpVertex<T>> &edge) override;

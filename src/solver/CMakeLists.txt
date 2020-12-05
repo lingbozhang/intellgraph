@@ -11,6 +11,7 @@ cc_library(
     "CONAN_PKG::eigen"
     "CONAN_PKG::glog"
     "edge"
+    "proto"
 )
 
 # Installs IntellGraph include headers

@@ -4,8 +4,9 @@ proto_library(
   STATIC
   NAME "proto"
   SRCS 
-    "vertex_parameter.proto"
     "edge_parameter.proto"
+    "graph_parameter.proto"
+    "vertex_parameter.proto"
 )
 
 # Installs IntellGraph include headers

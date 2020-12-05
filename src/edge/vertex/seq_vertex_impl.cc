@@ -29,6 +29,9 @@ SeqVertexImpl<T, Algorithm>::SeqVertexImpl(const VertexParameter &vtx_param,
     : op_vertex_(vtx_param, time_length) {}
 
 template <typename T, class Algorithm>
+SeqVertexImpl<T, Algorithm>::~SeqVertexImpl() = default;
+
+template <typename T, class Algorithm>
 void SeqVertexImpl<T, Algorithm>::Activate() {
   op_vertex_.Activate();
 }

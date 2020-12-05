@@ -21,6 +21,7 @@ Contributor(s):
 #include <string>
 
 #include "glog/logging.h"
+#include "src/proto/graph_parameter.pb.h"
 #include "src/proto/vertex_parameter.pb.h"
 
 namespace intellgraph {
@@ -30,15 +31,21 @@ public:
   template <class Base>
   using VertexConstructor =
       std::function<std::unique_ptr<Base>(const VertexParameter &, int)>;
+  template <class Base>
+  using VertexRegistryMap = std::map<std::string, VertexConstructor<Base>>;
+
   template <class Base, class VertexIn, class VertexOut>
   using EdgeConstructor =
       std::function<std::unique_ptr<Base>(int, VertexIn *, VertexOut *)>;
-
-  template <class Base>
-  using VertexRegistryMap = std::map<std::string, VertexConstructor<Base>>;
   template <class Base, class VertexIn, class VertexOut>
   using EdgeRegistryMap =
       std::map<std::string, EdgeConstructor<Base, VertexIn, VertexOut>>;
+
+  template <class Base>
+  using SolverConstructor =
+      std::function<std::unique_ptr<Base>(const SolverConfig &)>;
+  template <class Base>
+  using SolverRegistryMap = std::map<std::string, SolverConstructor<Base>>;
 
   Factory() = delete;
   ~Factory() = delete;
@@ -55,6 +62,10 @@ public:
                << " from the Registry";
     return nullptr;
   }
+  template <class Base> static VertexRegistryMap<Base> &VertexRegistry() {
+    static VertexRegistryMap<Base> impl;
+    return impl;
+  }
 
   template <class Base, class VertexIn, class VertexOut = VertexIn>
   static std::unique_ptr<Base> InstantiateEdge(const std::string &type, int id,
@@ -69,15 +80,25 @@ public:
                << " from the Registry";
     return nullptr;
   }
-
-  template <class Base> static VertexRegistryMap<Base> &VertexRegistry() {
-    static VertexRegistryMap<Base> impl;
-    return impl;
-  }
-
   template <class Base, class VertexIn, class VertexOut = VertexIn>
   static EdgeRegistryMap<Base, VertexIn, VertexOut> &EdgeRegistry() {
     static EdgeRegistryMap<Base, VertexIn, VertexOut> impl;
+    return impl;
+  }
+
+  template <class Base>
+  static std::unique_ptr<Base> InstantiateSolver(const SolverConfig &param) {
+    const std::string &type = param.type();
+    if (Factory::SolverRegistry<Base>().find(type) !=
+        Factory::SolverRegistry<Base>().end()) {
+      return Factory::SolverRegistry<Base>().at(type)(param);
+    }
+    LOG(FATAL) << "Failed to find the solver constructor " << type
+               << " from the Registry";
+    return nullptr;
+  }
+  template <class Base> static SolverRegistryMap<Base> &SolverRegistry() {
+    static SolverRegistryMap<Base> impl;
     return impl;
   }
 };
@@ -107,6 +128,16 @@ public:
   }
 };
 
+template <class Base, class Derived> class SolverRegister {
+public:
+  SolverRegister(const std::string &type) {
+    Factory::SolverRegistry<Base>().try_emplace(
+        type, [](const SolverConfig &param) -> std::unique_ptr<Base> {
+          return std::make_unique<Derived>(param);
+        });
+  }
+};
+
 #define REGISTER_VERTEX(base, derived, type)                                   \
   static const VertexRegister<base<float>, derived<float, type>>               \
       register_f_##type##_##base##_##derived(#type);                           \
@@ -122,6 +153,12 @@ public:
       base<double>, derived<double, vertex_in<double>, vertex_out<double>>,    \
       vertex_in<double>, vertex_out<double>>                                   \
       register_d_##type##_##base##_##derived##vertex_in##vertex_out(#type);
+
+#define REGISTER_SOLVER(base, derived, type)                                   \
+  static const SolverRegister<base<float>, derived<float>>                     \
+      register_f_##type##_##base##_##derived(#type);                           \
+  static const SolverRegister<base<double>, derived<double>>                   \
+      register_d_##type##_##base##_##derived(#type);
 
 } // namespace intellgraph
 

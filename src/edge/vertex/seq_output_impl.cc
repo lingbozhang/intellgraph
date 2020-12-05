@@ -29,6 +29,9 @@ SeqOutputImpl<T, Algorithm>::SeqOutputImpl(const VertexParameter &vtx_param,
     : output_vertex_(vtx_param, length) {}
 
 template <typename T, class Algorithm>
+SeqOutputImpl<T, Algorithm>::~SeqOutputImpl() = default;
+
+template <typename T, class Algorithm>
 void SeqOutputImpl<T, Algorithm>::Activate() {
   output_vertex_.Activate();
 }

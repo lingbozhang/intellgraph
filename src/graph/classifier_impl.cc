@@ -15,7 +15,7 @@ Contributor(s):
 #include "src/graph/classifier_impl.h"
 
 #include "glog/logging.h"
-#include "src/edge/factory.h"
+#include "src/factory.h"
 
 namespace intellgraph {
 

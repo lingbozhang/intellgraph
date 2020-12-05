@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "edge_parameter.proto";
+import "vertex_parameter.proto";
+
+package intellgraph;
+
+message SolverConfig {
+  // Required
+  string type = 1;
+
+  // Required
+  float eta = 2;
+
+  // Required
+  float lambda = 3;
+}
+
+message GraphConfig {
+  // Required
+  SolverConfig solver_config = 1;
+
+  // Required
+  int32 input_vertex_id = 2;
+
+  // Required
+  int32 output_vertex_id = 3;
+
+  // Required
+  repeated VertexParameter vtx_params = 4;
+
+  // Required
+  repeated EdgeParameter edge_params = 5;
+
+  // Optional, required for RNN
+  map<int32, int32> state_vertex_map = 6;
+}

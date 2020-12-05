@@ -15,26 +15,10 @@ cc_library(
     "vertex"
 )
 
-cc_library(
-  STATIC
-  NAME "edge_factory"
-  HDRS
-    "factory.h"
-    "registry.h"
-  SRCS
-    "registry.cc"
-  DEPS
-    "CONAN_PKG::glog"
-    "edge"
-    "proto"
-    "vertex"
-)
-
 # Installs IntellGraph include headers
 install(
   FILES
     dense_edge_impl.h
-    registry.h
   DESTINATION
     ${INTELLGRAPH_INCLUDE_DIR}/intellgraph
 )
