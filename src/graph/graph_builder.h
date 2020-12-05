@@ -17,10 +17,10 @@ Contributor(s):
 
 #include <memory>
 #include <set>
+#include <string>
 
 #include "boost/graph/adjacency_list.hpp"
 #include "src/graph.h"
-#include "src/graph/classifier_impl.h"
 #include "src/proto/edge_parameter.pb.h"
 #include "src/proto/vertex_parameter.pb.h"
 #include "src/solver.h"
@@ -33,24 +33,22 @@ public:
   GraphBuilder();
   ~GraphBuilder();
 
-  GraphBuilder &AddEdge(const std::string &edge_type,
-                        const VertexParameter &vtx_param_in,
-                        const VertexParameter &vtx_param_out);
-  GraphBuilder &SetInputVertexId(int id);
-  GraphBuilder &SetOutputVertexId(int id);
-  GraphBuilder &SetBatchSize(int batch_size);
-  GraphBuilder &
-  SetGraphInitVisitor(std::unique_ptr<Visitor<T>> graph_init_visitor);
-  GraphBuilder &SetSolver(std::unique_ptr<Solver<T>> solver);
-  std::unique_ptr<ClassifierImpl<T>> Build();
+  void add_edge(const std::string &edge_type,
+                const VertexParameter &vtx_param_in,
+                const VertexParameter &vtx_param_out);
+  const std::set<VertexParameter> &vertex_params();
+  const std::set<EdgeParameter> &edge_params();
+  const Graph::AdjacencyList &adjacency_list();
+
+  void set_input_vertex_id(int id);
+  int input_vertex_id();
+
+  void set_output_vertex_id(int id);
+  int output_vertex_id();
 
 private:
-  int batch_size_ = 0;
   int input_vertex_id_ = -1;
   int output_vertex_id_ = -1;
-
-  std::unique_ptr<Visitor<T>> graph_init_visitor_;
-  std::unique_ptr<Solver<T>> solver_;
 
   Graph::AdjacencyList adjacency_list_;
   std::set<VertexParameter> vertex_params_;

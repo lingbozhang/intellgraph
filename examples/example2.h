@@ -20,9 +20,9 @@ Contributor(s):
 #include <iostream>
 #include <memory>
 
+#include "include/intellgraph/classifier_builder.h"
 #include "include/intellgraph/classifier_impl.h"
 #include "include/intellgraph/eigen.h"
-#include "include/intellgraph/graph_builder.h"
 #include "include/intellgraph/proto/vertex_parameter.pb.h"
 #include "include/intellgraph/registry.h"
 #include "include/intellgraph/sgd_solver.h"
@@ -76,12 +76,11 @@ public:
     float eta = 0.1;
     int epochs = 500;
 
-    GraphBuilder<float> graph_builder;
+    ClassifierBuilder<float> graph_builder;
     std::unique_ptr<ClassifierImpl<float>> graph =
         graph_builder.AddEdge("Dense", vtx_param1, vtx_param2)
             .SetInputVertexId(0)
             .SetOutputVertexId(1)
-            .SetBatchSize(1)
             .SetSolver(std::make_unique<SgdSolver<float>>(eta, /*lambda=*/0.0))
             .Build();
 

@@ -29,6 +29,68 @@ SeqOutputImpl<T, Algorithm>::SeqOutputImpl(const VertexParameter &vtx_param,
     : output_vertex_(vtx_param, length) {}
 
 template <typename T, class Algorithm>
+void SeqOutputImpl<T, Algorithm>::Activate() {
+  output_vertex_.Activate();
+}
+
+template <typename T, class Algorithm>
+void SeqOutputImpl<T, Algorithm>::Derive() {
+  output_vertex_.Derive();
+}
+
+template <typename T, class Algorithm>
+void SeqOutputImpl<T, Algorithm>::ResizeVertex(int length) {
+  output_vertex_.ResizeVertex(length);
+}
+
+template <typename T, class Algorithm>
+int SeqOutputImpl<T, Algorithm>::id() const {
+  return output_vertex_.id();
+}
+
+template <typename T, class Algorithm>
+int SeqOutputImpl<T, Algorithm>::row() const {
+  return output_vertex_.row();
+}
+
+template <typename T, class Algorithm>
+int SeqOutputImpl<T, Algorithm>::col() const {
+  return output_vertex_.col();
+}
+
+template <typename T, class Algorithm>
+const MatrixX<T> &SeqOutputImpl<T, Algorithm>::activation() const {
+  return output_vertex_.activation();
+}
+
+template <typename T, class Algorithm>
+MatrixX<T> *SeqOutputImpl<T, Algorithm>::mutable_activation() {
+  return output_vertex_.mutable_activation();
+}
+
+template <typename T, class Algorithm>
+MatrixX<T> *SeqOutputImpl<T, Algorithm>::mutable_delta() {
+  return output_vertex_.mutable_delta();
+}
+
+template <typename T, class Algorithm>
+VectorX<T> *SeqOutputImpl<T, Algorithm>::mutable_bias() {
+  return output_vertex_.mutable_bias();
+}
+
+template <typename T, class Algorithm>
+T SeqOutputImpl<T, Algorithm>::CalcLoss(
+    const Eigen::Ref<const MatrixX<T>> &labels) {
+  return output_vertex_.CalcLoss(labels);
+}
+
+template <typename T, class Algorithm>
+void SeqOutputImpl<T, Algorithm>::CalcDelta(
+    const Eigen::Ref<const MatrixX<T>> &labels) {
+  output_vertex_.CalcDelta(labels);
+}
+
+template <typename T, class Algorithm>
 void SeqOutputImpl<T, Algorithm>::ForwardTimeByOneStep() {
   ++timestamp_;
 }

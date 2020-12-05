@@ -28,22 +28,18 @@ public:
   SeqVertexImpl(const VertexParameter &vtx_param, int time_length);
   ~SeqVertexImpl() override;
 
-  void Activate() override { op_vertex_.Activate(); }
-  void Derive() override { op_vertex_.Derive(); }
-  void ResizeVertex(int length) override { op_vertex_.ResizeVertex(length); }
+  void Activate() override;
+  void Derive() override;
+  void ResizeVertex(int length) override;
 
-  int id() const override { return op_vertex_.id(); }
-  int row() const override { return op_vertex_.row(); }
-  int col() const override { return op_vertex_.col(); }
+  int id() const override;
+  int row() const override;
+  int col() const override;
 
-  const MatrixX<T> &activation() const override {
-    return op_vertex_.activation();
-  }
-  MatrixX<T> *mutable_activation() override {
-    return op_vertex_.mutable_activation();
-  }
-  MatrixX<T> *mutable_delta() override { return op_vertex_.mutable_delta(); }
-  VectorX<T> *mutable_bias() override { return op_vertex_.mutable_bias(); }
+  const MatrixX<T> &activation() const override;
+  MatrixX<T> *mutable_activation() override;
+  MatrixX<T> *mutable_delta() override;
+  VectorX<T> *mutable_bias() override;
 
   void ForwardTimeByOneStep() override;
   int GetCurrentTimeStep() const override;

@@ -21,17 +21,16 @@ namespace intellgraph {
 
 template <typename T>
 ClassifierImpl<T>::ClassifierImpl(
-    int batch_size, std::unique_ptr<Visitor<T>> graph_init_visitor,
+    int batch_size, std::unique_ptr<Visitor<T>> init_visitor,
     std::unique_ptr<Solver<T>> solver,
     const typename Graph::AdjacencyList &adjacency_list, int input_vertex_id,
     int output_vertex_id, const std::set<VertexParameter> &vertex_params,
     const std::set<EdgeParameter> &edge_params)
-    : batch_size_(batch_size),
-      graph_init_visitor_(std::move(graph_init_visitor)),
+    : batch_size_(batch_size), init_visitor_(std::move(init_visitor)),
       solver_(std::move(solver)), adjacency_list_(adjacency_list),
       resize_vertex_visitor_(batch_size_) {
   DCHECK_GT(batch_size_, 0);
-  DCHECK(graph_init_visitor_);
+  DCHECK(init_visitor_);
   DCHECK(solver_);
 
   // Instantiates vertices
@@ -78,7 +77,7 @@ ClassifierImpl<T>::ClassifierImpl(
   // Determines Forward orders by topological sorting
   topological_sort(adjacency_list_, std::back_inserter(topological_order_));
   // Initializes the graph
-  this->Traverse(*graph_init_visitor_);
+  this->Traverse(*init_visitor_);
 }
 
 template <typename T> ClassifierImpl<T>::~ClassifierImpl() = default;

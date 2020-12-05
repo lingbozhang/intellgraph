@@ -4,11 +4,15 @@ cc_library(
   STATIC
   NAME "intellgraph"
   HDRS
+    "classifier_builder.h"
     "classifier_impl.h"
     "graph_builder.h"
+    "rnn_builder.h"
   SRCS
+    "classifier_builder.cc"
     "classifier_impl.cc"
     "graph_builder.cc"
+    "rnn_builder.cc"
   PUBLIC_DEPS
     "CONAN_PKG::eigen"
     "edge"
@@ -17,10 +21,10 @@ cc_library(
     "solver"
     "vertex"
     "utility"
+    "visitor"
   DEPS
     "CONAN_PKG::boost"
     "CONAN_PKG::glog"
-    "visitor"
 )
 
 install(
@@ -31,8 +35,10 @@ install(
 # Installs IntellGraph include headers
 install(
   FILES 
+    classifier_builder.h
     classifier_impl.h 
     graph_builder.h 
+    rnn_builder.h
   DESTINATION 
     ${INTELLGRAPH_INCLUDE_DIR}/intellgraph
 )

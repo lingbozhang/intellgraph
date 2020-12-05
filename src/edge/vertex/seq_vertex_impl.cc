@@ -29,6 +29,56 @@ SeqVertexImpl<T, Algorithm>::SeqVertexImpl(const VertexParameter &vtx_param,
     : op_vertex_(vtx_param, time_length) {}
 
 template <typename T, class Algorithm>
+void SeqVertexImpl<T, Algorithm>::Activate() {
+  op_vertex_.Activate();
+}
+
+template <typename T, class Algorithm>
+void SeqVertexImpl<T, Algorithm>::Derive() {
+  op_vertex_.Derive();
+}
+
+template <typename T, class Algorithm>
+void SeqVertexImpl<T, Algorithm>::ResizeVertex(int length) {
+  op_vertex_.ResizeVertex(length);
+}
+
+template <typename T, class Algorithm>
+int SeqVertexImpl<T, Algorithm>::id() const {
+  return op_vertex_.id();
+}
+
+template <typename T, class Algorithm>
+int SeqVertexImpl<T, Algorithm>::row() const {
+  return op_vertex_.row();
+}
+
+template <typename T, class Algorithm>
+int SeqVertexImpl<T, Algorithm>::col() const {
+  return op_vertex_.col();
+}
+
+template <typename T, class Algorithm>
+const MatrixX<T> &SeqVertexImpl<T, Algorithm>::activation() const {
+  return op_vertex_.activation();
+}
+
+template <typename T, class Algorithm>
+MatrixX<T> *SeqVertexImpl<T, Algorithm>::mutable_activation() {
+  return op_vertex_.mutable_activation();
+}
+
+template <typename T, class Algorithm>
+MatrixX<T> *SeqVertexImpl<T, Algorithm>::mutable_delta() {
+  return op_vertex_.mutable_delta();
+}
+
+template <typename T, class Algorithm>
+VectorX<T> *SeqVertexImpl<T, Algorithm>::mutable_bias() {
+  return op_vertex_.mutable_bias();
+}
+
+template <typename T, class Algorithm>
 void SeqVertexImpl<T, Algorithm>::ForwardTimeByOneStep() {
   ++timestamp_;
 }

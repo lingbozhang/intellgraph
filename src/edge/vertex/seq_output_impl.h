@@ -31,33 +31,21 @@ public:
   SeqOutputImpl(const VertexParameter &vtx_param, int batch_size);
   ~SeqOutputImpl() override;
 
-  void Activate() override { output_vertex_.Activate(); }
-  void Derive() override { output_vertex_.Derive(); }
-  void ResizeVertex(int length) override {
-    output_vertex_.ResizeVertex(length);
-  }
+  void Activate() override;
+  void Derive() override;
+  void ResizeVertex(int length) override;
 
-  int id() const override { return output_vertex_.id(); }
-  int row() const override { return output_vertex_.row(); }
-  int col() const override { return output_vertex_.col(); }
+  int id() const override;
+  int row() const override;
+  int col() const override;
 
-  const MatrixX<T> &activation() const override {
-    return output_vertex_.activation();
-  }
-  MatrixX<T> *mutable_activation() override {
-    return output_vertex_.mutable_activation();
-  }
-  MatrixX<T> *mutable_delta() override {
-    return output_vertex_.mutable_delta();
-  }
-  VectorX<T> *mutable_bias() override { return output_vertex_.mutable_bias(); }
+  const MatrixX<T> &activation() const override;
+  MatrixX<T> *mutable_activation() override;
+  MatrixX<T> *mutable_delta() override;
+  VectorX<T> *mutable_bias() override;
 
-  T CalcLoss(const Eigen::Ref<const MatrixX<T>> &labels) override {
-    return output_vertex_.CalcLoss(labels);
-  }
-  void CalcDelta(const Eigen::Ref<const MatrixX<T>> &labels) override {
-    output_vertex_.CalcDelta(labels);
-  }
+  T CalcLoss(const Eigen::Ref<const MatrixX<T>> &labels) override;
+  void CalcDelta(const Eigen::Ref<const MatrixX<T>> &labels) override;
 
   void ForwardTimeByOneStep() override;
   int GetCurrentTimeStep() const override;

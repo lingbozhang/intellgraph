@@ -15,12 +15,14 @@ Contributor(s):
 #ifndef INTELLGRAPH_SRC_GRAPH_CLASSIFIER_IMPL_H_
 #define INTELLGRAPH_SRC_GRAPH_CLASSIFIER_IMPL_H_
 
+#include <map>
 #include <memory>
 #include <set>
 #include <vector>
 
 #include "boost/graph/topological_sort.hpp"
 #include "glog/logging.h"
+#include "src/edge.h"
 #include "src/edge/dense_edge_impl.h"
 #include "src/edge/input_vertex.h"
 #include "src/edge/op_vertex.h"
@@ -41,7 +43,7 @@ namespace intellgraph {
 
 template <typename T> class ClassifierImpl : public Graph {
 public:
-  ClassifierImpl(int batch_size, std::unique_ptr<Visitor<T>> graph_init_visitor,
+  ClassifierImpl(int batch_size, std::unique_ptr<Visitor<T>> init_visitor,
                  std::unique_ptr<Solver<T>> solver,
                  const typename Graph::AdjacencyList &adj_list,
                  int input_vertex_id, int output_vertex_id,
@@ -92,10 +94,8 @@ private:
   template <class Visitor> void ReverseTraverse(Visitor &visitor);
 
   int batch_size_ = 0;
-  std::unique_ptr<Visitor<T>> graph_init_visitor_;
+  std::unique_ptr<Visitor<T>> init_visitor_;
   std::unique_ptr<Solver<T>> solver_;
-
-  MatrixX<T> threshold_;
 
   // Graph topology
   const typename Graph::AdjacencyList adjacency_list_;
@@ -112,6 +112,8 @@ private:
   InitVertexVisitor<T> init_vtx_visitor_;
   BackwardVisitor<T> backward_visitor_;
   ForwardVisitor<T> forward_visitor_;
+
+  MatrixX<T> threshold_;
 };
 
 // Tells compiler not to instantiate the template in translation units that

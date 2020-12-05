@@ -15,8 +15,6 @@ Contributor(s):
 #include "src/graph/graph_builder.h"
 
 #include "glog/logging.h"
-#include "src/solver/sgd_solver.h"
-#include "src/visitor/normal_init_visitor.h"
 
 namespace intellgraph {
 
@@ -30,14 +28,12 @@ static bool operator<(const EdgeParameter &left, const EdgeParameter &right) {
 }
 
 template <typename T> GraphBuilder<T>::GraphBuilder() = default;
-
 template <typename T> GraphBuilder<T>::~GraphBuilder() = default;
 
 template <typename T>
-GraphBuilder<T> &
-GraphBuilder<T>::AddEdge(const std::string &edge_type,
-                         const VertexParameter &vtx_param_in,
-                         const VertexParameter &vtx_param_out) {
+void GraphBuilder<T>::add_edge(const std::string &edge_type,
+                               const VertexParameter &vtx_param_in,
+                               const VertexParameter &vtx_param_out) {
   DCHECK(!edge_type.empty());
 
   vertex_params_.insert(vtx_param_in);
@@ -62,77 +58,42 @@ GraphBuilder<T>::AddEdge(const std::string &edge_type,
            .second) {
     LOG(ERROR) << "Add edge failed: edge " << edge_id
                << " has already been added into the adjacency list!";
-    return *this;
   }
-  return *this;
 }
 
 template <typename T>
-GraphBuilder<T> &GraphBuilder<T>::SetInputVertexId(int id) {
-  DCHECK_GE(id, 0);
+const std::set<VertexParameter> &GraphBuilder<T>::vertex_params() {
+  DCHECK_GT(vertex_params_.size(), 0);
+  return vertex_params_;
+}
 
+template <typename T>
+const std::set<EdgeParameter> &GraphBuilder<T>::edge_params() {
+  DCHECK_GT(edge_params_.size(), 0);
+  return edge_params_;
+}
+
+template <typename T>
+const Graph::AdjacencyList &GraphBuilder<T>::adjacency_list() {
+  return adjacency_list_;
+}
+
+template <typename T> void GraphBuilder<T>::set_input_vertex_id(int id) {
+  DCHECK_GE(id, 0);
   input_vertex_id_ = id;
-  return *this;
 }
 
-template <typename T>
-GraphBuilder<T> &GraphBuilder<T>::SetOutputVertexId(int id) {
+template <typename T> int GraphBuilder<T>::input_vertex_id() {
+  return input_vertex_id_;
+}
+
+template <typename T> void GraphBuilder<T>::set_output_vertex_id(int id) {
   DCHECK_GE(id, 0);
-
   output_vertex_id_ = id;
-  return *this;
 }
 
-template <typename T>
-GraphBuilder<T> &GraphBuilder<T>::SetBatchSize(int batch_size) {
-  batch_size_ = batch_size;
-  return *this;
-}
-
-template <typename T>
-GraphBuilder<T> &GraphBuilder<T>::SetGraphInitVisitor(
-    std::unique_ptr<Visitor<T>> graph_init_visitor) {
-  DCHECK(graph_init_visitor);
-
-  graph_init_visitor_ = std::move(graph_init_visitor);
-  return *this;
-}
-
-template <typename T>
-GraphBuilder<T> &GraphBuilder<T>::SetSolver(std::unique_ptr<Solver<T>> solver) {
-  DCHECK(solver);
-
-  solver_ = std::move(solver);
-  return *this;
-}
-
-template <typename T>
-std::unique_ptr<ClassifierImpl<T>> GraphBuilder<T>::Build() {
-  if (input_vertex_id_ == -1) {
-    LOG(ERROR) << "Build graph failed: the input vertex ID must be set!";
-    return nullptr;
-  }
-  if (output_vertex_id_ == -1) {
-    LOG(ERROR) << "Build graph failed: the output vertex ID must be set!";
-    return nullptr;
-  }
-  if (batch_size_ == 0) {
-    LOG(ERROR) << "Build graph failed: the batch size must be set!";
-    return nullptr;
-  }
-  if (!solver_) {
-    LOG(ERROR) << "Build graph: solver is not set!";
-    return nullptr;
-  }
-  if (!graph_init_visitor_) {
-    LOG(WARNING) << "Build graph: graph initialization visitor is not set, "
-                    "initialize the graph with normal distribution!";
-    graph_init_visitor_ = std::make_unique<NormalInitVisitor<T>>();
-  }
-  return std::make_unique<ClassifierImpl<T>>(
-      batch_size_, std::move(graph_init_visitor_), std::move(solver_),
-      adjacency_list_, input_vertex_id_, output_vertex_id_, vertex_params_,
-      edge_params_);
+template <typename T> int GraphBuilder<T>::output_vertex_id() {
+  return output_vertex_id_;
 }
 
 // Explicit instantiation

@@ -44,6 +44,7 @@ install(
     output_vertex_impl.h
     relu.h
     seq_vertex_impl.h
+    seq_output_impl.h
     sigmoid.h
     sigmoid_l2.h
   DESTINATION 
