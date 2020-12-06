@@ -14,55 +14,59 @@ Contributor(s):
 ==============================================================================*/
 #include "src/graph/classifier_impl.h"
 
+#include "boost/graph/adjacency_list.hpp"
 #include "glog/logging.h"
 #include "src/factory.h"
+#include "src/proto/graph_parameter.pb.h"
+#include "src/proto/vertex_parameter.pb.h"
+#include "src/visitor/backward_visitor.h"
+#include "src/visitor/forward_visitor.h"
+#include "src/visitor/init_vertex_visitor.h"
+#include "src/visitor/resize_vertex_visitor.h"
 
 namespace intellgraph {
 
 template <typename T>
-ClassifierImpl<T>::ClassifierImpl(
-    int batch_size, std::unique_ptr<Visitor<T>> init_visitor,
-    std::unique_ptr<Solver<T>> solver,
-    const typename Graph::AdjacencyList &adjacency_list, int input_vertex_id,
-    int output_vertex_id, const std::set<VertexParameter> &vertex_params,
-    const std::set<EdgeParameter> &edge_params)
-    : batch_size_(batch_size), init_visitor_(std::move(init_visitor)),
-      solver_(std::move(solver)), adjacency_list_(adjacency_list),
-      resize_vertex_visitor_(batch_size_) {
+ClassifierImpl<T>::ClassifierImpl(const GraphParameter &graph_parameter)
+    : Graph<T>(graph_parameter.edge_params()),
+      batch_size_(graph_parameter.length()) {
   DCHECK_GT(batch_size_, 0);
-  DCHECK(init_visitor_);
-  DCHECK(solver_);
 
-  // Instantiates vertices
-  for (const auto &vertex_param : vertex_params) {
-    int vtx_id = vertex_param.id();
-    if (vtx_id == input_vertex_id) {
-      // Instantiates the input vertex
-      std::unique_ptr<InputVertex<T>> input_vertex =
-          Factory::InstantiateVertex<InputVertex<T>>(vertex_param, batch_size_);
-      input_vertex_ = input_vertex.get();
-      vertex_by_id_.try_emplace(vtx_id, std::move(input_vertex));
-    } else if (vtx_id == output_vertex_id) {
-      // Instantiates intermediate vertices
-      std::unique_ptr<OutputVertex<T>> output_vertex =
-          Factory::InstantiateVertex<OutputVertex<T>>(vertex_param,
-                                                      batch_size_);
-      output_vertex_ = output_vertex.get();
-      vertex_by_id_.try_emplace(vtx_id, std::move(output_vertex));
-      // Builds the default |threshold_|
-      int dims = vertex_param.dims();
-      threshold_ = MatrixX<T>(dims, 1);
-      threshold_.setConstant(0.5);
-    } else {
-      // Instantiates output vertices
-      std::unique_ptr<OpVertex<T>> vertex =
-          Factory::InstantiateVertex<OpVertex<T>>(vertex_param, batch_size_);
-      vertex_by_id_.try_emplace(vtx_id, std::move(vertex));
-    }
+  if (graph_parameter.has_solver_config()) {
+    solver_ =
+        Factory::InstantiateSolver<Solver<T>>(graph_parameter.solver_config());
   }
 
+  // Builds the default |threshold_|
+  threshold_ = MatrixX<T>(graph_parameter.output_vertex_param().dims(), 1);
+  threshold_.setConstant(0.5);
+
+  // Instantiates the input vertex
+  std::unique_ptr<InputVertex<T>> input_vertex =
+      Factory::InstantiateVertex<InputVertex<T>>(
+          graph_parameter.input_vertex_param(), batch_size_);
+  input_vertex_ = input_vertex.get();
+  vertex_by_id_.try_emplace(graph_parameter.input_vertex_param().id(),
+                            std::move(input_vertex));
+
+  // Instantiates intermediate vertices
+  for (const auto &vertex_param :
+       graph_parameter.intermediate_vertex_params()) {
+    std::unique_ptr<OpVertex<T>> vertex =
+        Factory::InstantiateVertex<OpVertex<T>>(vertex_param, batch_size_);
+    vertex_by_id_.try_emplace(vertex_param.id(), std::move(vertex));
+  }
+
+  // Instantiates output vertices
+  std::unique_ptr<OutputVertex<T>> output_vertex =
+      Factory::InstantiateVertex<OutputVertex<T>>(
+          graph_parameter.output_vertex_param(), batch_size_);
+  output_vertex_ = output_vertex.get();
+  vertex_by_id_.try_emplace(graph_parameter.output_vertex_param().id(),
+                            std::move(output_vertex));
+
   // Instantiates edges
-  for (const auto &edge_param : edge_params) {
+  for (const auto &edge_param : graph_parameter.edge_params()) {
     int edge_id = edge_param.id();
     const std::string &edge_type = edge_param.type();
     int vtx_in_id = edge_param.vertex_in_id();
@@ -73,23 +77,24 @@ ClassifierImpl<T>::ClassifierImpl(
                      edge_type, edge_id, vertex_by_id_.at(vtx_in_id).get(),
                      vertex_by_id_.at(vtx_out_id).get()));
   }
-
-  // Determines Forward orders by topological sorting
-  topological_sort(adjacency_list_, std::back_inserter(topological_order_));
-  // Initializes the graph
-  this->Traverse(*init_visitor_);
 }
 
 template <typename T> ClassifierImpl<T>::~ClassifierImpl() = default;
 
 template <typename T>
+void ClassifierImpl<T>::Initialize(Visitor<T> &init_visitor) {
+  this->Traverse(init_visitor, edge_by_id_);
+}
+
+template <typename T>
 void ClassifierImpl<T>::Train(const MatrixX<T> &feature,
                               const Eigen::Ref<const MatrixX<int>> &labels) {
   DCHECK_GT(labels.cols(), 0);
+  DCHECK(solver_);
 
   this->Forward(feature);
   this->Backward(labels);
-  this->Traverse(*solver_);
+  this->Traverse(*solver_, edge_by_id_);
 }
 
 template <typename T>
@@ -169,74 +174,32 @@ const MatrixX<T> ClassifierImpl<T>::CalcConfusionMatrix(
   return confusion_matrix;
 }
 
-template <typename T>
-OpVertex<T> *ClassifierImpl<T>::mutable_vertex(int vertex_id) {
-  if (vertex_by_id_.find(vertex_id) != vertex_by_id_.end()) {
-    return vertex_by_id_.at(vertex_id).get();
-  }
-  LOG(WARNING) << "Vertex " << vertex_id << " does not exist in the graph.";
-  return nullptr;
-}
-
-template <typename T> Edge<T> *ClassifierImpl<T>::mutable_edge(int edge_id) {
-  if (edge_by_id_.find(edge_id) != edge_by_id_.end()) {
-    return edge_by_id_.at(edge_id).get();
-  }
-  LOG(WARNING) << "Edge " << edge_id << " does not exist in the graph.";
-  return nullptr;
-}
-
 template <typename T> void ClassifierImpl<T>::ZeroInitializeVertex() {
-  this->Traverse(init_vtx_visitor_);
+  static InitVertexVisitor<T> init_vtx_visitor = InitVertexVisitor<T>();
+  this->Traverse(init_vtx_visitor, edge_by_id_);
 }
 
 template <typename T>
 void ClassifierImpl<T>::Forward(const MatrixX<T> &feature) {
+  static ForwardVisitor<T> forward_visitor = ForwardVisitor<T>();
+  static ResizeVertexVisitor<T> resize_vertex_visitor =
+      ResizeVertexVisitor<T>(batch_size_);
   if (batch_size_ != feature.cols()) {
     batch_size_ = feature.cols();
-    resize_vertex_visitor_.set_batch_size(batch_size_);
-    this->Traverse(resize_vertex_visitor_);
+    resize_vertex_visitor.set_batch_size(batch_size_);
+    this->Traverse(resize_vertex_visitor, edge_by_id_);
   }
   input_vertex_->set_feature(&feature);
   this->ZeroInitializeVertex();
-  this->Traverse(forward_visitor_);
+  this->Traverse(forward_visitor, edge_by_id_);
   output_vertex_->Activate();
 }
 
 template <typename T>
 void ClassifierImpl<T>::Backward(const Eigen::Ref<const MatrixX<int>> &labels) {
+  static BackwardVisitor<T> backward_visitor = BackwardVisitor<T>();
   output_vertex_->CalcDelta(labels.cast<T>());
-  this->ReverseTraverse(backward_visitor_);
-}
-
-template <typename T>
-template <class Visitor>
-void ClassifierImpl<T>::Traverse(Visitor &visitor) {
-  // Trasverses the graph
-  for (auto it = topological_order_.rbegin(); it != topological_order_.rend();
-       ++it) {
-    int vtx_id = *it;
-    Graph::AdjacencyList::out_edge_iterator edge_it, edge_it_end;
-    for (std::tie(edge_it, edge_it_end) = out_edges(vtx_id, adjacency_list_);
-         edge_it != edge_it_end; ++edge_it) {
-      int edge_id = adjacency_list_[*edge_it].id;
-      edge_by_id_.at(edge_id)->Accept(visitor);
-    }
-  }
-}
-
-template <typename T>
-template <class Visitor>
-void ClassifierImpl<T>::ReverseTraverse(Visitor &visitor) {
-  // Trasverses the graph reversely
-  for (int vtx_id : topological_order_) {
-    Graph::AdjacencyList::in_edge_iterator edge_it, edge_it_end;
-    for (std::tie(edge_it, edge_it_end) = in_edges(vtx_id, adjacency_list_);
-         edge_it != edge_it_end; ++edge_it) {
-      int edge_id = adjacency_list_[*edge_it].id;
-      edge_by_id_.at(edge_id)->Accept(visitor);
-    }
-  }
+  this->RTraverse(backward_visitor, edge_by_id_);
 }
 
 // Explicit instantiation

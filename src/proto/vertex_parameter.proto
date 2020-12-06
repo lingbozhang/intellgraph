@@ -7,7 +7,15 @@ message VertexParameter {
   int32 id = 1;
 
   // Required
-  string type = 2;
+  enum Type {
+    INPUT = 0;
+    HIDDEN = 1;
+    OUTPUT = 2;
+  }
+  Type type = 2;
+
+  // Required
+  string operation = 3;
 
   // Required
   int32 dims = 4;

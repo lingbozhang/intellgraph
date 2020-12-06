@@ -20,12 +20,12 @@ Contributor(s):
 #include <iostream>
 #include <memory>
 
-#include "include/intellgraph/classifier_builder.h"
 #include "include/intellgraph/classifier_impl.h"
 #include "include/intellgraph/eigen.h"
+#include "include/intellgraph/graph/graph_builder.h"
 #include "include/intellgraph/proto/vertex_parameter.pb.h"
 #include "include/intellgraph/registry.h"
-#include "include/intellgraph/sgd_solver.h"
+#include "include/intellgraph/solver/sgd_solver.h"
 #include <google/protobuf/text_format.h>
 
 namespace intellgraph {
@@ -66,36 +66,35 @@ public:
     VertexParameter vtx_param1, vtx_param2;
     // Vertex 1
     google::protobuf::TextFormat::ParseFromString(
-        "id: 0 type: 'DummyTransformer' dims: 2", &vtx_param1);
+        "id: 0 type: INPUT operation: 'DummyTransformer' dims: 2", &vtx_param1);
     // Vertex 2
     google::protobuf::TextFormat::ParseFromString(
-        "id: 1 type: 'CrossEntropy' dims: 1", &vtx_param2);
+        "id: 1 type: OUTPUT operation: 'CrossEntropy' dims: 1", &vtx_param2);
     // Builds the graph
     // The Dense edge is added into the graph which represents a fully connected
     // neural network
-    float eta = 0.1;
+    GraphBuilder<float> graph_builder;
+    ClassifierImpl<float> graph =
+        graph_builder
+            .add_edge(/*edge_id=*/0, /*edge_type=*/"Dense", vtx_param1,
+                      vtx_param2)
+            .set_length(1)
+            .BuildClassifier();
+    graph.SetSolver(
+        std::make_unique<SgdSolver<float>>(/*eta=*/0.1, /*labmda=*/0.0));
+
     int epochs = 500;
-
-    ClassifierBuilder<float> graph_builder;
-    std::unique_ptr<ClassifierImpl<float>> graph =
-        graph_builder.AddEdge("Dense", vtx_param1, vtx_param2)
-            .SetInputVertexId(0)
-            .SetOutputVertexId(1)
-            .SetSolver(std::make_unique<SgdSolver<float>>(eta, /*lambda=*/0.0))
-            .Build();
-
     std::cout << "Total epochs: " << epochs << std::endl;
     int total_size = training_feature.cols();
     for (int epoch = 0; epoch < epochs; ++epoch) {
       for (int i = 0; i < 4; ++i) {
-        graph->Train(training_feature.col(i), training_labels.col(i));
+        graph.Train(training_feature.col(i), training_labels.col(i));
       }
-      float loss = graph->CalculateLoss(training_feature, training_labels);
+      float loss = graph.CalculateLoss(training_feature, training_labels);
       printf("Epoch %4d/%4d, Loss: %e\n", epoch, epochs, loss);
     }
     std::cout << "Training complete!!!" << std::endl;
-    float gender =
-        graph->GetProbabilityDist(test_feature).array().round()(0, 0);
+    float gender = graph.GetProbabilityDist(test_feature).array().round()(0, 0);
     printf("Tom's predicted gender: %1.0f (0: male, 1: female)\n", gender);
   }
 };

@@ -48,5 +48,5 @@ install(
     sigmoid.h
     sigmoid_l2.h
   DESTINATION 
-    ${INTELLGRAPH_INCLUDE_DIR}/intellgraph
+    ${INTELLGRAPH_INCLUDE_DIR}/intellgraph/edge/vertex
 )

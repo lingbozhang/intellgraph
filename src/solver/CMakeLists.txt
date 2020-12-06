@@ -17,5 +17,5 @@ cc_library(
 # Installs IntellGraph include headers
 install(
   FILES sgd_solver.h 
-  DESTINATION ${INTELLGRAPH_INCLUDE_DIR}/intellgraph
+  DESTINATION ${INTELLGRAPH_INCLUDE_DIR}/intellgraph/solver
 ) 

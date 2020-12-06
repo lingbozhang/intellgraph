@@ -16,22 +16,26 @@ message SolverConfig {
   float lambda = 3;
 }
 
-message GraphConfig {
-  // Required
+message GraphParameter {
+  // Optional
   SolverConfig solver_config = 1;
 
-  // Required
-  int32 input_vertex_id = 2;
+  // Required, length represents the batch size for classical NN, and the 
+  // sequence length for RNN
+  int32 length = 2;
 
   // Required
-  int32 output_vertex_id = 3;
+  VertexParameter input_vertex_param = 3;
 
   // Required
-  repeated VertexParameter vtx_params = 4;
+  VertexParameter output_vertex_param = 4;
+
+  // Optional
+  repeated VertexParameter intermediate_vertex_params = 5;
 
   // Required
-  repeated EdgeParameter edge_params = 5;
+  repeated EdgeParameter edge_params = 6;
 
   // Optional, required for RNN
-  map<int32, int32> state_vertex_map = 6;
+  map<int32, int32> state_vertex_map = 7;
 }

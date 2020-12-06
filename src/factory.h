@@ -53,7 +53,7 @@ public:
   template <class Base>
   static std::unique_ptr<Base> InstantiateVertex(const VertexParameter &param,
                                                  int batch_size) {
-    const std::string &type = param.type();
+    const std::string &type = param.operation();
     if (Factory::VertexRegistry<Base>().find(type) !=
         Factory::VertexRegistry<Base>().end()) {
       return Factory::VertexRegistry<Base>().at(type)(param, batch_size);
@@ -105,9 +105,9 @@ public:
 
 template <class Base, class Derived> class VertexRegister {
 public:
-  VertexRegister(const std::string &type) {
+  VertexRegister(const std::string &operation) {
     Factory::VertexRegistry<Base>().try_emplace(
-        type,
+        operation,
         [](const VertexParameter &vtx_param,
            int batch_size) -> std::unique_ptr<Base> {
           return std::make_unique<Derived>(vtx_param, batch_size);
@@ -138,11 +138,11 @@ public:
   }
 };
 
-#define REGISTER_VERTEX(base, derived, type)                                   \
-  static const VertexRegister<base<float>, derived<float, type>>               \
-      register_f_##type##_##base##_##derived(#type);                           \
-  static const VertexRegister<base<double>, derived<double, type>>             \
-      register_d_##type##_##base##_##derived(#type);
+#define REGISTER_VERTEX(base, derived, operation)                              \
+  static const VertexRegister<base<float>, derived<float, operation>>          \
+      register_f_##operation##_##base##_##derived(#operation);                 \
+  static const VertexRegister<base<double>, derived<double, operation>>        \
+      register_d_##operation##_##base##_##derived(#operation);
 
 #define REGISTER_EDGE(base, derived, vertex_in, vertex_out, type)              \
   static const EdgeRegister<                                                   \

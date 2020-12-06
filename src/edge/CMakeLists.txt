@@ -13,6 +13,7 @@ cc_library(
     "CONAN_PKG::eigen"
     "CONAN_PKG::glog"
     "vertex"
+    "utility"
 )
 
 # Installs IntellGraph include headers
@@ -20,5 +21,5 @@ install(
   FILES
     dense_edge_impl.h
   DESTINATION
-    ${INTELLGRAPH_INCLUDE_DIR}/intellgraph
+    ${INTELLGRAPH_INCLUDE_DIR}/intellgraph/edge
 )

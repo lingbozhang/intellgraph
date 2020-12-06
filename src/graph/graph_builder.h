@@ -18,13 +18,12 @@ Contributor(s):
 #include <memory>
 #include <set>
 #include <string>
+#include <utility>
 
-#include "boost/graph/adjacency_list.hpp"
-#include "src/graph.h"
+#include "src/graph/classifier_impl.h"
 #include "src/proto/edge_parameter.pb.h"
+#include "src/proto/graph_parameter.pb.h"
 #include "src/proto/vertex_parameter.pb.h"
-#include "src/solver.h"
-#include "src/visitor.h"
 
 namespace intellgraph {
 
@@ -33,26 +32,22 @@ public:
   GraphBuilder();
   ~GraphBuilder();
 
-  void add_edge(const std::string &edge_type,
-                const VertexParameter &vtx_param_in,
-                const VertexParameter &vtx_param_out);
-  const std::set<VertexParameter> &vertex_params();
-  const std::set<EdgeParameter> &edge_params();
-  const Graph::AdjacencyList &adjacency_list();
-
-  void set_input_vertex_id(int id);
-  int input_vertex_id();
-
-  void set_output_vertex_id(int id);
-  int output_vertex_id();
+  GraphBuilder<T> &add_edge(int edge_id, const std::string &edge_type,
+                            const VertexParameter &vtx_param_in,
+                            const VertexParameter &vtx_param_out);
+  GraphBuilder<T> &add_vertex(const VertexParameter &vtx_param);
+  GraphBuilder<T> &add_edge(const EdgeParameter &edge_param);
+  GraphBuilder<T> &add_solver(const SolverConfig &solver_config);
+  GraphBuilder<T> &set_length(int length);
+  const GraphParameter &graph_parameter();
+  ClassifierImpl<T> BuildClassifier();
 
 private:
-  int input_vertex_id_ = -1;
-  int output_vertex_id_ = -1;
-
-  Graph::AdjacencyList adjacency_list_;
-  std::set<VertexParameter> vertex_params_;
-  std::set<EdgeParameter> edge_params_;
+  int length_ = 0;
+  std::set<int> vertex_ids_;
+  std::set<int> edge_ids_;
+  std::set<std::pair<int, int>> edges_;
+  GraphParameter graph_parameter_;
 };
 
 // Tells compiler not to instantiate the template in translation units that

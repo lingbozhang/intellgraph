@@ -24,6 +24,7 @@ cc_library(
 # Installs IntellGraph include headers
 install(
   FILES 
+    boost.h
     edge.h
     eigen.h
     graph.h 

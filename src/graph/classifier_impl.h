@@ -18,46 +18,32 @@ Contributor(s):
 #include <map>
 #include <memory>
 #include <set>
-#include <vector>
 
-#include "boost/graph/topological_sort.hpp"
-#include "glog/logging.h"
 #include "src/edge.h"
-#include "src/edge/dense_edge_impl.h"
 #include "src/edge/input_vertex.h"
 #include "src/edge/op_vertex.h"
 #include "src/edge/output_vertex.h"
 #include "src/eigen.h"
 #include "src/graph.h"
-#include "src/proto/edge_parameter.pb.h"
-#include "src/proto/vertex_parameter.pb.h"
+#include "src/proto/graph_parameter.pb.h"
 #include "src/solver.h"
-#include "src/solver/sgd_solver.h"
 #include "src/visitor.h"
-#include "src/visitor/backward_visitor.h"
-#include "src/visitor/forward_visitor.h"
-#include "src/visitor/init_vertex_visitor.h"
-#include "src/visitor/resize_vertex_visitor.h"
 
 namespace intellgraph {
 
-template <typename T> class ClassifierImpl : public Graph {
+template <typename T> class ClassifierImpl : public Graph<T> {
 public:
-  ClassifierImpl(int batch_size, std::unique_ptr<Visitor<T>> init_visitor,
-                 std::unique_ptr<Solver<T>> solver,
-                 const typename Graph::AdjacencyList &adj_list,
-                 int input_vertex_id, int output_vertex_id,
-                 const std::set<VertexParameter> &vertex_params,
-                 const std::set<EdgeParameter> &edge_params);
+  explicit ClassifierImpl(const GraphParameter &graph_parameter);
   ~ClassifierImpl() override;
 
+  void Initialize(Visitor<T> &init_visitor) override;
   void Train(const MatrixX<T> &feature,
-             const Eigen::Ref<const MatrixX<int>> &labels);
+             const Eigen::Ref<const MatrixX<int>> &labels) override;
   T CalculateLoss(const MatrixX<T> &test_feature,
-                  const MatrixX<int> &test_labels);
-  const MatrixX<T> GetProbabilityDist(const MatrixX<T> &feature);
+                  const MatrixX<int> &test_labels) override;
+  void SetSolver(std::unique_ptr<Solver<T>> solver) override;
 
-  void SetSolver(std::unique_ptr<Solver<T>> solver);
+  const MatrixX<T> GetProbabilityDist(const MatrixX<T> &feature);
 
   // Used for threshold-moving/threshold-tuning
   // In the binary classification, predication that is greater than the
@@ -81,39 +67,18 @@ public:
   CalcConfusionMatrix(const MatrixX<T> &test_feature,
                       const Eigen::Ref<const MatrixX<int>> &test_labels);
 
-  OpVertex<T> *mutable_vertex(int vertex_id);
-  Edge<T> *mutable_edge(int edge_id);
-
-
 private:
   void ZeroInitializeVertex();
   void Forward(const MatrixX<T> &feature);
   void Backward(const Eigen::Ref<const MatrixX<int>> &labels);
 
-  template <class Visitor> void Traverse(Visitor &visitor);
-  template <class Visitor> void ReverseTraverse(Visitor &visitor);
-
   int batch_size_ = 0;
-  std::unique_ptr<Visitor<T>> init_visitor_;
   std::unique_ptr<Solver<T>> solver_;
-
-  // Graph topology
-  const typename Graph::AdjacencyList adjacency_list_;
-  std::vector<int> topological_order_;
-
-  // Graph data
+  MatrixX<T> threshold_;
   InputVertex<T> *input_vertex_ = nullptr;
   OutputVertex<T> *output_vertex_ = nullptr;
   std::map<int, std::unique_ptr<OpVertex<T>>> vertex_by_id_;
   std::map<int, std::unique_ptr<Edge<T>>> edge_by_id_;
-
-  // Graph Visitors
-  ResizeVertexVisitor<T> resize_vertex_visitor_;
-  InitVertexVisitor<T> init_vtx_visitor_;
-  BackwardVisitor<T> backward_visitor_;
-  ForwardVisitor<T> forward_visitor_;
-
-  MatrixX<T> threshold_;
 };
 
 // Tells compiler not to instantiate the template in translation units that

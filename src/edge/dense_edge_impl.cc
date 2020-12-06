@@ -14,7 +14,11 @@ Contributor(s):
 ==============================================================================*/
 #include "src/edge/dense_edge_impl.h"
 
+#include <functional>
+#include <math.h>
+
 #include "glog/logging.h"
+#include "src/utility/random.h"
 
 namespace intellgraph {
 
@@ -36,7 +40,8 @@ DenseEdgeImpl<T, VertexIn, VertexOut>::DenseEdgeImpl(int id, VertexIn *vtx_in,
   nabla_weight_ = std::make_unique<MatrixX<T>>(row, col);
 
   // Initialization
-  weight_->setIdentity();
+  weight_->array() = weight_->array().unaryExpr(std::function<T(T)>(
+      NormalFunctor<T>(0.0, std::sqrt(2.0 / weight_->cols()))));
   nabla_weight_->setZero();
 }
 

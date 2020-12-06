@@ -38,9 +38,7 @@ void NormalInitVisitor<T>::Visit(
   VectorX<T> *const bias_out = edge.vertex_out()->mutable_bias();
 
   weight->array() = weight->array().unaryExpr(std::function<T(T)>(
-      NormalFunctor<T>(0.0, std::sqrt(2.0 / weight->rows()))));
-  bias_out->array() = bias_out->array().unaryExpr(
-      std::function<T(T)>(NormalFunctor<T>(0.0, 1.0)));
+      NormalFunctor<T>(0.0, std::sqrt(2.0 / weight->cols()))));
 }
 
 // Explicit instantiation

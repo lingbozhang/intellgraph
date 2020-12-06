@@ -33,3 +33,9 @@ cc_test(
     "CONAN_PKG::glog"
     "visitor"
 )
+
+# Installs IntellGraph include headers
+install(
+  FILES normal_init_visitor.h 
+  DESTINATION ${INTELLGRAPH_INCLUDE_DIR}/intellgraph/visitor
+) 
