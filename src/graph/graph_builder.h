@@ -32,17 +32,19 @@ public:
   GraphBuilder();
   ~GraphBuilder();
 
-  GraphBuilder<T> &add_edge(int edge_id, const std::string &edge_type,
-                            const VertexParameter &vtx_param_in,
-                            const VertexParameter &vtx_param_out);
-  GraphBuilder<T> &add_vertex(const VertexParameter &vtx_param);
-  GraphBuilder<T> &add_edge(const EdgeParameter &edge_param);
-  GraphBuilder<T> &add_solver(const SolverConfig &solver_config);
-  GraphBuilder<T> &set_length(int length);
+  GraphBuilder<T> &AddEdge(int edge_id, const std::string &edge_type,
+                           const VertexParameter &vtx_param_in,
+                           const VertexParameter &vtx_param_out);
+  GraphBuilder<T> &AddVertex(const VertexParameter &vtx_param);
+  GraphBuilder<T> &AddEdge(const EdgeParameter &edge_param);
+  GraphBuilder<T> &AddSolver(const SolverConfig &solver_config);
+  GraphBuilder<T> &SetLength(int length);
   const GraphParameter &graph_parameter();
   ClassifierImpl<T> BuildClassifier();
 
 private:
+  bool IsValidEdgeParameter(const EdgeParameter &edge_param);
+
   int length_ = 0;
   std::set<int> vertex_ids_;
   std::set<int> edge_ids_;

@@ -51,6 +51,7 @@ public:
               << "Diana  -15                -6                1       \n"
               << "Tom     20                5                 0       \n"
               << "====================================================\n";
+
     // Prepares training data
     MatrixX<float> training_feature(2, 4);
     MatrixX<int> training_labels(1, 4);
@@ -60,8 +61,10 @@ public:
     training_labels << 1, 0, 0, 1;
     test_feature << 20, 5;
     test_labels << 0;
+
     // Registering instances
     Registry::LoadRegistry();
+
     // Constructs vertices
     VertexParameter vtx_param1, vtx_param2;
     // Vertex 1
@@ -70,31 +73,36 @@ public:
     // Vertex 2
     google::protobuf::TextFormat::ParseFromString(
         "id: 1 type: OUTPUT operation: 'CrossEntropy' dims: 1", &vtx_param2);
+
+    // Constructs a solver
+    SolverConfig solver_config;
+    google::protobuf::TextFormat::ParseFromString(
+        "type: 'SGD' eta: 0.1 lambda: 0.0", &solver_config);
+
     // Builds the graph
-    // The Dense edge is added into the graph which represents a fully connected
-    // neural network
+    // The Dense edge represents a fully connected neural network
     GraphBuilder<float> graph_builder;
-    ClassifierImpl<float> graph =
+    ClassifierImpl<float> classifier =
         graph_builder
-            .add_edge(/*edge_id=*/0, /*edge_type=*/"Dense", vtx_param1,
-                      vtx_param2)
-            .set_length(1)
+            .AddEdge(/*edge_id=*/0, /*edge_type=*/"Dense", vtx_param1,
+                     vtx_param2)
+            .AddSolver(solver_config)
+            .SetLength(1)
             .BuildClassifier();
-    graph.SetSolver(
-        std::make_unique<SgdSolver<float>>(/*eta=*/0.1, /*labmda=*/0.0));
 
     int epochs = 500;
     std::cout << "Total epochs: " << epochs << std::endl;
     int total_size = training_feature.cols();
     for (int epoch = 0; epoch < epochs; ++epoch) {
       for (int i = 0; i < 4; ++i) {
-        graph.Train(training_feature.col(i), training_labels.col(i));
+        classifier.Train(training_feature.col(i), training_labels.col(i));
       }
-      float loss = graph.CalculateLoss(training_feature, training_labels);
+      float loss = classifier.CalculateLoss(training_feature, training_labels);
       printf("Epoch %4d/%4d, Loss: %e\n", epoch, epochs, loss);
     }
     std::cout << "Training complete!!!" << std::endl;
-    float gender = graph.GetProbabilityDist(test_feature).array().round()(0, 0);
+    float gender =
+        classifier.GetProbabilityDist(test_feature).array().round()(0, 0);
     printf("Tom's predicted gender: %1.0f (0: male, 1: female)\n", gender);
   }
 };

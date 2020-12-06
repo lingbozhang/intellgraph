@@ -29,27 +29,16 @@ template <typename T> GraphBuilder<T>::~GraphBuilder() = default;
 
 template <typename T>
 GraphBuilder<T> &
-GraphBuilder<T>::add_edge(int edge_id, const std::string &edge_type,
-                          const VertexParameter &vtx_param_in,
-                          const VertexParameter &vtx_param_out) {
+GraphBuilder<T>::AddEdge(int edge_id, const std::string &edge_type,
+                         const VertexParameter &vtx_param_in,
+                         const VertexParameter &vtx_param_out) {
   DCHECK_GE(edge_id, 0);
   DCHECK(!edge_type.empty());
   DCHECK_NE(vtx_param_in.id(), vtx_param_out.id());
 
-  if (edge_ids_.count(edge_id)) {
-    LOG(ERROR) << "Add edge: " << edge_id
-               << " failed, edge id has already been added in the graph!";
-    return *this;
-  }
-  if (edges_.count(std::make_pair(vtx_param_in.id(), vtx_param_out.id()))) {
-    LOG(ERROR) << "Add edge: " << edge_id
-               << " failed, edge has already been added in the graph!";
-    return *this;
-  }
-
   // Adds vertices
-    add_vertex(vtx_param_in);
-    add_vertex(vtx_param_out);
+  AddVertex(vtx_param_in);
+  AddVertex(vtx_param_out);
 
   // Constructs the edge parameter
   EdgeParameter edge_param;
@@ -57,15 +46,13 @@ GraphBuilder<T>::add_edge(int edge_id, const std::string &edge_type,
   edge_param.set_type(edge_type);
   edge_param.set_vertex_in_id(vtx_param_in.id());
   edge_param.set_vertex_out_id(vtx_param_out.id());
-  graph_parameter_.add_edge_params()->CopyFrom(edge_param);
+  AddEdge(edge_param);
 
-  edge_ids_.insert(edge_id);
-  edges_.insert(std::make_pair(vtx_param_in.id(), vtx_param_out.id()));
   return *this;
 }
 
 template <typename T>
-GraphBuilder<T> &GraphBuilder<T>::add_vertex(const VertexParameter &vtx_param) {
+GraphBuilder<T> &GraphBuilder<T>::AddVertex(const VertexParameter &vtx_param) {
   if (vertex_ids_.count(vtx_param.id())) {
     LOG(WARNING) << "Add vertex: << " << vtx_param.id()
                  << " failed, it has already been added!";
@@ -91,22 +78,9 @@ GraphBuilder<T> &GraphBuilder<T>::add_vertex(const VertexParameter &vtx_param) {
 }
 
 template <typename T>
-GraphBuilder<T> &GraphBuilder<T>::add_edge(const EdgeParameter &edge_param) {
-  if (edge_ids_.count(edge_param.id())) {
-    LOG(ERROR) << "Add edge: " << edge_param.id()
-               << " failed, edge id has already been added in the graph!";
-    return *this;
-  }
-  if (vertex_ids_.count(edge_param.vertex_in_id()) ||
-      vertex_ids_.count(edge_param.vertex_out_id())) {
-    LOG(ERROR) << "Add edge: " << edge_param.id()
-               << " failed, the vertices haven't been added in the graph!";
-    return *this;
-  }
-  if (edges_.count(std::make_pair(edge_param.vertex_in_id(),
-                                  edge_param.vertex_out_id()))) {
-    LOG(ERROR) << "Add edge: " << edge_param.id()
-               << " failed, edge has already been added in the graph!";
+GraphBuilder<T> &GraphBuilder<T>::AddEdge(const EdgeParameter &edge_param) {
+  if (!IsValidEdgeParameter(edge_param)) {
+    LOG(ERROR) << "Add edge failed: not a valid edge parameter!";
     return *this;
   }
   graph_parameter_.add_edge_params()->CopyFrom(edge_param);
@@ -117,8 +91,7 @@ GraphBuilder<T> &GraphBuilder<T>::add_edge(const EdgeParameter &edge_param) {
 }
 
 template <typename T>
-GraphBuilder<T> &
-GraphBuilder<T>::add_solver(const SolverConfig &solver_config) {
+GraphBuilder<T> &GraphBuilder<T>::AddSolver(const SolverConfig &solver_config) {
   DCHECK_GT(solver_config.eta(), 0);
   DCHECK_GE(solver_config.lambda(), 0);
 
@@ -126,7 +99,7 @@ GraphBuilder<T>::add_solver(const SolverConfig &solver_config) {
   return *this;
 }
 
-template <typename T> GraphBuilder<T> &GraphBuilder<T>::set_length(int length) {
+template <typename T> GraphBuilder<T> &GraphBuilder<T>::SetLength(int length) {
   DCHECK_GT(length, 0);
   length_ = length;
   return *this;
@@ -153,6 +126,28 @@ template <typename T> ClassifierImpl<T> GraphBuilder<T>::BuildClassifier() {
       << "Build the Classifier failed, graph edge parameters"
          "haven't been set!";
   return ClassifierImpl<T>(graph_parameter_);
+}
+
+template <typename T>
+bool GraphBuilder<T>::IsValidEdgeParameter(const EdgeParameter &edge_param) {
+  if (edge_ids_.count(edge_param.id())) {
+    LOG(ERROR) << "Add edge: " << edge_param.id()
+               << " failed, edge id has already been added in the graph!";
+    return false;
+  }
+  if (!vertex_ids_.count(edge_param.vertex_in_id()) ||
+      !vertex_ids_.count(edge_param.vertex_out_id())) {
+    LOG(ERROR) << "Add edge: " << edge_param.id()
+               << " failed, edge vertices haven't been added in the graph!";
+    return false;
+  }
+  if (edges_.count(std::make_pair(edge_param.vertex_in_id(),
+                                  edge_param.vertex_out_id()))) {
+    LOG(ERROR) << "Add edge: " << edge_param.id()
+               << " failed, edge has already been added in the graph!";
+    return false;
+  }
+  return true;
 }
 
 // Explicit instantiation
