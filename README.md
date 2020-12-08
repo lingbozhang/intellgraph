@@ -54,6 +54,13 @@ $ cd intellgraph/build/manual/bin
 $ ./examples
 ```
 
+## Running Tests
+After successfully build the project in build/manual, tests can be triggered
+running the command shown below:
+```bash
+$ ctest
+```
+
 ## Contribution guidelines
 
 ## License

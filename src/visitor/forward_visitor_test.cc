@@ -36,6 +36,8 @@ TEST(ForwardVisitorTest, VisitSuccess) {
 
   vtx_out_float.mutable_bias()->setConstant(1.0f);
   vtx_out_double.mutable_bias()->setConstant(1.0f);
+  edge_float.mutable_weight()->setIdentity();
+  edge_double.mutable_weight()->setIdentity();
 
   ForwardVisitor<float> visitor_float;
   ForwardVisitor<double> visitor_double;
