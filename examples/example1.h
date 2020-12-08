@@ -15,49 +15,52 @@ Contributor(s):
 #ifndef INTELLGRAPH_EXAMPLES_EXAMPLE1_H_
 #define INTELLGRAPH_EXAMPLES_EXAMPLE1_H_
 
+#include <cstdio>
+
 #include <iostream>
 #include <memory>
 
 #include "include/intellgraph/eigen.h"
-#include "include/intellgraph/graph_builder.h"
-#include "include/intellgraph/graph_impl.h"
+#include "include/intellgraph/graph/classifier_impl.h"
+#include "include/intellgraph/graph/graph_builder.h"
 #include "include/intellgraph/proto/vertex_parameter.pb.h"
 #include "include/intellgraph/registry.h"
-#include "include/intellgraph/sgd_solver.h"
+#include "include/intellgraph/solver/sgd_solver.h"
+#include <google/protobuf/text_format.h>
 
 namespace intellgraph {
 
-// Example 1 constructs and trains a simple classifer. The classifier has two
-// layers: input layer and output layer. In the output layer, the sigmoid
-// function is used as the activation function and l2 norm is used as the loss
-// function.
-// In IntellGraph, current version implements Eigen library for matrix
-// abstraction.
+// Example 2 constructs a two-layer (including the Input Layer) neural network
+// that predicts the gender based on the weight and height. The IntellGraph has
+// two vertices: input vertex and output vertex. In the output vertex, the
+// sigmoid function is used as the activation function and l2 norm is used as
+// the loss function.
 class Example1 {
 public:
-  static void run() {
-    std::cout << "=================================" << std::endl;
-    std::cout << "A Simple Classifier for 2D points" << std::endl;
-    std::cout << "=================================" << std::endl;
+  Example1() = delete;
+  ~Example1() = delete;
 
-    // Prepares train data
-    MatrixX<float> training_feature(2, 6);
-    MatrixX<float> training_labels(1, 6);
-    MatrixX<float> test_feature(2, 4);
-    MatrixX<float> test_labels(1, 4);
+  static void Run() {
+    std::cout << "====================================================\n"
+              << "  Predict gender based on body weight and height    \n"
+              << "====================================================\n"
+              << "Name    Weight(minus 135) Height(minus 66)  Gender  \n"
+              << "Alice   -2                -1                1       \n"
+              << "Bob     25                6                 0       \n"
+              << "Charlie 17                4                 0       \n"
+              << "Diana  -15                -6                1       \n"
+              << "Tom     20                5                 0       \n"
+              << "====================================================\n";
 
-    // Training data: * represents class 1, O represents class 0;
-    //
-    //                 * (0.5, 1.0)   * (1.0, 1.0)
-    //  O (0.0, 0.5)                  * (1.0, 0.5)
-    //  O (0.0, 0.0)   O (0.5, 0.0)
-    //
-    training_feature << 0.0, 1.0, 0.5, 1.0, 0.0, 0.5, 0.0, 1.0, 1.0, 0.5, 0.5,
-        0.0;
-    training_labels << 0, 1, 1, 1, 0, 0;
-
-    test_feature << 0.25, 0.0, 0.25, 0.75, 0.0, 0.25, 0.25, 0.75;
-    test_labels << 0.0, 0.0, 0.0, 1.0;
+    // Prepares training data
+    MatrixX<float> training_feature(2, 4);
+    MatrixX<int> training_labels(1, 4);
+    MatrixX<float> test_feature(2, 1);
+    MatrixX<int> test_labels(1, 1);
+    training_feature << -2, 25, 17, -15, -1, 6, 4, -6;
+    training_labels << 1, 0, 0, 1;
+    test_feature << 20, 5;
+    test_labels << 0;
 
     // Registering instances
     Registry::LoadRegistry();
@@ -65,43 +68,42 @@ public:
     // Constructs vertices
     VertexParameter vtx_param1, vtx_param2;
     // Vertex 1
-    vtx_param1.set_id(0);
-    vtx_param1.set_type("DummyTransformer");
-    vtx_param1.set_dims(2);
+    google::protobuf::TextFormat::ParseFromString(
+        "id: 0 type: INPUT operation: 'DummyTransformer' dims: 2", &vtx_param1);
     // Vertex 2
-    vtx_param2.set_id(1);
-    vtx_param2.set_type("SigmoidL2");
-    vtx_param2.set_dims(1);
+    google::protobuf::TextFormat::ParseFromString(
+        "id: 1 type: OUTPUT operation: 'CrossEntropy' dims: 1", &vtx_param2);
+
+    // Constructs a solver
+    SolverConfig solver_config;
+    google::protobuf::TextFormat::ParseFromString(
+        "type: 'SGD' eta: 0.1 lambda: 0.0", &solver_config);
 
     // Builds the graph
-    // The Dense edge is added into the graph which represents a fully connected
-    // neural network
+    // The Dense edge represents a fully connected neural network
     GraphBuilder<float> graph_builder;
-    std::unique_ptr<GraphImpl<float>> graph =
-        graph_builder.AddEdge("Dense", vtx_param1, vtx_param2)
-            .SetInputVertexId(0)
-            .SetOutputVertexId(1)
-            .SetBatchSize(1)
-            .Build();
+    ClassifierImpl<float> classifier =
+        graph_builder
+            .AddEdge(/*edge_id=*/0, /*edge_type=*/"Dense", vtx_param1,
+                     vtx_param2)
+            .AddSolver(solver_config)
+            .SetLength(1)
+            .BuildClassifier();
 
-    // Constructs a solver using the Stochastic Gradient Descent algorithm
-    float eta = 1.0;
-    SgdSolver<float> solver(eta, 0.01 /* lambda */);
-
-    int loops = 100;
-    std::cout << "Total epochs: " << loops << std::endl;
+    int epochs = 500;
+    std::cout << "Total epochs: " << epochs << std::endl;
     int total_size = training_feature.cols();
-    for (int epoch = 0; epoch < loops; ++epoch) {
-      std::cout << "Epoch: " << epoch << "/" << loops << std::endl;
-      for (int i = 0; i < 6; ++i) {
-        graph->Train(solver, training_feature.col(i), training_labels.col(i));
+    for (int epoch = 0; epoch < epochs; ++epoch) {
+      for (int i = 0; i < 4; ++i) {
+        classifier.Train(training_feature.col(i), training_labels.col(i));
       }
-      float accuracy = graph->CalculateAccuracy(test_feature, test_labels);
-      std::cout << "Accuracy: " << accuracy << "%." << std::endl;
-      std::cout << "Loss: " << graph->CalculateLoss(test_feature, test_labels)
-                << std::endl;
+      float loss = classifier.CalculateLoss(training_feature, training_labels);
+      printf("Epoch %4d/%4d, Loss: %e\n", epoch, epochs, loss);
     }
-    std::cout << "Complete" << std::endl;
+    std::cout << "Training complete!!!" << std::endl;
+    float gender =
+        classifier.GetProbabilityDist(test_feature).array().round()(0, 0);
+    printf("Tom's predicted gender: %1.0f (0: male, 1: female)\n", gender);
   }
 };
 

@@ -14,7 +14,7 @@ Contributor(s):
 ==============================================================================*/
 #include <iostream>
 
-#include "examples/example2.h"
+#include "examples/example1.h"
 #include "glog/logging.h"
 
 using namespace intellgraph;
@@ -26,6 +26,6 @@ int main(int argc, char *argv[]) {
   fLS::FLAGS_log_dir = "/tmp/";
   google::InitGoogleLogging(argv[0]);
 
-  Example2::Run();
+  Example1::Run();
   return 0;
 }

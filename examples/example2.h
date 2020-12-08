@@ -20,8 +20,8 @@ Contributor(s):
 #include <iostream>
 #include <memory>
 
-#include "include/intellgraph/classifier_impl.h"
 #include "include/intellgraph/eigen.h"
+#include "include/intellgraph/graph/classifier_impl.h"
 #include "include/intellgraph/graph/graph_builder.h"
 #include "include/intellgraph/proto/vertex_parameter.pb.h"
 #include "include/intellgraph/registry.h"
