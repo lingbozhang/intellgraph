@@ -28,8 +28,9 @@ First we need to check out the git repo:
 
 ```bash
 $ cd ${insert your workspace folder here}
-$ git clone https://github.com/lingbozhang/intellgraph my-project
-# Initializes and updates git submodule
+$ git clone https://github.com/lingbozhang/intellgraph
+$ # Initializes and updates git submodule
+$ cd intellgraph
 $ git submodule init
 $ git submodule update
 ```
@@ -44,8 +45,7 @@ $ cd build/manual
 $ conan install ../..
 $ cmake ../..
 $ cd src && make install # Installs the intellgraph library
-$ ..
-$ make
+$ .. && make
 ```
 ## Run examples
 To run examples (codes are located in the examples/ directory), do following:
