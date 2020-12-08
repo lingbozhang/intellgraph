@@ -30,11 +30,10 @@ Contributor(s):
 
 namespace intellgraph {
 
-// Example 2 constructs a two-layer (including the Input Layer) neural network
+// Example 1 constructs a two-layer (including the Input Layer) neural network
 // that predicts the gender based on the weight and height. The IntellGraph has
-// two vertices: input vertex and output vertex. In the output vertex, the
-// sigmoid function is used as the activation function and l2 norm is used as
-// the loss function.
+// two vertices: input vertex and output vertex. In the output vertex, the cross
+// entropy is used as the loss function.
 class Example1 {
 public:
   Example1() = delete;
