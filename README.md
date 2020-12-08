@@ -47,7 +47,7 @@ $ cmake ../..
 $ cd src && make install # Installs the intellgraph library
 $ .. && make
 ```
-## Run examples
+## Running examples
 To run examples (codes are located in the examples/ directory), do following:
 ```
 $ cd intellgraph/build/manual/bin
