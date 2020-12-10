@@ -35,25 +35,21 @@ SgdSolver<T>::SgdSolver(const SolverConfig &config)
 
 template <typename T> SgdSolver<T>::~SgdSolver() = default;
 
-template <typename T>
-void SgdSolver<T>::Visit(DenseEdgeImpl<T, OpVertex<T>, OpVertex<T>> &edge) {
+template <typename T> void SgdSolver<T>::Visit(Edge<T> &edge) {
   LOG(INFO) << "DenseEdge " << edge.id() << " is updated with the SGD solver.";
 
-  OpVertex<T> *const vtx_out = edge.vertex_out();
-
-  VectorX<T> *const bias_out = vtx_out->mutable_bias();
+  VectorX<T> *const bias = edge.mutable_bias();
   MatrixX<T> *const weight = edge.mutable_weight();
 
   const MatrixX<T> nabla_weight = edge.CalcNablaWeight();
-  MatrixX<T> *const delta_out = vtx_out->mutable_delta();
+  const MatrixX<T> &delta = edge.delta();
 
   // Updates |weight| matrix
   weight->array() =
       (1.0 - eta_ * lambda_) * weight->array() - eta_ * nabla_weight.array();
 
   // Updates |bias| vector
-  bias_out->array() -=
-      (eta_ / delta_out->cols()) * delta_out->rowwise().sum().array();
+  bias->array() -= (eta_ / delta.cols()) * delta.rowwise().sum().array();
 }
 
 // Explicitly instantiation

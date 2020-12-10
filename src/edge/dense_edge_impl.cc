@@ -62,6 +62,16 @@ MatrixX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_weight() {
 };
 
 template <typename T, class VertexIn, class VertexOut>
+VectorX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_bias() {
+  return vtx_out_->mutable_bias();
+};
+
+template <typename T, class VertexIn, class VertexOut>
+const MatrixX<T> &DenseEdgeImpl<T, VertexIn, VertexOut>::delta() {
+  return *vtx_out_->mutable_delta();
+}
+
+template <typename T, class VertexIn, class VertexOut>
 MatrixX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_nabla_weight() {
   if (!nabla_weight_) {
     LOG(ERROR)

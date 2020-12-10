@@ -16,6 +16,7 @@ Contributor(s):
 #define INTELLGRAPH_SRC_EDGE_EDGE_H_
 
 #include "src/eigen.h"
+#include "src/solver.h"
 #include "src/visitor.h"
 
 namespace intellgraph {
@@ -30,10 +31,13 @@ public:
   virtual ~Edge() = default;
 
   virtual void Accept(Visitor<T> &visitor) = 0;
+  virtual void Accept(Solver<T> &solver) = 0;
 
   virtual int id() const = 0;
   virtual const MatrixX<T> &weight() = 0;
   virtual MatrixX<T> *mutable_weight() = 0;
+  virtual VectorX<T> *mutable_bias() = 0;
+  virtual const MatrixX<T> &delta() = 0;
   virtual MatrixX<T> *mutable_nabla_weight() = 0;
 
   virtual const MatrixX<T> CalcNablaWeight() = 0;

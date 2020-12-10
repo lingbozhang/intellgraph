@@ -20,6 +20,7 @@ Contributor(s):
 #include "src/edge.h"
 #include "src/edge/op_vertex.h"
 #include "src/eigen.h"
+#include "src/solver.h"
 #include "src/visitor.h"
 
 namespace intellgraph {
@@ -31,10 +32,13 @@ public:
   ~DenseEdgeImpl();
 
   void Accept(Visitor<T> &visitor) override { visitor.Visit(*this); }
+  void Accept(Solver<T> &solver) override { solver.Visit(*this); }
 
   int id() const override;
   const MatrixX<T> &weight() override;
   MatrixX<T> *mutable_weight() override;
+  VectorX<T> *mutable_bias() override;
+  const MatrixX<T> &delta() override;
   MatrixX<T> *mutable_nabla_weight() override;
 
   VertexIn *const vertex_in();

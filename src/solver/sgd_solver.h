@@ -15,6 +15,7 @@ Contributor(s):
 #ifndef INTELLGRAPH_SRC_SOLVER_SGD_SOLVER_H_
 #define INTELLGRAPH_SRC_SOLVER_SGD_SOLVER_H_
 
+#include "src/edge.h"
 #include "src/proto/graph_parameter.pb.h"
 #include "src/solver.h"
 
@@ -27,7 +28,7 @@ public:
   explicit SgdSolver(const SolverConfig &config);
   ~SgdSolver() override;
 
-  void Visit(DenseEdgeImpl<T, OpVertex<T>, OpVertex<T>> &edge) override;
+  void Visit(Edge<T> &edge) override;
 
 private:
   T eta_ = 0;
