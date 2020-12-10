@@ -15,14 +15,17 @@ Contributor(s):
 #ifndef INTELLGRAPH_SRC_SOLVER_H_
 #define INTELLGRAPH_SRC_SOLVER_H_
 
-#include "src/visitor.h"
-
 namespace intellgraph {
 
-template <typename T> class Solver : public Visitor<T> {
+// Forward declaration
+template <typename T> class Edge;
+
+template <typename T> class Solver {
 public:
   Solver() = default;
-  ~Solver() override = default;
+  virtual ~Solver() = default;
+
+  virtual void Visit(Edge<T> &edge) = 0;
 };
 
 } // namespace intellgraph
