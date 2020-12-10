@@ -39,7 +39,7 @@ public:
   int row() const override;
   int col() const override;
 
-  const MatrixX<T> &activation() const override;
+  const Eigen::Block<const MatrixX<T>> activation() const override;
   MatrixX<T> *mutable_activation() override;
   MatrixX<T> *mutable_delta() override;
   VectorX<T> *mutable_bias() override;

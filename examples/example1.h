@@ -26,6 +26,7 @@ Contributor(s):
 #include "include/intellgraph/proto/vertex_parameter.pb.h"
 #include "include/intellgraph/registry.h"
 #include "include/intellgraph/solver/sgd_solver.h"
+#include "src/solver/momentum.h"
 #include <google/protobuf/text_format.h>
 
 namespace intellgraph {
@@ -76,7 +77,7 @@ public:
     // Constructs a solver
     SolverConfig solver_config;
     google::protobuf::TextFormat::ParseFromString(
-        "type: 'SGD' eta: 0.1 lambda: 0.0", &solver_config);
+        "type: 'SGD' eta: 0.01 lambda: 0.0", &solver_config);
 
     // Builds the graph
     // The Dense edge represents a fully connected neural network
@@ -89,7 +90,7 @@ public:
             .SetLength(1)
             .BuildClassifier();
 
-    int epochs = 500;
+    int epochs = 100;
     std::cout << "Total epochs: " << epochs << std::endl;
     int total_size = training_feature.cols();
     for (int epoch = 0; epoch < epochs; ++epoch) {

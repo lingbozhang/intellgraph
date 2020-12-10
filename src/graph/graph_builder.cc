@@ -101,7 +101,7 @@ GraphBuilder<T> &GraphBuilder<T>::AddSolver(const SolverConfig &solver_config) {
 
 template <typename T> GraphBuilder<T> &GraphBuilder<T>::SetLength(int length) {
   DCHECK_GT(length, 0);
-  length_ = length;
+  graph_parameter_.set_length(length);
   return *this;
 }
 

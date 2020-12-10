@@ -45,7 +45,6 @@ public:
 private:
   bool IsValidEdgeParameter(const EdgeParameter &edge_param);
 
-  int length_ = 0;
   std::set<int> vertex_ids_;
   std::set<int> edge_ids_;
   std::set<std::pair<int, int>> edges_;

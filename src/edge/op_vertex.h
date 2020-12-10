@@ -38,7 +38,7 @@ public:
   virtual int row() const = 0;
   virtual int col() const = 0;
 
-  virtual const MatrixX<T> &activation() const = 0;
+  virtual const Eigen::Block<const MatrixX<T>> activation() const = 0;
   virtual MatrixX<T> *mutable_activation() = 0;
 
   virtual MatrixX<T> *mutable_delta() = 0;
