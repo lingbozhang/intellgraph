@@ -37,12 +37,10 @@ DenseEdgeImpl<T, VertexIn, VertexOut>::DenseEdgeImpl(int id, VertexIn *vtx_in,
   DCHECK_GT(col, 0);
 
   weight_ = std::make_unique<MatrixX<T>>(row, col);
-  nabla_weight_ = std::make_unique<MatrixX<T>>(row, col);
 
   // Initialization
   weight_->array() = weight_->array().unaryExpr(std::function<T(T)>(
       NormalFunctor<T>(0.0, std::sqrt(2.0 / weight_->cols()))));
-  nabla_weight_->setZero();
 }
 
 template <typename T, class VertexIn, class VertexOut>
@@ -65,6 +63,11 @@ MatrixX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_weight() {
 
 template <typename T, class VertexIn, class VertexOut>
 MatrixX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_nabla_weight() {
+  if (!nabla_weight_) {
+    LOG(ERROR)
+        << "Get nabla weight failed, nabla weight hasn't been allocated yet!";
+    return nullptr;
+  }
   return nabla_weight_.get();
 }
 
@@ -76,6 +79,16 @@ VertexIn *const DenseEdgeImpl<T, VertexIn, VertexOut>::vertex_in() {
 template <typename T, class VertexIn, class VertexOut>
 VertexOut *const DenseEdgeImpl<T, VertexIn, VertexOut>::vertex_out() {
   return vtx_out_;
+}
+
+template <typename T, class VertexIn, class VertexOut>
+const MatrixX<T> DenseEdgeImpl<T, VertexIn, VertexOut>::CalcNablaWeight() {
+  // Calculates |nabla_weight|:
+  // $\frac{\partial loss}{\partial W^l}=a^{l-1}(\delta^{l})^T$
+  int batch_size = vtx_in_->col();
+  return (vtx_in_->activation().leftCols(batch_size) *
+          vtx_out_->mutable_delta()->leftCols(batch_size).transpose()) /
+         batch_size;
 }
 
 // Explicitly instantiation

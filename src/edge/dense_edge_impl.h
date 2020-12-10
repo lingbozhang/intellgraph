@@ -40,6 +40,8 @@ public:
   VertexIn *const vertex_in();
   VertexOut *const vertex_out();
 
+  const MatrixX<T> CalcNablaWeight() override;
+
 private:
   int id_;
   VertexIn *const vtx_in_;

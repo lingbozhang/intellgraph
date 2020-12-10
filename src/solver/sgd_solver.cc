@@ -22,8 +22,8 @@ namespace intellgraph {
 
 template <typename T>
 SgdSolver<T>::SgdSolver(T eta, T lambda) : eta_(eta), lambda_(lambda) {
-  DCHECK_GT(eta, 0.0);
-  DCHECK_GE(lambda, 0.0);
+  DCHECK_GT(eta_, 0.0);
+  DCHECK_GE(lambda_, 0.0);
 }
 
 template <typename T>
@@ -42,14 +42,14 @@ void SgdSolver<T>::Visit(DenseEdgeImpl<T, OpVertex<T>, OpVertex<T>> &edge) {
   OpVertex<T> *const vtx_out = edge.vertex_out();
 
   VectorX<T> *const bias_out = vtx_out->mutable_bias();
-  MatrixX<T> *const delta_out = vtx_out->mutable_delta();
-
   MatrixX<T> *const weight = edge.mutable_weight();
-  const MatrixX<T> *const nabla_weight = edge.mutable_nabla_weight();
+
+  const MatrixX<T> nabla_weight = edge.CalcNablaWeight();
+  MatrixX<T> *const delta_out = vtx_out->mutable_delta();
 
   // Updates |weight| matrix
   weight->array() =
-      (1.0 - eta_ * lambda_) * weight->array() - eta_ * nabla_weight->array();
+      (1.0 - eta_ * lambda_) * weight->array() - eta_ * nabla_weight.array();
 
   // Updates |bias| vector
   bias_out->array() -=
