@@ -4,8 +4,10 @@ cc_library(
   STATIC
   NAME "solver"
   HDRS
+    "momentum.h"
     "sgd_solver.h"
   SRCS
+    "momentum.cc"
     "sgd_solver.cc"
   DEPS
     "CONAN_PKG::eigen"
@@ -16,6 +18,8 @@ cc_library(
 
 # Installs IntellGraph include headers
 install(
-  FILES sgd_solver.h 
+  FILES 
+    momentum.h
+    sgd_solver.h 
   DESTINATION ${INTELLGRAPH_INCLUDE_DIR}/intellgraph/solver
 ) 

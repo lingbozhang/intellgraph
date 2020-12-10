@@ -90,8 +90,11 @@ int OutputVertexImpl<T, Algorithm>::col() const {
 }
 
 template <typename T, class Algorithm>
-const MatrixX<T> &OutputVertexImpl<T, Algorithm>::activation() const {
-  return *activation_;
+const Eigen::Block<const MatrixX<T>>
+OutputVertexImpl<T, Algorithm>::activation() const {
+  const MatrixX<T> *act_ptr =
+      static_cast<const MatrixX<T> *>(activation_.get());
+  return act_ptr->block(0, 0, row_, col_);
 }
 
 template <typename T, class Algorithm>

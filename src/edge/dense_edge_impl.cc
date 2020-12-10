@@ -25,18 +25,16 @@ namespace intellgraph {
 template <typename T, class VertexIn, class VertexOut>
 DenseEdgeImpl<T, VertexIn, VertexOut>::DenseEdgeImpl(int id, VertexIn *vtx_in,
                                                      VertexOut *vtx_out)
-    : id_(id), vtx_in_(vtx_in), vtx_out_(vtx_out) {
+    : id_(id), row_(vtx_in->row()), col_(vtx_out->row()), vtx_in_(vtx_in),
+      vtx_out_(vtx_out) {
   DCHECK_GE(id_, 0);
+  DCHECK_GT(row_, 0);
+  DCHECK_GT(col_, 0);
   DCHECK(vtx_in_);
   DCHECK(vtx_out_);
   DCHECK_EQ(vtx_in_->col(), vtx_out_->col());
 
-  int row = vtx_in_->row();
-  int col = vtx_out_->row();
-  DCHECK_GT(row, 0);
-  DCHECK_GT(col, 0);
-
-  weight_ = std::make_unique<MatrixX<T>>(row, col);
+  weight_ = std::make_unique<MatrixX<T>>(row_, col_);
 
   // Initialization
   weight_->array() = weight_->array().unaryExpr(std::function<T(T)>(
@@ -49,6 +47,16 @@ DenseEdgeImpl<T, VertexIn, VertexOut>::~DenseEdgeImpl() = default;
 template <typename T, class VertexIn, class VertexOut>
 int DenseEdgeImpl<T, VertexIn, VertexOut>::id() const {
   return id_;
+}
+
+template <typename T, class VertexIn, class VertexOut>
+int DenseEdgeImpl<T, VertexIn, VertexOut>::row() const {
+  return row_;
+}
+
+template <typename T, class VertexIn, class VertexOut>
+int DenseEdgeImpl<T, VertexIn, VertexOut>::col() const {
+  return col_;
 }
 
 template <typename T, class VertexIn, class VertexOut>
@@ -67,18 +75,29 @@ VectorX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_bias() {
 };
 
 template <typename T, class VertexIn, class VertexOut>
-const MatrixX<T> &DenseEdgeImpl<T, VertexIn, VertexOut>::delta() {
-  return *vtx_out_->mutable_delta();
+Eigen::Block<MatrixX<T>> DenseEdgeImpl<T, VertexIn, VertexOut>::delta() {
+  return vtx_out_->mutable_delta()->block(0, 0, vtx_out_->row(),
+                                          vtx_out_->col());
 }
 
 template <typename T, class VertexIn, class VertexOut>
-MatrixX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_nabla_weight() {
-  if (!nabla_weight_) {
-    LOG(ERROR)
-        << "Get nabla weight failed, nabla weight hasn't been allocated yet!";
-    return nullptr;
+MatrixX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_moment() {
+  // Lazy initialization
+  if (!moment_) {
+    moment_ = std::make_unique<MatrixX<T>>(row_, col_);
+    moment_->setConstant(0);
   }
-  return nabla_weight_.get();
+  return moment_.get();
+}
+
+template <typename T, class VertexIn, class VertexOut>
+VectorX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_moment_delta() {
+  // Lazy initialization
+  if (!moment_delta_) {
+    moment_delta_ = std::make_unique<VectorX<T>>(col_);
+    moment_delta_->setConstant(0);
+  }
+  return moment_delta_.get();
 }
 
 template <typename T, class VertexIn, class VertexOut>

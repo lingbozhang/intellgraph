@@ -35,11 +35,14 @@ public:
   void Accept(Solver<T> &solver) override { solver.Visit(*this); }
 
   int id() const override;
+  int row() const override;
+  int col() const override;
   const MatrixX<T> &weight() override;
   MatrixX<T> *mutable_weight() override;
   VectorX<T> *mutable_bias() override;
-  const MatrixX<T> &delta() override;
-  MatrixX<T> *mutable_nabla_weight() override;
+  Eigen::Block<MatrixX<T>> delta() override;
+  MatrixX<T> *mutable_moment() override;
+  VectorX<T> *mutable_moment_delta() override;
 
   VertexIn *const vertex_in();
   VertexOut *const vertex_out();
@@ -47,12 +50,15 @@ public:
   const MatrixX<T> CalcNablaWeight() override;
 
 private:
-  int id_;
+  int id_ = -1;
+  int row_ = 0;
+  int col_ = 0;
   VertexIn *const vtx_in_;
   VertexOut *const vtx_out_;
 
   std::unique_ptr<MatrixX<T>> weight_;
-  std::unique_ptr<MatrixX<T>> nabla_weight_;
+  std::unique_ptr<MatrixX<T>> moment_;
+  std::unique_ptr<VectorX<T>> moment_delta_;
 };
 
 // Tells compiler not to instantiate the template in translation units that

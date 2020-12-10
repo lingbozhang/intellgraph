@@ -36,13 +36,13 @@ SgdSolver<T>::SgdSolver(const SolverConfig &config)
 template <typename T> SgdSolver<T>::~SgdSolver() = default;
 
 template <typename T> void SgdSolver<T>::Visit(Edge<T> &edge) {
-  LOG(INFO) << "DenseEdge " << edge.id() << " is updated with the SGD solver.";
+  LOG(INFO) << "Edge " << edge.id() << " is updated with the SGD solver.";
 
   VectorX<T> *const bias = edge.mutable_bias();
   MatrixX<T> *const weight = edge.mutable_weight();
 
   const MatrixX<T> nabla_weight = edge.CalcNablaWeight();
-  const MatrixX<T> &delta = edge.delta();
+  const Eigen::Block<MatrixX<T>> &delta = edge.delta();
 
   // Updates |weight| matrix
   weight->array() =

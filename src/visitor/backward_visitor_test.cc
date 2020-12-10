@@ -52,11 +52,6 @@ TEST(BackwardVisitorTest, VisitSuccess) {
   edge_float.Accept(visitor_float);
   edge_double.Accept(visitor_double);
 
-  EXPECT_EQ(*edge_float.mutable_nabla_weight(),
-            act_in_float.matrix() * delta_out_float.transpose() / 2.0f);
-  EXPECT_EQ(*edge_double.mutable_nabla_weight(),
-            act_in_double.matrix() * delta_out_double.transpose() / 2.0);
-
   EXPECT_EQ(*vtx_in_float.mutable_delta(),
             ((weight_float * delta_out_float).array() *
              (act_in_float.array() * (1.0f - act_in_float.array())))

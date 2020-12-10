@@ -62,7 +62,8 @@ int SeqVertexImpl<T, Algorithm>::col() const {
 }
 
 template <typename T, class Algorithm>
-const MatrixX<T> &SeqVertexImpl<T, Algorithm>::activation() const {
+const Eigen::Block<const MatrixX<T>>
+SeqVertexImpl<T, Algorithm>::activation() const {
   return op_vertex_.activation();
 }
 

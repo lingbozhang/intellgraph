@@ -36,7 +36,7 @@ public:
   int row() const override;
   int col() const override;
 
-  const MatrixX<T> &activation() const override;
+  const Eigen::Block<const MatrixX<T>> activation() const override;
   void set_feature(const MatrixX<T> *feature) override;
 
 private:

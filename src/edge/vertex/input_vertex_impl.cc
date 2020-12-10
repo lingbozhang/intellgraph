@@ -50,9 +50,10 @@ int InputVertexImpl<T, Transformer>::col() const {
 }
 
 template <typename T, class Transformer>
-const MatrixX<T> &InputVertexImpl<T, Transformer>::activation() const {
+const Eigen::Block<const MatrixX<T>>
+InputVertexImpl<T, Transformer>::activation() const {
   DCHECK(feature_);
-  return *feature_;
+  return feature_->block(0, 0, row_, col_);
 }
 
 template <typename T, class Transformer>

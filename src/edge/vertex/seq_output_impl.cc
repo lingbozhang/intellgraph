@@ -62,7 +62,8 @@ int SeqOutputImpl<T, Algorithm>::col() const {
 }
 
 template <typename T, class Algorithm>
-const MatrixX<T> &SeqOutputImpl<T, Algorithm>::activation() const {
+const Eigen::Block<const MatrixX<T>>
+SeqOutputImpl<T, Algorithm>::activation() const {
   return output_vertex_.activation();
 }
 
