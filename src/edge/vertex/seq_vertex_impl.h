@@ -24,8 +24,8 @@ namespace intellgraph {
 template <typename T, class Algorithm>
 class SeqVertexImpl : public Algorithm, public SeqVertex<T> {
 public:
-  SeqVertexImpl(int id, int row, int col);
-  SeqVertexImpl(const VertexParameter &vtx_param, int time_length);
+  explicit SeqVertexImpl(int id, int row, int col);
+  explicit SeqVertexImpl(const VertexParameter &vtx_param, int time_length);
   ~SeqVertexImpl() override;
 
   void Activate() override;

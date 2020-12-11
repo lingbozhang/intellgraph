@@ -37,13 +37,18 @@ public:
   ~DynMatrix();
 
   int row() const { return row_; }
+
   int col() const { return col_; }
+
   int size() const { return size_; }
+
   const Eigen::Map<const MatrixX<T>> &map() const { return const_data_map_; }
+
   Eigen::Map<MatrixX<T>> mutable_map() { return data_map_; }
 
-  void Resize(int row, int col);
   T *data() { return data_.get(); }
+
+  void Resize(int row, int col);
 
 private:
   int row_ = 0;

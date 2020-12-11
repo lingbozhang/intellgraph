@@ -28,8 +28,8 @@ class InputVertexImpl : public InputVertex<T> {
 public:
   typedef T value_type;
 
-  InputVertexImpl(int id, int row, int col);
-  InputVertexImpl(const VertexParameter &vertex_param, int batch_size);
+  explicit InputVertexImpl(int id, int row, int col);
+  explicit InputVertexImpl(const VertexParameter &vertex_param, int batch_size);
   ~InputVertexImpl() override;
 
   int id() const override;
