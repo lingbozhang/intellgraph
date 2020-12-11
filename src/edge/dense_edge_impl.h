@@ -42,11 +42,11 @@ public:
   const Eigen::Map<const MatrixX<T>> &weight() override;
   Eigen::Map<MatrixX<T>> mutable_weight() override;
   Eigen::Map<MatrixX<T>> mutable_bias() override;
-  Eigen::Map<MatrixX<T>> mutable_moment() override;
-  Eigen::Map<MatrixX<T>> mutable_moment_delta() override;
+  Eigen::Map<MatrixX<T>> mutable_weight_store_1() override;
+  Eigen::Map<MatrixX<T>> mutable_bias_store_1() override;
 
   const MatrixX<T> CalcNablaWeight() override;
-  const Eigen::Map<MatrixX<T>> delta() override;
+  const MatrixX<T> CalcNablaBias() override;
 
   VertexIn *const vertex_in();
   VertexOut *const vertex_out();
@@ -60,8 +60,8 @@ private:
   VertexOut *const vtx_out_;
 
   DynMatrix<T> weight_;
-  DynMatrix<T> moment_;
-  DynMatrix<T> moment_delta_;
+  DynMatrix<T> weight_store_1_;
+  DynMatrix<T> bias_store_1_;
 };
 
 // Tells compiler not to instantiate the template in translation units that

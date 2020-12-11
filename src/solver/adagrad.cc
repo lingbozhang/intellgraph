@@ -12,31 +12,22 @@ limitations under the License.
 Contributor(s):
         Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#include "src/solver/sgd_solver.h"
+#include "src/solver/adagrad.h"
 
 #include "glog/logging.h"
-#include "src/edge/dense_edge_impl.h"
-#include "src/eigen.h"
 
 namespace intellgraph {
 
 template <typename T>
-SgdSolver<T>::SgdSolver(T eta, T lambda) : eta_(eta), lambda_(lambda) {
-  DCHECK_GT(eta_, 0.0);
-  DCHECK_GE(lambda_, 0.0);
+Adagrad<T>::Adagrad(T eta, T lambda) : eta_(eta), lambda_(lambda) {
+  DCHECK_GT(eta_, 0);
+  DCHECK_GE(lambda_, 0);
 }
 
-template <typename T>
-SgdSolver<T>::SgdSolver(const SolverConfig &config)
-    : eta_(config.eta()), lambda_(config.lambda()) {
-  DCHECK_GT(eta_, 0.0);
-  DCHECK_GE(lambda_, 0.0);
-}
+template <typename T> Adagrad<T>::~Adagrad() = default;
 
-template <typename T> SgdSolver<T>::~SgdSolver() = default;
-
-template <typename T> void SgdSolver<T>::Visit(Edge<T> &edge) {
-  LOG(INFO) << "Edge " << edge.id() << " is updated with the SGD solver.";
+template <typename T> void Adagrad<T>::Visit(Edge<T> &edge) {
+  LOG(INFO) << "Edge " << edge.id() << " is updated with the Adagrad.";
 
   Eigen::Map<MatrixX<T>> bias = edge.mutable_bias();
   Eigen::Map<MatrixX<T>> weight = edge.mutable_weight();
@@ -44,15 +35,24 @@ template <typename T> void SgdSolver<T>::Visit(Edge<T> &edge) {
   const MatrixX<T> nabla_weight = edge.CalcNablaWeight();
   const MatrixX<T> nabla_bias = edge.CalcNablaBias();
 
+  Eigen::Map<MatrixX<T>> g = edge.mutable_weight_store_1();
+  Eigen::Map<MatrixX<T>> g_bias = edge.mutable_bias_store_1();
+
+  // Updates the Moment
+  g.array() += (nabla_weight.array() + lambda_ * weight.array()).square();
+  g_bias.array() += nabla_bias.array().square();
+
+  // Type epsilon is added inside the log function to avoid overflow
+  T epsilon = std::numeric_limits<T>::epsilon();
   // Updates |weight| matrix
-  weight.noalias() = (1.0 - eta_ * lambda_) * weight - eta_ * nabla_weight;
+  weight.array() -= eta_ * nabla_weight.array() / (g.array() + epsilon).sqrt();
 
   // Updates |bias| vector
-  bias.noalias() -= eta_ * nabla_bias;
+  bias.array() -= eta_ * nabla_bias.array() / (g_bias.array() + epsilon).sqrt();
 }
 
-// Explicitly instantiation
-template class SgdSolver<float>;
-template class SgdSolver<double>;
+// Explicit instantiation
+template class Adagrad<float>;
+template class Adagrad<double>;
 
 } // namespace intellgraph

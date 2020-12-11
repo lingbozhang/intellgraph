@@ -36,23 +36,23 @@ template <typename T> void Momentum<T>::Visit(Edge<T> &edge) {
   Eigen::Map<MatrixX<T>> bias = edge.mutable_bias();
   Eigen::Map<MatrixX<T>> weight = edge.mutable_weight();
 
-  const MatrixX<T> nable_weight = edge.CalcNablaWeight();
-  const Eigen::Map<MatrixX<T>> delta = edge.delta();
+  const MatrixX<T> nabla_weight = edge.CalcNablaWeight();
+  const MatrixX<T> nabla_bias = edge.CalcNablaBias();
 
-  Eigen::Map<MatrixX<T>> moment = edge.mutable_moment();
-  Eigen::Map<MatrixX<T>> moment_delta = edge.mutable_moment_delta();
+  Eigen::Map<MatrixX<T>> weight_moment = edge.mutable_weight_store_1();
+  Eigen::Map<MatrixX<T>> bias_moment = edge.mutable_bias_store_1();
 
   // Updates the Moment
-  moment.array() = gama_ * moment.array() +
-                   eta_ * (nable_weight.array() + lambda_ * weight.array());
-  moment_delta.array() = gama_ * moment_delta.array() + eta_ * delta.array();
+  weight_moment.array() =
+      gama_ * weight_moment.array() +
+      eta_ * (nabla_weight.array() + lambda_ * weight.array());
+  bias_moment.array() = gama_ * bias_moment.array() + eta_ * nabla_bias.array();
 
   // Updates |weight| matrix
-  weight.noalias() -= moment;
+  weight.noalias() -= weight_moment;
 
   // Updates |bias| vector
-  int batch_size = delta.cols();
-  bias.noalias() -= moment_delta.colwise().sum() / batch_size;
+  bias.noalias() -= bias_moment;
 }
 
 // Explicitly instantiation

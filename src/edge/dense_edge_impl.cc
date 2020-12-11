@@ -76,28 +76,31 @@ Eigen::Map<MatrixX<T>> DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_bias() {
 };
 
 template <typename T, class VertexIn, class VertexOut>
-Eigen::Map<MatrixX<T>> DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_moment() {
+Eigen::Map<MatrixX<T>>
+DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_weight_store_1() {
   // Lazy initialization
-  if (!moment_.data()) {
-    moment_ = DynMatrix<T>(row_, col_);
+  if (!weight_store_1_.data()) {
+    weight_store_1_ = DynMatrix<T>(row_, col_);
   }
-  return moment_.mutable_map();
+  return weight_store_1_.mutable_map();
 }
 
 template <typename T, class VertexIn, class VertexOut>
 Eigen::Map<MatrixX<T>>
-DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_moment_delta() {
+DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_bias_store_1() {
   // Lazy initialization
-  if (!moment_delta_.data()) {
-    moment_delta_ = DynMatrix<T>(vtx_out_->row(), vtx_out_->col());
+  if (!bias_store_1_.data()) {
+    bias_store_1_ = DynMatrix<T>(vtx_out_->mutable_bias().rows(),
+                                 vtx_out_->mutable_bias().cols());
   }
-  // Resizes the |moment_delta_| if dimensions mismatch with the corresponding
+  // Resizes the |moment_bias_| if dimensions mismatch with the corresponding
   // delta matrix
-  if (moment_delta_.row() != vtx_out_->row() ||
-      moment_delta_.col() != vtx_out_->col()) {
-    moment_delta_.Resize(vtx_out_->row(), vtx_out_->col());
+  if (bias_store_1_.row() != vtx_out_->mutable_bias().rows() ||
+      bias_store_1_.col() != vtx_out_->mutable_bias().cols()) {
+    bias_store_1_.Resize(vtx_out_->mutable_bias().rows(),
+                         vtx_out_->mutable_bias().cols());
   }
-  return moment_delta_.mutable_map();
+  return bias_store_1_.mutable_map();
 }
 
 template <typename T, class VertexIn, class VertexOut>
@@ -119,8 +122,9 @@ const MatrixX<T> DenseEdgeImpl<T, VertexIn, VertexOut>::CalcNablaWeight() {
 }
 
 template <typename T, class VertexIn, class VertexOut>
-const Eigen::Map<MatrixX<T>> DenseEdgeImpl<T, VertexIn, VertexOut>::delta() {
-  return vtx_out_->mutable_delta();
+const MatrixX<T> DenseEdgeImpl<T, VertexIn, VertexOut>::CalcNablaBias() {
+  return vtx_out_->mutable_delta().rowwise().sum() /
+         vtx_out_->mutable_delta().cols();
 }
 
 // Explicitly instantiation
