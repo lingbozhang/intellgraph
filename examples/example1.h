@@ -26,7 +26,6 @@ Contributor(s):
 #include "include/intellgraph/proto/vertex_parameter.pb.h"
 #include "include/intellgraph/registry.h"
 #include "include/intellgraph/solver/sgd_solver.h"
-#include "src/solver/adagrad.h"
 #include <google/protobuf/text_format.h>
 
 namespace intellgraph {
@@ -90,7 +89,6 @@ public:
             .SetLength(1)
             .BuildClassifier();
 
-    classifier.SetSolver(std::make_unique<Adagrad<float>>(0.01, 0.0));
     int epochs = 500;
     std::cout << "Total epochs: " << epochs << std::endl;
     int total_size = training_feature.cols();
