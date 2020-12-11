@@ -26,45 +26,41 @@ TEST(SigmoidTest, ActivateSuccess) {
   // Activation element value EQ zero
   OpVertexImpl<float, Sigmoid> op_vertex_float(0, 1, 1);
   op_vertex_float.Activate();
-  EXPECT_FLOAT_EQ((*op_vertex_float.mutable_activation())(0, 0), 0.5f);
+  EXPECT_FLOAT_EQ(op_vertex_float.act()(0, 0), 0.5f);
 
   OpVertexImpl<double, Sigmoid> op_vertex_double(1, 1, 1);
   op_vertex_double.Activate();
-  EXPECT_DOUBLE_EQ((*op_vertex_double.mutable_activation())(0, 0), 0.5);
+  EXPECT_DOUBLE_EQ(op_vertex_double.act()(0, 0), 0.5);
 
   // Activation element value GT zero
-  op_vertex_float.mutable_activation()->setIdentity();
+  op_vertex_float.mutable_act().setIdentity();
   op_vertex_float.Activate();
-  EXPECT_FLOAT_EQ((*op_vertex_float.mutable_activation())(0, 0),
-                  1.0f / (1.0f + std::exp(-1.0f)));
+  EXPECT_FLOAT_EQ(op_vertex_float.act()(0, 0), 1.0f / (1.0f + std::exp(-1.0f)));
 
-  op_vertex_double.mutable_activation()->setIdentity();
+  op_vertex_double.mutable_act().setIdentity();
   op_vertex_double.Activate();
-  EXPECT_DOUBLE_EQ((*op_vertex_double.mutable_activation())(0, 0),
-                   1.0 / (1.0 + std::exp(-1.0)));
+  EXPECT_DOUBLE_EQ(op_vertex_double.act()(0, 0), 1.0 / (1.0 + std::exp(-1.0)));
 
   // Activation element value LT zero
-  op_vertex_float.mutable_activation()->setConstant(-1.0f);
+  op_vertex_float.mutable_act().setConstant(-1.0f);
   op_vertex_float.Activate();
-  EXPECT_FLOAT_EQ((*op_vertex_float.mutable_activation())(0, 0),
-                  1.0f / (1.0f + std::exp(1.0f)));
+  EXPECT_FLOAT_EQ(op_vertex_float.act()(0, 0), 1.0f / (1.0f + std::exp(1.0f)));
 
-  op_vertex_double.mutable_activation()->setConstant(-1.0);
+  op_vertex_double.mutable_act().setConstant(-1.0);
   op_vertex_double.Activate();
-  EXPECT_DOUBLE_EQ((*op_vertex_double.mutable_activation())(0, 0),
-                   1.0 / (1.0 + std::exp(1.0)));
+  EXPECT_DOUBLE_EQ(op_vertex_double.act()(0, 0), 1.0 / (1.0 + std::exp(1.0)));
 }
 
 TEST(SigmoidTest, DeriveSuccess) {
   OpVertexImpl<float, Sigmoid> op_vertex_float(0, 1, 1);
   op_vertex_float.Activate();
   op_vertex_float.Derive();
-  EXPECT_FLOAT_EQ((*op_vertex_float.mutable_activation())(0, 0), 0.25f);
+  EXPECT_FLOAT_EQ(op_vertex_float.act()(0, 0), 0.25f);
 
   OpVertexImpl<double, Sigmoid> op_vertex_double(1, 1, 1);
   op_vertex_double.Activate();
   op_vertex_double.Derive();
-  EXPECT_DOUBLE_EQ((*op_vertex_double.mutable_activation())(0, 0), 0.25);
+  EXPECT_DOUBLE_EQ(op_vertex_double.act()(0, 0), 0.25);
 }
 
 } // namespace

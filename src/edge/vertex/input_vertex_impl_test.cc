@@ -55,8 +55,8 @@ TEST(InputVertexImplTest, SetFeatureSuccess) {
   input_vertex_float.set_feature(&data_float);
   input_vertex_double.set_feature(&data_double);
 
-  EXPECT_EQ(input_vertex_float.activation()(0, 0), 1.0f);
-  EXPECT_EQ(input_vertex_double.activation()(0, 0), 1.0);
+  EXPECT_EQ(input_vertex_float.act()(0, 0), 1.0f);
+  EXPECT_EQ(input_vertex_double.act()(0, 0), 1.0);
 }
 
 } // namespace

@@ -36,10 +36,10 @@ public:
   int row() const override;
   int col() const override;
 
-  const Eigen::Block<const MatrixX<T>> activation() const override;
-  MatrixX<T> *mutable_activation() override;
-  MatrixX<T> *mutable_delta() override;
-  VectorX<T> *mutable_bias() override;
+  const Eigen::Map<const MatrixX<T>> &act() const override;
+  Eigen::Map<MatrixX<T>> mutable_act() override;
+  Eigen::Map<MatrixX<T>> mutable_delta() override;
+  Eigen::Map<MatrixX<T>> mutable_bias() override;
 
   void ForwardTimeByOneStep() override;
   int GetCurrentTimeStep() const override;

@@ -33,28 +33,26 @@ template <typename T> Momentum<T>::~Momentum() = default;
 template <typename T> void Momentum<T>::Visit(Edge<T> &edge) {
   LOG(INFO) << "Edge " << edge.id() << " is updated with the Momentum.";
 
-  VectorX<T> *const bias = edge.mutable_bias();
-  MatrixX<T> *const weight = edge.mutable_weight();
+  Eigen::Map<MatrixX<T>> bias = edge.mutable_bias();
+  Eigen::Map<MatrixX<T>> weight = edge.mutable_weight();
 
   const MatrixX<T> nable_weight = edge.CalcNablaWeight();
-  const Eigen::Block<MatrixX<T>> &delta = edge.delta();
+  const Eigen::Map<MatrixX<T>> delta = edge.delta();
 
-  MatrixX<T> *const moment = edge.mutable_moment();
-  VectorX<T> *const moment_delta = edge.mutable_moment_delta();
-  DCHECK_EQ(moment->rows(), weight->rows());
-  DCHECK_EQ(moment->cols(), weight->cols());
+  Eigen::Map<MatrixX<T>> moment = edge.mutable_moment();
+  Eigen::Map<MatrixX<T>> moment_delta = edge.mutable_moment_delta();
 
   // Updates the Moment
-  moment->array() = gama_ * moment->array() +
-                    eta_ * (nable_weight.array() + lambda_ * weight->array());
-  moment_delta->array() = gama_ * moment_delta->array() +
-                          (eta_ / delta.cols()) * delta.rowwise().sum().array();
+  moment.array() = gama_ * moment.array() +
+                   eta_ * (nable_weight.array() + lambda_ * weight.array());
+  moment_delta.array() = gama_ * moment_delta.array() + eta_ * delta.array();
 
   // Updates |weight| matrix
-  weight->array() -= moment->array();
+  weight.noalias() -= moment;
 
   // Updates |bias| vector
-  bias->array() -= moment_delta->array();
+  int batch_size = delta.cols();
+  bias.noalias() -= moment_delta.colwise().sum() / batch_size;
 }
 
 // Explicitly instantiation

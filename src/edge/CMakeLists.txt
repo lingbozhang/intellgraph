@@ -12,8 +12,9 @@ cc_library(
   DEPS
     "CONAN_PKG::eigen"
     "CONAN_PKG::glog"
-    "vertex"
+    "tensor"
     "utility"
+    "vertex"
 )
 
 # Installs IntellGraph include headers

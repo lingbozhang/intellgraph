@@ -34,21 +34,21 @@ TEST(InitVisitorTest, VisitSuccess) {
   DenseEdgeImpl<double, OpVertex<double>> edge_double(0, &vtx_in_double,
                                                       &vtx_out_double);
 
-  vtx_out_float.mutable_activation()->setConstant(2.0f);
-  vtx_out_double.mutable_activation()->setConstant(2.0);
+  vtx_out_float.mutable_act().setConstant(2.0f);
+  vtx_out_double.mutable_act().setConstant(2.0);
 
-  vtx_out_float.mutable_delta()->setConstant(1.0f);
-  vtx_out_double.mutable_delta()->setConstant(1.0);
+  vtx_out_float.mutable_delta().setConstant(1.0f);
+  vtx_out_double.mutable_delta().setConstant(1.0);
 
   InitVertexVisitor<float> visitor_float;
   InitVertexVisitor<double> visitor_double;
   edge_float.Accept(visitor_float);
   edge_double.Accept(visitor_double);
 
-  EXPECT_EQ(*vtx_out_float.mutable_activation(), MatrixX<float>::Zero(4, 2));
-  EXPECT_EQ(*vtx_out_double.mutable_activation(), MatrixX<double>::Zero(4, 2));
-  EXPECT_EQ(*vtx_out_float.mutable_delta(), MatrixX<float>::Zero(4, 2));
-  EXPECT_EQ(*vtx_out_double.mutable_delta(), MatrixX<double>::Zero(4, 2));
+  EXPECT_EQ(vtx_out_float.mutable_act(), MatrixX<float>::Zero(4, 2));
+  EXPECT_EQ(vtx_out_double.mutable_act(), MatrixX<double>::Zero(4, 2));
+  EXPECT_EQ(vtx_out_float.mutable_delta(), MatrixX<float>::Zero(4, 2));
+  EXPECT_EQ(vtx_out_double.mutable_delta(), MatrixX<double>::Zero(4, 2));
 }
 
 } // namespace

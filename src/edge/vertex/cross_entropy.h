@@ -48,16 +48,13 @@ public:
     DCHECK_EQ(vertex.row(), labels.rows());
     DCHECK_EQ(vertex.col(), labels.cols());
 
-    const MatrixX<T> &activation = vertex.activation();
-    int batch_size = vertex.col();
+    const Eigen::Map<const MatrixX<T>> &act = vertex.act();
     // Type epsilon is added inside the log function to avoid overflow
     T epsilon = std::numeric_limits<T>::epsilon();
-    T loss =
-        (labels.array() *
-             (epsilon + activation.leftCols(batch_size).array()).log() +
-         (1.0 - labels.array()) *
-             (1.0 - activation.leftCols(batch_size).array() + epsilon).log())
-            .sum();
+    T loss = (labels.array() * (epsilon + act.array()).log() +
+              (1.0 - labels.array()) * (1.0 - act.array() + epsilon).log())
+                 .sum();
+    int batch_size = vertex.col();
     return -loss / batch_size;
   }
 
@@ -67,12 +64,10 @@ public:
     DCHECK_EQ(vertex.row(), labels.rows());
     DCHECK_EQ(vertex.col(), labels.cols());
 
-    MatrixX<T> *delta = vertex.mutable_delta();
-    const MatrixX<T> &activation = vertex.activation();
+    Eigen::Map<MatrixX<T>> delta = vertex.mutable_delta();
+    const Eigen::Map<const MatrixX<T>> &act = vertex.act();
 
-    int batch_size = vertex.col();
-    delta->leftCols(batch_size) =
-        activation.leftCols(batch_size) - labels.matrix();
+    delta = act - labels;
   }
 
 protected:

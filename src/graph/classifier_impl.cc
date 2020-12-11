@@ -108,7 +108,7 @@ template <typename T>
 const MatrixX<T>
 ClassifierImpl<T>::GetProbabilityDist(const MatrixX<T> &feature) {
   this->Forward(feature);
-  return output_vertex_->activation().leftCols(batch_size_);
+  return output_vertex_->act();
 }
 
 template <typename T>
@@ -131,7 +131,7 @@ const MatrixX<T> ClassifierImpl<T>::CalcConfusionMatrix(
   DCHECK_EQ(output_vertex_->row(), test_labels.rows());
 
   this->Forward(test_feature);
-  const MatrixX<T> &activation = output_vertex_->activation();
+  const MatrixX<T> &activation = output_vertex_->act();
   int class_num = activation.rows() == 1 ? 2 : activation.rows();
   int batch_size = output_vertex_->col();
   MatrixX<T> confusion_matrix = MatrixX<T>::Zero(class_num, class_num);

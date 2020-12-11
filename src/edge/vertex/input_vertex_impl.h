@@ -36,7 +36,7 @@ public:
   int row() const override;
   int col() const override;
 
-  const Eigen::Block<const MatrixX<T>> activation() const override;
+  const Eigen::Map<const MatrixX<T>> &act() const override;
   void set_feature(const MatrixX<T> *feature) override;
 
 private:
@@ -45,6 +45,8 @@ private:
   int col_;
 
   const MatrixX<T> *feature_ = nullptr;
+  Eigen::Map<const MatrixX<T>> feature_map_ =
+      Eigen::Map<const MatrixX<T>>(nullptr, -1, -1);
 };
 
 } // namespace intellgraph

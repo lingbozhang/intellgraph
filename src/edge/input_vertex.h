@@ -17,6 +17,7 @@ Contributor(s):
 
 #include "src/edge/op_vertex.h"
 #include "src/eigen.h"
+#include "src/logging.h"
 
 namespace intellgraph {
 
@@ -34,9 +35,17 @@ public:
   void Activate() override {}
   void Derive() override {}
   void ResizeVertex(int length) override {}
-  MatrixX<T> *mutable_activation() override { return nullptr; }
-  VectorX<T> *mutable_bias() override { return nullptr; }
-  MatrixX<T> *mutable_delta() override { return nullptr; }
+  Eigen::Map<MatrixX<T>> mutable_act() override {
+    NOTREACHED();
+    return Eigen::Map<MatrixX<T>>(nullptr, -1, -1);
+  }
+  Eigen::Map<MatrixX<T>> mutable_delta() override {
+    return Eigen::Map<MatrixX<T>>(nullptr, -1, -1);
+  }
+  Eigen::Map<MatrixX<T>> mutable_bias() override {
+    NOTREACHED();
+    return Eigen::Map<MatrixX<T>>(nullptr, -1, -1);
+  }
 
   virtual void set_feature(const MatrixX<T> *feature) = 0;
 };

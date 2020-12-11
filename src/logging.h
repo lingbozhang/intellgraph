@@ -12,32 +12,17 @@ limitations under the License.
 Contributor(s):
         Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#include "src/visitor/init_vertex_visitor.h"
+#ifndef INTELLGRAPH_SRC_LOGGING_H_
+#define INTELLGRAPH_SRC_LOGGING_H_
 
 #include "glog/logging.h"
-#include "src/edge/dense_edge_impl.h"
-#include "src/eigen.h"
 
-namespace intellgraph {
+namespace logging {
 
-template <typename T> InitVertexVisitor<T>::InitVertexVisitor() = default;
+#ifndef NOTREACHED
+#define NOTREACHED() DCHECK(false)
+#endif
 
-template <typename T> InitVertexVisitor<T>::~InitVertexVisitor() = default;
+} // namespace logging
 
-template <typename T>
-void InitVertexVisitor<T>::Visit(
-    DenseEdgeImpl<T, OpVertex<T>, OpVertex<T>> &edge) {
-  LOG(INFO) << "OpVertex " << edge.vertex_out()->id()
-            << " is zero initialized.";
-
-  OpVertex<T> *const vtx_out = edge.vertex_out();
-  vtx_out->mutable_act().setZero();
-  vtx_out->mutable_delta().setZero();
-}
-
-// Explicit instantiation
-template class InitVertexVisitor<float>;
-template class InitVertexVisitor<double>;
-
-} // namespace intellgraph
-
+#endif // INTELLGRAPH_SRC_LOGGING_H_

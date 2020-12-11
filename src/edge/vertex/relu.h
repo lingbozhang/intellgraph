@@ -26,23 +26,23 @@ public:
   Relu() = default;
 
   template <typename T> static void Activate(OpVertexImpl<T, Relu> &vertex) {
-    MatrixX<T> *const activation = vertex.mutable_activation();
-    for (size_t i = 0; i < activation->rows(); ++i) {
-      for (size_t j = 0; j < vertex.col(); ++j) {
-        if (activation->matrix()(i, j) < 0) {
-          activation->matrix()(i, j) = 0;
+    Eigen::Map<MatrixX<T>> act = vertex.mutable_act();
+    for (size_t i = 0; i < act.rows(); ++i) {
+      for (size_t j = 0; j < act.cols(); ++j) {
+        if (act(i, j) < 0) {
+          act(i, j) = 0;
         }
       }
     }
   }
 
   template <typename T> static void Derive(OpVertexImpl<T, Relu> &vertex) {
-    MatrixX<T> *const activation = vertex.mutable_activation();
-    for (size_t i = 0; i < activation->rows(); ++i) {
-      for (size_t j = 0; j < vertex.col(); ++j) {
-        DCHECK_GE(activation->matrix()(i, j), 0);
-        if (activation->matrix()(i, j) > 0) {
-          activation->matrix()(i, j) = 1;
+    Eigen::Map<MatrixX<T>> act = vertex.mutable_act();
+    for (size_t i = 0; i < act.rows(); ++i) {
+      for (size_t j = 0; j < act.cols(); ++j) {
+        DCHECK_GE(act(i, j), 0);
+        if (act(i, j) > 0) {
+          act(i, j) = 1;
         }
       }
     }

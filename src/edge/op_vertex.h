@@ -38,11 +38,10 @@ public:
   virtual int row() const = 0;
   virtual int col() const = 0;
 
-  virtual const Eigen::Block<const MatrixX<T>> activation() const = 0;
-  virtual MatrixX<T> *mutable_activation() = 0;
-
-  virtual MatrixX<T> *mutable_delta() = 0;
-  virtual VectorX<T> *mutable_bias() = 0;
+  virtual const Eigen::Map<const MatrixX<T>> &act() const = 0;
+  virtual Eigen::Map<MatrixX<T>> mutable_act() = 0;
+  virtual Eigen::Map<MatrixX<T>> mutable_delta() = 0;
+  virtual Eigen::Map<MatrixX<T>> mutable_bias() = 0;
 };
 
 } // namespace intellgraph

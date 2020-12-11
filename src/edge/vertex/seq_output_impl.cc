@@ -62,23 +62,22 @@ int SeqOutputImpl<T, Algorithm>::col() const {
 }
 
 template <typename T, class Algorithm>
-const Eigen::Block<const MatrixX<T>>
-SeqOutputImpl<T, Algorithm>::activation() const {
-  return output_vertex_.activation();
+const Eigen::Map<const MatrixX<T>> &SeqOutputImpl<T, Algorithm>::act() const {
+  return output_vertex_.act();
 }
 
 template <typename T, class Algorithm>
-MatrixX<T> *SeqOutputImpl<T, Algorithm>::mutable_activation() {
-  return output_vertex_.mutable_activation();
+Eigen::Map<MatrixX<T>> SeqOutputImpl<T, Algorithm>::mutable_act() {
+  return output_vertex_.mutable_act();
 }
 
 template <typename T, class Algorithm>
-MatrixX<T> *SeqOutputImpl<T, Algorithm>::mutable_delta() {
+Eigen::Map<MatrixX<T>> SeqOutputImpl<T, Algorithm>::mutable_delta() {
   return output_vertex_.mutable_delta();
 }
 
 template <typename T, class Algorithm>
-VectorX<T> *SeqOutputImpl<T, Algorithm>::mutable_bias() {
+Eigen::Map<MatrixX<T>> SeqOutputImpl<T, Algorithm>::mutable_bias() {
   return output_vertex_.mutable_bias();
 }
 

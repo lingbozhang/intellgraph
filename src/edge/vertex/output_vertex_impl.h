@@ -17,6 +17,7 @@ Contributor(s):
 
 #include "src/edge/output_vertex.h"
 #include "src/proto/vertex_parameter.pb.h"
+#include "src/tensor/dyn_matrix.h"
 
 namespace intellgraph {
 
@@ -37,10 +38,10 @@ public:
   int row() const override;
   int col() const override;
 
-  const Eigen::Block<const MatrixX<T>> activation() const override;
-  MatrixX<T> *mutable_activation() override;
-  MatrixX<T> *mutable_delta() override;
-  VectorX<T> *mutable_bias() override;
+  const Eigen::Map<const MatrixX<T>> &act() const override;
+  Eigen::Map<MatrixX<T>> mutable_act() override;
+  Eigen::Map<MatrixX<T>> mutable_delta() override;
+  Eigen::Map<MatrixX<T>> mutable_bias() override;
 
   T CalcLoss(const Eigen::Ref<const MatrixX<T>> &labels) override;
   void CalcDelta(const Eigen::Ref<const MatrixX<T>> &labels) override;
@@ -50,9 +51,9 @@ private:
   int row_;
   int col_;
 
-  std::unique_ptr<MatrixX<T>> activation_;
-  std::unique_ptr<MatrixX<T>> delta_;
-  std::unique_ptr<VectorX<T>> bias_;
+  DynMatrix<T> act_;
+  DynMatrix<T> delta_;
+  DynMatrix<T> bias_;
 };
 
 } // namespace intellgraph
