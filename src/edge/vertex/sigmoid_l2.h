@@ -46,10 +46,9 @@ public:
     DCHECK_EQ(vertex.row(), labels.rows());
     DCHECK_EQ(vertex.col(), labels.cols());
 
-    const MatrixX<T> &activation = vertex.activation();
-    int batch_size = vertex.col();
-    T loss = (activation.leftCols(batch_size) - labels.matrix()).squaredNorm();
-    return loss / 2.0 / batch_size;
+    const Eigen::Map<const MatrixX<T>> &act = vertex.act();
+    T loss = (act - labels).squaredNorm();
+    return loss / 2.0 / act.cols();
   }
 
   template <typename T>
@@ -58,15 +57,12 @@ public:
     DCHECK_EQ(vertex.row(), labels.rows());
     DCHECK_EQ(vertex.col(), labels.cols());
 
-    MatrixX<T> *delta = vertex.mutable_delta();
-    const MatrixX<T> &activation = vertex.activation();
+    Eigen::Map<MatrixX<T>> delta = vertex.mutable_delta();
+    const Eigen::Map<const MatrixX<T>> &act = vertex.act();
 
-    int batch_size = vertex.col();
-    delta->leftCols(batch_size) =
-        activation.leftCols(batch_size) - labels.matrix();
-    vertex.Derive();
-    delta->leftCols(batch_size).array() *=
-        activation.leftCols(batch_size).array();
+    delta.noalias() = act - labels;
+    Sigmoid::Derive(vertex);
+    delta.array() *= act.array();
   }
 
 protected:

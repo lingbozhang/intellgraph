@@ -28,19 +28,15 @@ public:
   template <typename T> static void Activate(OpVertex<T> &vertex) {
     // Sigmoid activation function:
     // $\sigma(z)=1.0/(1.0+e^{-z})$
-    MatrixX<T> *const activation = vertex.mutable_activation();
-    int batch_size = vertex.col();
-    activation->leftCols(batch_size).array() =
-        0.5 * (1.0 + (0.5 * activation->leftCols(batch_size).array()).tanh());
+    Eigen::Map<MatrixX<T>> act = vertex.mutable_act();
+    act.array() = 0.5 * (1.0 + (0.5 * act.array()).tanh());
   }
 
   template <typename T> static void Derive(OpVertex<T> &vertex) {
     // Derivative equation:
     // $d\sigma/dz=\sigma(z)(1-\sigma(z))$
-    MatrixX<T> *const activation = vertex.mutable_activation();
-    int batch_size = vertex.col();
-    activation->leftCols(batch_size).array() *=
-        (1.0 - activation->leftCols(batch_size).array());
+    Eigen::Map<MatrixX<T>> act = vertex.mutable_act();
+    act.array() *= (1.0 - act.array());
   }
 
 protected:

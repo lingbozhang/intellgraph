@@ -20,6 +20,7 @@ Contributor(s):
 #include "src/edge/op_vertex.h"
 #include "src/eigen.h"
 #include "src/proto/vertex_parameter.pb.h"
+#include "src/tensor/dyn_matrix.h"
 
 namespace intellgraph {
 
@@ -30,8 +31,8 @@ class OpVertexImpl : public Algorithm, public OpVertex<T> {
 public:
   typedef T value_type;
 
-  OpVertexImpl(int id, int row, int col);
-  OpVertexImpl(const VertexParameter &vtx_param, int batch_size);
+  explicit OpVertexImpl(int id, int row, int col);
+  explicit OpVertexImpl(const VertexParameter &vtx_param, int batch_size);
   ~OpVertexImpl() override;
 
   void Activate() override;
@@ -42,19 +43,19 @@ public:
   int row() const override;
   int col() const override;
 
-  const Eigen::Block<const MatrixX<T>> activation() const override;
-  MatrixX<T> *mutable_activation() override;
-  MatrixX<T> *mutable_delta() override;
-  VectorX<T> *mutable_bias() override;
+  const Eigen::Map<const MatrixX<T>> &act() const override;
+  Eigen::Map<MatrixX<T>> mutable_act() override;
+  Eigen::Map<MatrixX<T>> mutable_delta() override;
+  Eigen::Map<MatrixX<T>> mutable_bias() override;
 
 private:
   int id_;
   int row_;
   int col_;
 
-  std::unique_ptr<MatrixX<T>> activation_;
-  std::unique_ptr<MatrixX<T>> delta_;
-  std::unique_ptr<VectorX<T>> bias_;
+  DynMatrix<T> act_;
+  DynMatrix<T> delta_;
+  DynMatrix<T> bias_;
 };
 
 } // namespace intellgraph

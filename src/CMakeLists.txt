@@ -1,9 +1,14 @@
-add_subdirectory(edge)
-add_subdirectory(graph)
+# Grouped by dependencies
 add_subdirectory(proto)
-add_subdirectory(visitor)
-add_subdirectory(solver)
+add_subdirectory(tensor)
 add_subdirectory(utility)
+
+add_subdirectory(edge)
+
+add_subdirectory(solver)
+add_subdirectory(visitor)
+
+add_subdirectory(graph)
 
 cc_library(
   STATIC

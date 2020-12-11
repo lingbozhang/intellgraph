@@ -34,10 +34,10 @@ TEST(ForwardVisitorTest, VisitSuccess) {
   DenseEdgeImpl<double, OpVertex<double>> edge_double(0, &vtx_in_double,
                                                       &vtx_out_double);
 
-  vtx_out_float.mutable_bias()->setConstant(1.0f);
-  vtx_out_double.mutable_bias()->setConstant(1.0f);
-  edge_float.mutable_weight()->setIdentity();
-  edge_double.mutable_weight()->setIdentity();
+  vtx_out_float.mutable_bias().setConstant(1.0f);
+  vtx_out_double.mutable_bias().setConstant(1.0f);
+  edge_float.mutable_weight().setIdentity();
+  edge_double.mutable_weight().setIdentity();
 
   ForwardVisitor<float> visitor_float;
   ForwardVisitor<double> visitor_double;
@@ -46,11 +46,11 @@ TEST(ForwardVisitorTest, VisitSuccess) {
 
   Eigen::Matrix<float, 4, 2> expected_result_float;
   expected_result_float << 1.5f, 1.5f, 1.5f, 1.5f, 1.0f, 1.0f, 1.0f, 1.0f;
-  EXPECT_EQ((*vtx_out_float.mutable_activation()), expected_result_float);
+  EXPECT_EQ(vtx_out_float.mutable_act(), expected_result_float);
 
   Eigen::Matrix<double, 4, 2> expected_result_double;
   expected_result_double << 1.5, 1.5, 1.5, 1.5, 1.0, 1.0, 1.0, 1.0;
-  EXPECT_EQ((*vtx_out_double.mutable_activation()), expected_result_double);
+  EXPECT_EQ(vtx_out_double.mutable_act(), expected_result_double);
 }
 
 } // namespace

@@ -32,31 +32,31 @@ TEST(BackwardVisitorTest, VisitSuccess) {
   DenseEdgeImpl<double, OpVertex<double>> edge_double(0, &vtx_in_double,
                                                       &vtx_out_double);
 
-  vtx_in_float.mutable_activation()->setConstant(1.5f);
-  vtx_in_double.mutable_activation()->setConstant(1.5);
-  MatrixX<float> act_in_float = *vtx_in_float.mutable_activation();
-  MatrixX<double> act_in_double = *vtx_in_double.mutable_activation();
+  vtx_in_float.mutable_act().setConstant(1.5f);
+  vtx_in_double.mutable_act().setConstant(1.5);
+  const MatrixX<float> act_in_float = vtx_in_float.mutable_act();
+  const MatrixX<double> act_in_double = vtx_in_double.mutable_act();
 
-  vtx_out_float.mutable_delta()->setConstant(1.0f);
-  vtx_out_double.mutable_delta()->setConstant(1.0);
-  MatrixX<float> delta_out_float = *vtx_out_float.mutable_delta();
-  MatrixX<double> delta_out_double = *vtx_out_double.mutable_delta();
+  vtx_out_float.mutable_delta().setConstant(1.0f);
+  vtx_out_double.mutable_delta().setConstant(1.0);
+  const MatrixX<float> delta_out_float = vtx_out_float.mutable_delta();
+  const MatrixX<double> delta_out_double = vtx_out_double.mutable_delta();
 
-  edge_float.mutable_weight()->setConstant(2.0f);
-  edge_double.mutable_weight()->setConstant(2.0);
-  MatrixX<float> weight_float = *edge_float.mutable_weight();
-  MatrixX<double> weight_double = *edge_double.mutable_weight();
+  edge_float.mutable_weight().setConstant(2.0f);
+  edge_double.mutable_weight().setConstant(2.0);
+  const MatrixX<float> weight_float = edge_float.mutable_weight();
+  const MatrixX<double> weight_double = edge_double.mutable_weight();
 
   BackwardVisitor<float> visitor_float;
   BackwardVisitor<double> visitor_double;
   edge_float.Accept(visitor_float);
   edge_double.Accept(visitor_double);
 
-  EXPECT_EQ(*vtx_in_float.mutable_delta(),
+  EXPECT_EQ(vtx_in_float.mutable_delta(),
             ((weight_float * delta_out_float).array() *
              (act_in_float.array() * (1.0f - act_in_float.array())))
                 .matrix());
-  EXPECT_EQ(*vtx_in_double.mutable_delta(),
+  EXPECT_EQ(vtx_in_double.mutable_delta(),
             ((weight_double * delta_out_double).array() *
              (act_in_double.array() * (1.0 - act_in_double.array())))
                 .matrix());

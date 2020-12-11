@@ -14,7 +14,7 @@ Contributor(s):
 ==============================================================================*/
 #include "src/edge/vertex/input_vertex_impl.h"
 
-#include "glog/logging.h"
+#include "src/logging.h"
 
 namespace intellgraph {
 
@@ -50,10 +50,10 @@ int InputVertexImpl<T, Transformer>::col() const {
 }
 
 template <typename T, class Transformer>
-const Eigen::Block<const MatrixX<T>>
-InputVertexImpl<T, Transformer>::activation() const {
+const Eigen::Map<const MatrixX<T>> &
+InputVertexImpl<T, Transformer>::act() const {
   DCHECK(feature_);
-  return feature_->block(0, 0, row_, col_);
+  return feature_map_;
 }
 
 template <typename T, class Transformer>
@@ -66,6 +66,8 @@ void InputVertexImpl<T, Transformer>::set_feature(const MatrixX<T> *feature) {
     col_ = feature->cols();
   }
   feature_ = feature;
+  new (&feature_map_)
+      Eigen::Map<const MatrixX<T>>(feature_->data(), row_, col_);
 }
 
 // Explicitly instantiation

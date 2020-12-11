@@ -27,14 +27,9 @@ OpVertexImpl<T, Algorithm>::OpVertexImpl(int id, int row, int col)
   DCHECK_GT(row_, 0);
   DCHECK_GT(col_, 0);
 
-  activation_ = std::make_unique<MatrixX<T>>(row_, col_);
-  delta_ = std::make_unique<MatrixX<T>>(row_, col_);
-  bias_ = std::make_unique<VectorX<T>>(row_);
-
-  // Zero initialization
-  activation_->setZero();
-  delta_->setZero();
-  bias_->setZero();
+  act_ = DynMatrix<T>(row_, col_);
+  delta_ = DynMatrix<T>(row_, col_);
+  bias_ = DynMatrix<T>(row_, 1);
 }
 
 template <typename T, class Algorithm>
@@ -62,16 +57,8 @@ void OpVertexImpl<T, Algorithm>::ResizeVertex(int length) {
   DCHECK(length != col_);
 
   col_ = length;
-  if (length > activation_->cols()) {
-    LOG(INFO) << "OpVertexImpl " << id_
-              << " activation column is expanded from " << activation_->cols()
-              << " to " << length;
-    activation_ = std::make_unique<MatrixX<T>>(row_, length);
-    delta_ = std::make_unique<MatrixX<T>>(row_, length);
-    // Zero initialization
-    activation_->setZero();
-    delta_->setZero();
-  }
+  act_.Resize(row_, col_);
+  delta_.Resize(row_, col_);
 }
 
 template <typename T, class Algorithm>
@@ -90,26 +77,23 @@ int OpVertexImpl<T, Algorithm>::col() const {
 }
 
 template <typename T, class Algorithm>
-const Eigen::Block<const MatrixX<T>>
-OpVertexImpl<T, Algorithm>::activation() const {
-  const MatrixX<T> *act_ptr =
-      static_cast<const MatrixX<T> *>(activation_.get());
-  return act_ptr->block(0, 0, row_, col_);
+const Eigen::Map<const MatrixX<T>> &OpVertexImpl<T, Algorithm>::act() const {
+  return act_.map();
 }
 
 template <typename T, class Algorithm>
-MatrixX<T> *OpVertexImpl<T, Algorithm>::mutable_activation() {
-  return activation_.get();
+Eigen::Map<MatrixX<T>> OpVertexImpl<T, Algorithm>::mutable_act() {
+  return act_.mutable_map();
 }
 
 template <typename T, class Algorithm>
-MatrixX<T> *OpVertexImpl<T, Algorithm>::mutable_delta() {
-  return delta_.get();
+Eigen::Map<MatrixX<T>> OpVertexImpl<T, Algorithm>::mutable_delta() {
+  return delta_.mutable_map();
 }
 
 template <typename T, class Algorithm>
-VectorX<T> *OpVertexImpl<T, Algorithm>::mutable_bias() {
-  return bias_.get();
+Eigen::Map<MatrixX<T>> OpVertexImpl<T, Algorithm>::mutable_bias() {
+  return bias_.mutable_map();
 }
 
 // Explicit instantiation

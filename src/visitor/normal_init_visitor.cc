@@ -34,11 +34,10 @@ void NormalInitVisitor<T>::Visit(
             << "OpVertex " << edge.vertex_out()->id()
             << " are initialized with the Normal Distribution function";
 
-  MatrixX<T> *const weight = edge.mutable_weight();
-  VectorX<T> *const bias_out = edge.vertex_out()->mutable_bias();
+  Eigen::Map<MatrixX<T>> weight = edge.mutable_weight();
 
-  weight->array() = weight->array().unaryExpr(std::function<T(T)>(
-      NormalFunctor<T>(0.0, std::sqrt(2.0 / weight->cols()))));
+  weight.array() = weight.array().unaryExpr(std::function<T(T)>(
+      NormalFunctor<T>(0.0, std::sqrt(2.0 / weight.cols()))));
 }
 
 // Explicit instantiation

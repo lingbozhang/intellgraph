@@ -31,21 +31,18 @@ void BackwardVisitor<T>::Visit(
   OpVertex<T> *vtx_in = edge.vertex_in();
   OpVertex<T> *vtx_out = edge.vertex_out();
 
-  const MatrixX<T> &activation_in = vtx_in->activation();
-  MatrixX<T> *const delta_in = vtx_in->mutable_delta();
-  MatrixX<T> *const delta_out = vtx_out->mutable_delta();
+  const Eigen::Map<const MatrixX<T>> &act_in = vtx_in->act();
+  const Eigen::Map<const MatrixX<T>> &weight = edge.weight();
 
-  const MatrixX<T> &weight = edge.weight();
+  Eigen::Map<MatrixX<T>> delta_in = vtx_in->mutable_delta();
+  Eigen::Map<MatrixX<T>> delta_out = vtx_out->mutable_delta();
 
   // Calculates |delta_in|:
   // $\delta^l= \mathcal{D}[f^\prime(z^l)]W^{l+1}\delta^{l+1}$
-  int batch_size = vtx_in->col();
-  if (delta_in) {
-    // Delta matrix data are updated rather than overwritten
+  // Delta matrix data are updated rather than overwritten
+  if (delta_in.data()) {
     vtx_in->Derive();
-    delta_in->leftCols(batch_size).array() +=
-        (weight * delta_out->leftCols(batch_size)).array() *
-        activation_in.leftCols(batch_size).array();
+    delta_in.array() += (weight * delta_out).array() * act_in.array();
   }
 }
 

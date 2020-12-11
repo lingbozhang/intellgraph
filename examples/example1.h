@@ -26,7 +26,6 @@ Contributor(s):
 #include "include/intellgraph/proto/vertex_parameter.pb.h"
 #include "include/intellgraph/registry.h"
 #include "include/intellgraph/solver/sgd_solver.h"
-#include "src/solver/momentum.h"
 #include <google/protobuf/text_format.h>
 
 namespace intellgraph {

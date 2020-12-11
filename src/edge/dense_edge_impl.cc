@@ -18,6 +18,7 @@ Contributor(s):
 #include <math.h>
 
 #include "glog/logging.h"
+#include "src/tensor/dyn_matrix.h"
 #include "src/utility/random.h"
 
 namespace intellgraph {
@@ -34,11 +35,10 @@ DenseEdgeImpl<T, VertexIn, VertexOut>::DenseEdgeImpl(int id, VertexIn *vtx_in,
   DCHECK(vtx_out_);
   DCHECK_EQ(vtx_in_->col(), vtx_out_->col());
 
-  weight_ = std::make_unique<MatrixX<T>>(row_, col_);
-
+  weight_ = DynMatrix<T>(row_, col_);
   // Initialization
-  weight_->array() = weight_->array().unaryExpr(std::function<T(T)>(
-      NormalFunctor<T>(0.0, std::sqrt(2.0 / weight_->cols()))));
+  weight_.mutable_map().array() = weight_.mutable_map().array().unaryExpr(
+      std::function<T(T)>(NormalFunctor<T>(0.0, std::sqrt(2.0 / col_))));
 }
 
 template <typename T, class VertexIn, class VertexOut>
@@ -60,44 +60,44 @@ int DenseEdgeImpl<T, VertexIn, VertexOut>::col() const {
 }
 
 template <typename T, class VertexIn, class VertexOut>
-const MatrixX<T> &DenseEdgeImpl<T, VertexIn, VertexOut>::weight() {
-  return *weight_;
+const Eigen::Map<const MatrixX<T>> &
+DenseEdgeImpl<T, VertexIn, VertexOut>::weight() {
+  return weight_.map();
 };
 
 template <typename T, class VertexIn, class VertexOut>
-MatrixX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_weight() {
-  return weight_.get();
+Eigen::Map<MatrixX<T>> DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_weight() {
+  return weight_.mutable_map();
 };
 
 template <typename T, class VertexIn, class VertexOut>
-VectorX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_bias() {
+Eigen::Map<MatrixX<T>> DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_bias() {
   return vtx_out_->mutable_bias();
 };
 
 template <typename T, class VertexIn, class VertexOut>
-Eigen::Block<MatrixX<T>> DenseEdgeImpl<T, VertexIn, VertexOut>::delta() {
-  return vtx_out_->mutable_delta()->block(0, 0, vtx_out_->row(),
-                                          vtx_out_->col());
+Eigen::Map<MatrixX<T>> DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_moment() {
+  // Lazy initialization
+  if (!moment_.data()) {
+    moment_ = DynMatrix<T>(row_, col_);
+  }
+  return moment_.mutable_map();
 }
 
 template <typename T, class VertexIn, class VertexOut>
-MatrixX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_moment() {
+Eigen::Map<MatrixX<T>>
+DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_moment_delta() {
   // Lazy initialization
-  if (!moment_) {
-    moment_ = std::make_unique<MatrixX<T>>(row_, col_);
-    moment_->setConstant(0);
+  if (!moment_delta_.data()) {
+    moment_delta_ = DynMatrix<T>(vtx_out_->row(), vtx_out_->col());
   }
-  return moment_.get();
-}
-
-template <typename T, class VertexIn, class VertexOut>
-VectorX<T> *DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_moment_delta() {
-  // Lazy initialization
-  if (!moment_delta_) {
-    moment_delta_ = std::make_unique<VectorX<T>>(col_);
-    moment_delta_->setConstant(0);
+  // Resizes the |moment_delta_| if dimensions mismatch with the corresponding
+  // delta matrix
+  if (moment_delta_.row() != vtx_out_->row() ||
+      moment_delta_.col() != vtx_out_->col()) {
+    moment_delta_.Resize(vtx_out_->row(), vtx_out_->col());
   }
-  return moment_delta_.get();
+  return moment_delta_.mutable_map();
 }
 
 template <typename T, class VertexIn, class VertexOut>
@@ -115,9 +115,12 @@ const MatrixX<T> DenseEdgeImpl<T, VertexIn, VertexOut>::CalcNablaWeight() {
   // Calculates |nabla_weight|:
   // $\frac{\partial loss}{\partial W^l}=a^{l-1}(\delta^{l})^T$
   int batch_size = vtx_in_->col();
-  return (vtx_in_->activation().leftCols(batch_size) *
-          vtx_out_->mutable_delta()->leftCols(batch_size).transpose()) /
-         batch_size;
+  return (vtx_in_->act() * vtx_out_->mutable_delta().transpose()) / batch_size;
+}
+
+template <typename T, class VertexIn, class VertexOut>
+const Eigen::Map<MatrixX<T>> DenseEdgeImpl<T, VertexIn, VertexOut>::delta() {
+  return vtx_out_->mutable_delta();
 }
 
 // Explicitly instantiation

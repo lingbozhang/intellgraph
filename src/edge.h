@@ -36,14 +36,14 @@ public:
   virtual int id() const = 0;
   virtual int row() const = 0;
   virtual int col() const = 0;
-  virtual const MatrixX<T> &weight() = 0;
-  virtual MatrixX<T> *mutable_weight() = 0;
-  virtual VectorX<T> *mutable_bias() = 0;
-  virtual Eigen::Block<MatrixX<T>> delta() = 0;
-  virtual MatrixX<T> *mutable_moment() = 0;
-  virtual VectorX<T> *mutable_moment_delta() = 0;
+  virtual const Eigen::Map<const MatrixX<T>> &weight() = 0;
+  virtual Eigen::Map<MatrixX<T>> mutable_weight() = 0;
+  virtual Eigen::Map<MatrixX<T>> mutable_bias() = 0;
+  virtual Eigen::Map<MatrixX<T>> mutable_moment() = 0;
+  virtual Eigen::Map<MatrixX<T>> mutable_moment_delta() = 0;
 
   virtual const MatrixX<T> CalcNablaWeight() = 0;
+  virtual const Eigen::Map<MatrixX<T>> delta() = 0;
 };
 
 } // namespace intellgraph
