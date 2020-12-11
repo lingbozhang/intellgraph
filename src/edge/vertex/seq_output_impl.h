@@ -27,8 +27,8 @@ class SeqOutputImpl : public Algorithm, public SeqOutput<T> {
 public:
   typedef T value_type;
 
-  SeqOutputImpl(int id, int row, int col);
-  SeqOutputImpl(const VertexParameter &vtx_param, int batch_size);
+  explicit SeqOutputImpl(int id, int row, int col);
+  explicit SeqOutputImpl(const VertexParameter &vtx_param, int batch_size);
   ~SeqOutputImpl() override;
 
   void Activate() override;

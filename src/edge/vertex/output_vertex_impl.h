@@ -26,8 +26,8 @@ class OutputVertexImpl : public Algorithm, public OutputVertex<T> {
 public:
   typedef T value_type;
 
-  OutputVertexImpl(int id, int row, int col);
-  OutputVertexImpl(const VertexParameter &vtx_param, int batch_size);
+  explicit OutputVertexImpl(int id, int row, int col);
+  explicit OutputVertexImpl(const VertexParameter &vtx_param, int batch_size);
   ~OutputVertexImpl() override;
 
   void Activate() override;
