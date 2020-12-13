@@ -4,10 +4,12 @@ cc_library(
   STATIC
   NAME "solver"
   HDRS
+    "adadelta.h"
     "adagrad.h"
     "momentum.h"
     "sgd_solver.h"
   SRCS
+    "adadelta.cc"
     "adagrad.cc"
     "momentum.cc"
     "sgd_solver.cc"
@@ -21,6 +23,7 @@ cc_library(
 # Installs IntellGraph include headers
 install(
   FILES 
+    adadelta.h
     adagrad.h
     momentum.h
     sgd_solver.h 

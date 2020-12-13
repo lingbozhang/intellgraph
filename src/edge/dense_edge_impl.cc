@@ -77,30 +77,36 @@ Eigen::Map<MatrixX<T>> DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_bias() {
 
 template <typename T, class VertexIn, class VertexOut>
 Eigen::Map<MatrixX<T>>
-DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_weight_store_1() {
-  // Lazy initialization
-  if (!weight_store_1_.data()) {
-    weight_store_1_ = DynMatrix<T>(row_, col_);
+DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_weight_stores(int index) {
+  DCHECK_GE(index, 0);
+  DCHECK_LE(index, weight_stores_.size());
+
+  if (index == weight_stores_.size()) {
+    // Lazy initialization
+    weight_stores_.emplace_back(row_, col_);
   }
-  return weight_store_1_.mutable_map();
+  return weight_stores_[index].mutable_map();
 }
 
 template <typename T, class VertexIn, class VertexOut>
 Eigen::Map<MatrixX<T>>
-DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_bias_store_1() {
-  // Lazy initialization
-  if (!bias_store_1_.data()) {
-    bias_store_1_ = DynMatrix<T>(vtx_out_->mutable_bias().rows(),
-                                 vtx_out_->mutable_bias().cols());
+DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_bias_stores(int index) {
+  DCHECK_GE(index, 0);
+  DCHECK_LE(index, bias_stores_.size());
+
+  if (index == bias_stores_.size()) {
+    // Lazy initialization
+    bias_stores_.emplace_back(vtx_out_->mutable_bias().rows(),
+                              vtx_out_->mutable_bias().cols());
   }
   // Resizes the |moment_bias_| if dimensions mismatch with the corresponding
   // delta matrix
-  if (bias_store_1_.row() != vtx_out_->mutable_bias().rows() ||
-      bias_store_1_.col() != vtx_out_->mutable_bias().cols()) {
-    bias_store_1_.Resize(vtx_out_->mutable_bias().rows(),
-                         vtx_out_->mutable_bias().cols());
+  if (bias_stores_[index].row() != vtx_out_->mutable_bias().rows() ||
+      bias_stores_[index].col() != vtx_out_->mutable_bias().cols()) {
+    bias_stores_[index].Resize(vtx_out_->mutable_bias().rows(),
+                               vtx_out_->mutable_bias().cols());
   }
-  return bias_store_1_.mutable_map();
+  return bias_stores_[index].mutable_map();
 }
 
 template <typename T, class VertexIn, class VertexOut>

@@ -39,8 +39,8 @@ public:
   virtual const Eigen::Map<const MatrixX<T>> &weight() = 0;
   virtual Eigen::Map<MatrixX<T>> mutable_weight() = 0;
   virtual Eigen::Map<MatrixX<T>> mutable_bias() = 0;
-  virtual Eigen::Map<MatrixX<T>> mutable_weight_store_1() = 0;
-  virtual Eigen::Map<MatrixX<T>> mutable_bias_store_1() = 0;
+  virtual Eigen::Map<MatrixX<T>> mutable_weight_stores(int index) = 0;
+  virtual Eigen::Map<MatrixX<T>> mutable_bias_stores(int index) = 0;
 
   virtual const MatrixX<T> CalcNablaWeight() = 0;
   virtual const MatrixX<T> CalcNablaBias() = 0;

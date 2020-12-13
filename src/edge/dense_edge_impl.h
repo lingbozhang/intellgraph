@@ -16,6 +16,7 @@ Contributor(s):
 #define INTELLGRAPH_SRC_EDGE_DENSE_EDGE_IMPL_H_
 
 #include <memory>
+#include <vector>
 
 #include "src/edge.h"
 #include "src/edge/op_vertex.h"
@@ -42,8 +43,8 @@ public:
   const Eigen::Map<const MatrixX<T>> &weight() override;
   Eigen::Map<MatrixX<T>> mutable_weight() override;
   Eigen::Map<MatrixX<T>> mutable_bias() override;
-  Eigen::Map<MatrixX<T>> mutable_weight_store_1() override;
-  Eigen::Map<MatrixX<T>> mutable_bias_store_1() override;
+  Eigen::Map<MatrixX<T>> mutable_weight_stores(int index) override;
+  Eigen::Map<MatrixX<T>> mutable_bias_stores(int index) override;
 
   const MatrixX<T> CalcNablaWeight() override;
   const MatrixX<T> CalcNablaBias() override;
@@ -60,8 +61,8 @@ private:
   VertexOut *const vtx_out_;
 
   DynMatrix<T> weight_;
-  DynMatrix<T> weight_store_1_;
-  DynMatrix<T> bias_store_1_;
+  std::vector<DynMatrix<T>> weight_stores_;
+  std::vector<DynMatrix<T>> bias_stores_;
 };
 
 // Tells compiler not to instantiate the template in translation units that

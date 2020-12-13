@@ -19,9 +19,11 @@ Contributor(s):
 namespace intellgraph {
 
 template <typename T>
-Adagrad<T>::Adagrad(T eta, T lambda) : eta_(eta), lambda_(lambda) {
+Adagrad<T>::Adagrad(T eta, T lambda, T epsilon)
+    : eta_(eta), lambda_(lambda), epsilon_(epsilon) {
   DCHECK_GT(eta_, 0);
   DCHECK_GE(lambda_, 0);
+  DCHECK_GT(epsilon, 0);
 }
 
 template <typename T> Adagrad<T>::~Adagrad() = default;
@@ -35,20 +37,18 @@ template <typename T> void Adagrad<T>::Visit(Edge<T> &edge) {
   const MatrixX<T> nabla_weight = edge.CalcNablaWeight();
   const MatrixX<T> nabla_bias = edge.CalcNablaBias();
 
-  Eigen::Map<MatrixX<T>> g = edge.mutable_weight_store_1();
-  Eigen::Map<MatrixX<T>> g_bias = edge.mutable_bias_store_1();
+  Eigen::Map<MatrixX<T>> g = edge.mutable_weight_stores(0);
+  Eigen::Map<MatrixX<T>> g_bias = edge.mutable_bias_stores(0);
 
-  // Updates the Moment
   g.array() += (nabla_weight.array() + lambda_ * weight.array()).square();
   g_bias.array() += nabla_bias.array().square();
 
-  // Type epsilon is added inside the log function to avoid overflow
-  T epsilon = std::numeric_limits<T>::epsilon();
   // Updates |weight| matrix
-  weight.array() -= eta_ * nabla_weight.array() / (g.array() + epsilon).sqrt();
+  weight.array() -= eta_ * nabla_weight.array() / (g.array() + epsilon_).sqrt();
 
   // Updates |bias| vector
-  bias.array() -= eta_ * nabla_bias.array() / (g_bias.array() + epsilon).sqrt();
+  bias.array() -=
+      eta_ * nabla_bias.array() / (g_bias.array() + epsilon_).sqrt();
 }
 
 // Explicit instantiation
