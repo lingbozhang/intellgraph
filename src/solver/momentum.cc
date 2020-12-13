@@ -20,11 +20,10 @@ Contributor(s):
 namespace intellgraph{
 
 template <typename T>
-Momentum<T>::Momentum(T eta, T gama, T lambda)
-    : eta_(eta), gama_(gama), lambda_(lambda) {
+Momentum<T>::Momentum(T eta, T gamma, T lambda)
+    : eta_(eta), gamma_(gamma), lambda_(lambda) {
   DCHECK_GT(eta_, 0.0);
-  DCHECK_GE(gama_, 0);
-  DCHECK_LT(gama_, 1);
+  DCHECK(gamma_ > 0 && gamma_ < 1);
   DCHECK_GE(lambda_, 0.0);
 }
 
@@ -36,23 +35,22 @@ template <typename T> void Momentum<T>::Visit(Edge<T> &edge) {
   Eigen::Map<MatrixX<T>> bias = edge.mutable_bias();
   Eigen::Map<MatrixX<T>> weight = edge.mutable_weight();
 
-  const MatrixX<T> nabla_weight = edge.CalcNablaWeight();
+  MatrixX<T> nabla_weight;
+  nabla_weight.noalias() = edge.CalcNablaWeight() + lambda_ * weight;
   const MatrixX<T> nabla_bias = edge.CalcNablaBias();
 
-  Eigen::Map<MatrixX<T>> weight_moment = edge.mutable_weight_stores(0);
-  Eigen::Map<MatrixX<T>> bias_moment = edge.mutable_bias_stores(0);
+  Eigen::Map<MatrixX<T>> weight_update = edge.mutable_weight_stores(0);
+  Eigen::Map<MatrixX<T>> bias_update = edge.mutable_bias_stores(0);
 
   // Updates the Moment
-  weight_moment.array() =
-      gama_ * weight_moment.array() +
-      eta_ * (nabla_weight.array() + lambda_ * weight.array());
-  bias_moment.array() = gama_ * bias_moment.array() + eta_ * nabla_bias.array();
+  weight_update.noalias() = gamma_ * weight_update + eta_ * nabla_weight;
+  bias_update.noalias() = gamma_ * bias_update + eta_ * nabla_bias;
 
   // Updates |weight| matrix
-  weight.noalias() -= weight_moment;
+  weight.noalias() -= weight_update;
 
   // Updates |bias| vector
-  bias.noalias() -= bias_moment;
+  bias.noalias() -= bias_update;
 }
 
 // Explicitly instantiation

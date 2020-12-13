@@ -24,7 +24,6 @@ namespace intellgraph {
 template <typename T> class Adagrad : public Solver<T> {
 public:
   explicit Adagrad(T eta, T lambda, T epsilon = 1e-8);
-  explicit Adagrad(const SolverConfig &config);
   ~Adagrad() override;
 
   void Visit(Edge<T> &edge) override;

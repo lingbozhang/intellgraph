@@ -2,7 +2,6 @@ cc_library(
   STATIC
   NAME "utility"
   HDRS
-    "util.h"
     "random.h"
   SRCS
     "random.cc"
@@ -11,8 +10,9 @@ cc_library(
 # Installs IntellGraph include headers
 install(
   FILES 
-    util.h
+    ipow.h
     random.h
+    util.h
   DESTINATION 
     ${INTELLGRAPH_INCLUDE_DIR}/intellgraph
 ) 
