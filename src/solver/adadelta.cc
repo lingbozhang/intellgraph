@@ -21,8 +21,7 @@ namespace intellgraph {
 template <typename T>
 Adadelta<T>::Adadelta(T gamma, T lambda, T epsilon)
     : gamma_(gamma), lambda_(lambda), epsilon_(epsilon) {
-  DCHECK_GT(gamma_, 0);
-  DCHECK_GT(gamma_, 1);
+  DCHECK(gamma_ > 0 && gamma_ < 1);
   DCHECK_GE(lambda_, 0);
   DCHECK_GT(epsilon_, 0);
 }
@@ -30,25 +29,24 @@ Adadelta<T>::Adadelta(T gamma, T lambda, T epsilon)
 template <typename T> Adadelta<T>::~Adadelta() = default;
 
 template <typename T> void Adadelta<T>::Visit(Edge<T> &edge) {
-  LOG(INFO) << "Edge " << edge.id() << " is updated with the Adagrad.";
+  LOG(INFO) << "Edge " << edge.id() << " is updated with the Adadetla.";
 
   Eigen::Map<MatrixX<T>> bias = edge.mutable_bias();
   Eigen::Map<MatrixX<T>> weight = edge.mutable_weight();
 
-  const MatrixX<T> nabla_weight = edge.CalcNablaWeight();
+  MatrixX<T> nabla_weight;
+  nabla_weight.noalias() = edge.CalcNablaWeight() + lambda_ * weight;
   const MatrixX<T> nabla_bias = edge.CalcNablaBias();
 
   Eigen::Map<MatrixX<T>> g_mean = edge.mutable_weight_stores(0);
+  Eigen::Map<MatrixX<T>> g_bias_mean = edge.mutable_bias_stores(0);
   Eigen::Map<MatrixX<T>> weight_update_square_mean =
       edge.mutable_weight_stores(1);
-  Eigen::Map<MatrixX<T>> g_bias_mean = edge.mutable_bias_stores(0);
   Eigen::Map<MatrixX<T>> bias_update_square_mean = edge.mutable_bias_stores(1);
 
   // Updates |g_mean| and |g_bias_mean|
   g_mean.array() =
-      gamma_ * g_mean.array() +
-      (1.0 - gamma_) *
-          (nabla_weight.array() + lambda_ * weight.array()).square();
+      gamma_ * g_mean.array() + (1.0 - gamma_) * nabla_weight.array().square();
   g_bias_mean.array() = gamma_ * g_bias_mean.array() +
                         (1.0 - gamma_) * nabla_bias.array().square();
 
@@ -78,4 +76,3 @@ template class Adadelta<float>;
 template class Adadelta<double>;
 
 } // namespace intellgraph
-

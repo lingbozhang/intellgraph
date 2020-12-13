@@ -12,8 +12,8 @@ limitations under the License.
 Contributor(s):
         Lingbo Zhang <lingboz2015@gmail.com>
 ==============================================================================*/
-#ifndef INTELLGRAPH_SRC_SOLVER_MOMENTUM_H_
-#define INTELLGRAPH_SRC_SOLVER_MOMENTUM_H_
+#ifndef INTELLGRAPH_SRC_SOLVER_ADAM_H_
+#define INTELLGRAPH_SRC_SOLVER_ADAM_H_
 
 #include "src/edge.h"
 #include "src/proto/graph_parameter.pb.h"
@@ -21,26 +21,28 @@ Contributor(s):
 
 namespace intellgraph {
 
-// Class that implements the Stochastic Gradient Descent algorithm with momentum
-template <typename T> class Momentum : public Solver<T> {
+template <typename T> class Adam : public Solver<T> {
 public:
-  explicit Momentum(T eta, T gamma = 0.9, T lambda = 0);
-  ~Momentum() override;
+  explicit Adam(T eta = 0.001, T lambda = 0.0, T beta1 = 0.9, T beta2 = 0.999,
+                T epsilon = 1e-8);
+  ~Adam() override;
 
   void Visit(Edge<T> &edge) override;
 
 private:
   T eta_ = 0;
-  T gamma_ = 0;
   T lambda_ = 0;
+  T beta1_ = 0;
+  T beta2_ = 0;
+  T epsilon_ = 0;
+  int iteration_count_ = 0;
 };
 
 // Tells compiler not to instantiate the template in translation units that
 // include this header file
-extern template class Momentum<float>;
-extern template class Momentum<double>;
+extern template class Adam<float>;
+extern template class Adam<double>;
 
 } // namespace intellgraph
 
-#endif // INTELLGRAPH_SRC_SOLVER_MOMENTUM_H_
-
+#endif // INTELLGRAPH_SRC_SOLVER_ADAM_H_

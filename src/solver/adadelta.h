@@ -24,7 +24,6 @@ namespace intellgraph {
 template <typename T> class Adadelta : public Solver<T> {
 public:
   explicit Adadelta(T gamma, T lambda, T epsilon = 1e-8);
-  explicit Adadelta(const SolverConfig &config);
   ~Adadelta() override;
 
   void Visit(Edge<T> &edge) override;

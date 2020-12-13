@@ -34,13 +34,14 @@ template <typename T> void Adagrad<T>::Visit(Edge<T> &edge) {
   Eigen::Map<MatrixX<T>> bias = edge.mutable_bias();
   Eigen::Map<MatrixX<T>> weight = edge.mutable_weight();
 
-  const MatrixX<T> nabla_weight = edge.CalcNablaWeight();
+  MatrixX<T> nabla_weight;
+  nabla_weight.noalias() = edge.CalcNablaWeight() + lambda_ * weight;
   const MatrixX<T> nabla_bias = edge.CalcNablaBias();
 
   Eigen::Map<MatrixX<T>> g = edge.mutable_weight_stores(0);
   Eigen::Map<MatrixX<T>> g_bias = edge.mutable_bias_stores(0);
 
-  g.array() += (nabla_weight.array() + lambda_ * weight.array()).square();
+  g.array() += nabla_weight.array().square();
   g_bias.array() += nabla_bias.array().square();
 
   // Updates |weight| matrix
