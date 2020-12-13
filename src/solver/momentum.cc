@@ -39,8 +39,8 @@ template <typename T> void Momentum<T>::Visit(Edge<T> &edge) {
   const MatrixX<T> nabla_weight = edge.CalcNablaWeight();
   const MatrixX<T> nabla_bias = edge.CalcNablaBias();
 
-  Eigen::Map<MatrixX<T>> weight_moment = edge.mutable_weight_store_1();
-  Eigen::Map<MatrixX<T>> bias_moment = edge.mutable_bias_store_1();
+  Eigen::Map<MatrixX<T>> weight_moment = edge.mutable_weight_stores(0);
+  Eigen::Map<MatrixX<T>> bias_moment = edge.mutable_bias_stores(0);
 
   // Updates the Moment
   weight_moment.array() =
