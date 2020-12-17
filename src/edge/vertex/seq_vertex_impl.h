@@ -40,6 +40,7 @@ public:
   Eigen::Map<MatrixX<T>> mutable_act() override;
   Eigen::Map<MatrixX<T>> mutable_delta() override;
   Eigen::Map<MatrixX<T>> mutable_bias() override;
+  const MatrixX<T> CalcNablaBias() override;
 
   void ForwardByOneTimeStep() override;
   int GetCurrentTimeStep() const override;

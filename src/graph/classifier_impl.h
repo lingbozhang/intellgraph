@@ -20,9 +20,9 @@ Contributor(s):
 #include <set>
 
 #include "src/edge.h"
-#include "src/edge/input_vertex.h"
 #include "src/edge/op_vertex.h"
 #include "src/edge/output_vertex.h"
+#include "src/edge/vertex/input_vertex.h"
 #include "src/eigen.h"
 #include "src/graph.h"
 #include "src/proto/graph_parameter.pb.h"

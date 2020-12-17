@@ -17,7 +17,7 @@ Contributor(s):
 
 #include <memory>
 
-#include "src/edge/input_vertex.h"
+#include "src/edge/vertex/input_vertex.h"
 #include "src/eigen.h"
 #include "src/proto/vertex_parameter.pb.h"
 

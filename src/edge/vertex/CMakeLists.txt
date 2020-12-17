@@ -2,12 +2,14 @@ cc_library(
   STATIC
   NAME "vertex"
   HDRS
+    "input_vertex.h"
     "input_vertex_impl.h"
     "op_vertex_impl.h"
     "output_vertex_impl.h"
     "seq_output_impl.h"
     "seq_vertex_impl.h"
   SRCS
+    "input_vertex.cc"
     "input_vertex_impl.cc"
     "op_vertex_impl.cc"
     "output_vertex_impl.cc"

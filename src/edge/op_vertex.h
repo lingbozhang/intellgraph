@@ -31,6 +31,7 @@ public:
 
   virtual void Activate() = 0;
   virtual void Derive() = 0;
+
   // Resizes activation and delta matrices
   virtual void ResizeVertex(int length) = 0;
 
@@ -42,6 +43,7 @@ public:
   virtual Eigen::Map<MatrixX<T>> mutable_act() = 0;
   virtual Eigen::Map<MatrixX<T>> mutable_delta() = 0;
   virtual Eigen::Map<MatrixX<T>> mutable_bias() = 0;
+  virtual const MatrixX<T> CalcNablaBias() = 0;
 };
 
 } // namespace intellgraph

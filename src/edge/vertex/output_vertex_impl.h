@@ -42,6 +42,7 @@ public:
   Eigen::Map<MatrixX<T>> mutable_act() override;
   Eigen::Map<MatrixX<T>> mutable_delta() override;
   Eigen::Map<MatrixX<T>> mutable_bias() override;
+  const MatrixX<T> CalcNablaBias() override;
 
   T CalcLoss(const Eigen::Ref<const MatrixX<T>> &labels) override;
   void CalcDelta(const Eigen::Ref<const MatrixX<T>> &labels) override;

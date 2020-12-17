@@ -82,6 +82,12 @@ Eigen::Map<MatrixX<T>> SeqVertexImpl<T, Algorithm>::mutable_bias() {
 }
 
 template <typename T, class Algorithm>
+const MatrixX<T> SeqVertexImpl<T, Algorithm>::CalcNablaBias() {
+  Eigen::Map<MatrixX<T>> delta = op_vertex_.mutable_delta();
+  return delta.col(timestamp_);
+}
+
+template <typename T, class Algorithm>
 void SeqVertexImpl<T, Algorithm>::ForwardByOneTimeStep() {
   ++timestamp_;
 }
