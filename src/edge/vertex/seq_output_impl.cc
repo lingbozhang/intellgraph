@@ -25,8 +25,8 @@ SeqOutputImpl<T, Algorithm>::SeqOutputImpl(int id, int row, int col)
 
 template <typename T, class Algorithm>
 SeqOutputImpl<T, Algorithm>::SeqOutputImpl(const VertexParameter &vtx_param,
-                                           int length)
-    : output_vertex_(vtx_param, length) {}
+                                           int sequence_length)
+    : output_vertex_(vtx_param, sequence_length) {}
 
 template <typename T, class Algorithm>
 SeqOutputImpl<T, Algorithm>::~SeqOutputImpl() = default;
@@ -94,7 +94,7 @@ void SeqOutputImpl<T, Algorithm>::CalcDelta(
 }
 
 template <typename T, class Algorithm>
-void SeqOutputImpl<T, Algorithm>::ForwardTimeByOneStep() {
+void SeqOutputImpl<T, Algorithm>::ForwardByOneTimeStep() {
   ++timestamp_;
 }
 

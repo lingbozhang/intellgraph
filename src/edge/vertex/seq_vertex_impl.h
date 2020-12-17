@@ -25,7 +25,7 @@ template <typename T, class Algorithm>
 class SeqVertexImpl : public Algorithm, public SeqVertex<T> {
 public:
   explicit SeqVertexImpl(int id, int row, int col);
-  explicit SeqVertexImpl(const VertexParameter &vtx_param, int time_length);
+  explicit SeqVertexImpl(const VertexParameter &vtx_param, int sequence_length);
   ~SeqVertexImpl() override;
 
   void Activate() override;
@@ -41,7 +41,7 @@ public:
   Eigen::Map<MatrixX<T>> mutable_delta() override;
   Eigen::Map<MatrixX<T>> mutable_bias() override;
 
-  void ForwardTimeByOneStep() override;
+  void ForwardByOneTimeStep() override;
   int GetCurrentTimeStep() const override;
 
 private:

@@ -28,7 +28,7 @@ public:
   typedef T value_type;
 
   explicit SeqOutputImpl(int id, int row, int col);
-  explicit SeqOutputImpl(const VertexParameter &vtx_param, int batch_size);
+  explicit SeqOutputImpl(const VertexParameter &vtx_param, int sequence_length);
   ~SeqOutputImpl() override;
 
   void Activate() override;
@@ -47,7 +47,7 @@ public:
   T CalcLoss(const Eigen::Ref<const MatrixX<T>> &labels) override;
   void CalcDelta(const Eigen::Ref<const MatrixX<T>> &labels) override;
 
-  void ForwardTimeByOneStep() override;
+  void ForwardByOneTimeStep() override;
   int GetCurrentTimeStep() const override;
 
 private:

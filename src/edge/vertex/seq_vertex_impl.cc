@@ -25,8 +25,8 @@ SeqVertexImpl<T, Algorithm>::SeqVertexImpl(int id, int row, int col)
 
 template <typename T, class Algorithm>
 SeqVertexImpl<T, Algorithm>::SeqVertexImpl(const VertexParameter &vtx_param,
-                                           int time_length)
-    : op_vertex_(vtx_param, time_length) {}
+                                           int sequence_length)
+    : op_vertex_(vtx_param, sequence_length) {}
 
 template <typename T, class Algorithm>
 SeqVertexImpl<T, Algorithm>::~SeqVertexImpl() = default;
@@ -82,7 +82,7 @@ Eigen::Map<MatrixX<T>> SeqVertexImpl<T, Algorithm>::mutable_bias() {
 }
 
 template <typename T, class Algorithm>
-void SeqVertexImpl<T, Algorithm>::ForwardTimeByOneStep() {
+void SeqVertexImpl<T, Algorithm>::ForwardByOneTimeStep() {
   ++timestamp_;
 }
 

@@ -27,7 +27,7 @@ public:
   SeqVertex() = default;
   ~SeqVertex() override = default;
 
-  virtual void ForwardTimeByOneStep() = 0;
+  virtual void ForwardByOneTimeStep() = 0;
   virtual int GetCurrentTimeStep() const = 0;
 };
 

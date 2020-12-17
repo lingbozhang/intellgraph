@@ -81,5 +81,3 @@ template class AdaMax<float>;
 template class AdaMax<double>;
 
 } // namespace intellgraph
-
-
