@@ -82,6 +82,12 @@ Eigen::Map<MatrixX<T>> SeqOutputImpl<T, Algorithm>::mutable_bias() {
 }
 
 template <typename T, class Algorithm>
+const MatrixX<T> SeqOutputImpl<T, Algorithm>::CalcNablaBias() {
+  Eigen::Map<MatrixX<T>> delta = output_vertex_.mutable_delta();
+  return delta.col(timestamp_);
+}
+
+template <typename T, class Algorithm>
 T SeqOutputImpl<T, Algorithm>::CalcLoss(
     const Eigen::Ref<const MatrixX<T>> &labels) {
   return output_vertex_.CalcLoss(labels);

@@ -99,13 +99,6 @@ DenseEdgeImpl<T, VertexIn, VertexOut>::mutable_bias_stores(int index) {
     bias_stores_.emplace_back(vtx_out_->mutable_bias().rows(),
                               vtx_out_->mutable_bias().cols());
   }
-  // Resizes the |moment_bias_| if dimensions mismatch with the corresponding
-  // delta matrix
-  if (bias_stores_[index].row() != vtx_out_->mutable_bias().rows() ||
-      bias_stores_[index].col() != vtx_out_->mutable_bias().cols()) {
-    bias_stores_[index].Resize(vtx_out_->mutable_bias().rows(),
-                               vtx_out_->mutable_bias().cols());
-  }
   return bias_stores_[index].mutable_map();
 }
 
@@ -129,8 +122,7 @@ const MatrixX<T> DenseEdgeImpl<T, VertexIn, VertexOut>::CalcNablaWeight() {
 
 template <typename T, class VertexIn, class VertexOut>
 const MatrixX<T> DenseEdgeImpl<T, VertexIn, VertexOut>::CalcNablaBias() {
-  return vtx_out_->mutable_delta().rowwise().sum() /
-         vtx_out_->mutable_delta().cols();
+  return vtx_out_->CalcNablaBias();
 }
 
 // Explicitly instantiation

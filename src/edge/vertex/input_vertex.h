@@ -17,7 +17,6 @@ Contributor(s):
 
 #include "src/edge/op_vertex.h"
 #include "src/eigen.h"
-#include "src/logging.h"
 
 namespace intellgraph {
 
@@ -28,27 +27,25 @@ class InputVertex : public OpVertex<T> {
 public:
   typedef T value_type;
 
-  InputVertex() = default;
-  ~InputVertex() override = default;
+  InputVertex();
+  ~InputVertex() override;
 
   // Dummy implementations:
-  void Activate() override {}
-  void Derive() override {}
-  void ResizeVertex(int length) override {}
-  Eigen::Map<MatrixX<T>> mutable_act() override {
-    NOTREACHED();
-    return Eigen::Map<MatrixX<T>>(nullptr, -1, -1);
-  }
-  Eigen::Map<MatrixX<T>> mutable_delta() override {
-    return Eigen::Map<MatrixX<T>>(nullptr, -1, -1);
-  }
-  Eigen::Map<MatrixX<T>> mutable_bias() override {
-    NOTREACHED();
-    return Eigen::Map<MatrixX<T>>(nullptr, -1, -1);
-  }
+  void Activate() override;
+  void Derive() override;
+  void ResizeVertex(int length) override;
+  Eigen::Map<MatrixX<T>> mutable_act() override;
+  Eigen::Map<MatrixX<T>> mutable_delta() override;
+  Eigen::Map<MatrixX<T>> mutable_bias() override;
+  const MatrixX<T> CalcNablaBias() override;
 
   virtual void set_feature(const MatrixX<T> *feature) = 0;
 };
+
+// Tells compiler not to instantiate the template in translation units that
+// include this header file
+extern template class InputVertex<float>;
+extern template class InputVertex<double>;
 
 } // namespace intellgraph
 

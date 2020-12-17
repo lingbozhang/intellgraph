@@ -98,6 +98,11 @@ Eigen::Map<MatrixX<T>> OutputVertexImpl<T, Algorithm>::mutable_bias() {
 }
 
 template <typename T, class Algorithm>
+const MatrixX<T> OutputVertexImpl<T, Algorithm>::CalcNablaBias() {
+  return delta_.mutable_map().rowwise().sum() / col_;
+}
+
+template <typename T, class Algorithm>
 T OutputVertexImpl<T, Algorithm>::CalcLoss(
     const Eigen::Ref<const MatrixX<T>> &labels) {
   return Algorithm::CalcLoss(*this, labels);

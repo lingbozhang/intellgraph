@@ -96,6 +96,11 @@ Eigen::Map<MatrixX<T>> OpVertexImpl<T, Algorithm>::mutable_bias() {
   return bias_.mutable_map();
 }
 
+template <typename T, class Algorithm>
+const MatrixX<T> OpVertexImpl<T, Algorithm>::CalcNablaBias() {
+  return delta_.mutable_map().rowwise().sum() / col_;
+}
+
 // Explicit instantiation
 template class OpVertexImpl<float, Relu>;
 template class OpVertexImpl<double, Relu>;
